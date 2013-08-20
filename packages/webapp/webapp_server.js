@@ -396,6 +396,9 @@ var runWebAppServer = function () {
 
     var boilerplateHtmlPath = path.join(clientDir, clientJson.page);
     boilerplateHtml = fs.readFileSync(boilerplateHtmlPath, 'utf8');
+
+    // Include __meteor_runtime_config__ in the app html, as an inline script if
+    // it's not forbidden by CSP.
     if (typeof(SecurityHeaders) === "undefined" ||
         SecurityHeaders.inlineScriptsAllowed()) {
       boilerplateHtml = boilerplateHtml.replace(

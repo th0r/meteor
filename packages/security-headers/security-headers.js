@@ -34,7 +34,7 @@ var noneKeyword = "'none'";
 
 // By default, unsafe inline scripts and styles are allowed, since we expect
 // many apps will use them for analytics, etc. Unsafe eval is disallowed, and
-// the only allowable content source is the same origin or data;, except for
+// the only allowable content source is the same origin or data, except for
 // connect which allows anything (since meteor.com apps make websocket
 // connections to a lot of different origins).
 var defaultCspSrcs = {
@@ -134,7 +134,7 @@ if (Meteor.isServer) {
 
   // allow<Resource>Origin, allow<Resource>Data, allow<Resource>self, and
   // disallow<Resource> methods for each type of resource.
-  // XXX Should there also be disallow<Resource>Origin, disallow<ResourceData>,
+  // XXX Should there also be disallow<Resource>Origin, disallow<Resource>Data,
   // disallow<Resource>self?
   _.each(["script", "object", "img", "media",
           "frame", "font", "connect", "style"],
