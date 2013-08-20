@@ -1,6 +1,6 @@
 Package.describe({
   summary: "Adds Content Security Policy and X-Frame-Options headers to " +
-    "help prevent XSS and clicjacking attacks."
+    "help prevent XSS and clickjacking attacks."
 });
 
 Package.on_use(function (api) {
