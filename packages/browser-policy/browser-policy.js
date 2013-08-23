@@ -28,7 +28,7 @@
 // BrowserPolicy.allowFramingByAnyOrigin();
 
 // By default, only the same origin can frame the app.
-var xFrameOptions = "SAMEORIGIN";
+var xFrameOptions;
 
 // CSP keywords have to be single-quoted.
 var unsafeInline = "'unsafe-inline'";
@@ -36,20 +36,7 @@ var unsafeEval = "'unsafe-eval'";
 var selfKeyword = "'self'";
 var noneKeyword = "'none'";
 
-// By default, unsafe inline scripts and styles are allowed, since we expect
-// many apps will use them for analytics, etc. Unsafe eval is disallowed, and
-// the only allowable content source is the same origin or data, except for
-// connect which allows anything (since meteor.com apps make websocket
-// connections to a lot of different origins).
-var defaultCspSrcs = {
-  "default-src": [selfKeyword],
-  "script-src": [selfKeyword, unsafeInline],
-  "connect-src": ["*"],
-  "img-src": ["data:", selfKeyword],
-  "style-src": [selfKeyword, unsafeInline]
-};
-
-var cspSrcs = defaultCspSrcs;
+var cspSrcs;
 
 var constructCsp = function () {
   // XXX isn't there a nicer underscore way to do this?
@@ -88,96 +75,93 @@ var ensureDirective = function (directive) {
 WebApp.connectHandlers.use(function (req, res, next) {
   if (xFrameOptions)
     res.setHeader("X-Frame-Options", xFrameOptions);
-  res.setHeader("Content-Security-Policy", constructCsp());
+  if (cspSrcs)
+    res.setHeader("Content-Security-Policy", constructCsp());
   next();
 });
 
-if (Meteor.isServer) {
-  BrowserPolicy = {
-    allowFramingBySameOrigin: function () {
-      xFrameOptions = "SAMEORIGIN";
-    },
-    disallowFraming: function () {
-      xFrameOptions = "DENY";
-    },
-    allowFramingByOrigin: function (origin) {
-      xFrameOptions = "ALLOW-FROM " + origin;
-    },
-    allowFramingByAnyOrigin: function () {
-      xFrameOptions = null;
-    },
+BrowserPolicy = {
+  allowFramingBySameOrigin: function () {
+    xFrameOptions = "SAMEORIGIN";
+  },
+  disallowFraming: function () {
+    xFrameOptions = "DENY";
+  },
+  allowFramingByOrigin: function (origin) {
+    xFrameOptions = "ALLOW-FROM " + origin;
+  },
+  allowFramingByAnyOrigin: function () {
+    xFrameOptions = null;
+  },
 
-    setContentSecurityPolicy: function (csp) {
-      cspSrcs = parseCsp(csp);
-    },
+  setContentSecurityPolicy: function (csp) {
+    cspSrcs = parseCsp(csp);
+  },
 
-    // Helpers for creating content security policies
+  // Helpers for creating content security policies
 
-    // Used by webapp to determine whether we need an extra round trip for
-    // __meteor_runtime_config__.
-    inlineScriptsAllowed: function () {
-      ensureDirective("script-src");
-      return (_.indexOf(cspSrcs["script-src"], unsafeInline) !== -1);
-    },
+  // Used by webapp to determine whether we need an extra round trip for
+  // __meteor_runtime_config__.
+  inlineScriptsAllowed: function () {
+    ensureDirective("script-src");
+    return (_.indexOf(cspSrcs["script-src"], unsafeInline) !== -1);
+  },
 
-    allowInlineScripts: function () {
-      ensureDirective("script-src");
-      cspSrcs["script-src"].push(unsafeInline);
-    },
-    disallowInlineScripts: function () {
-      ensureDirective("script-src");
-      removeCspSrc("script-src", unsafeInline);
-    },
-    allowEval: function () {
-      ensureDirective("script-src");
-      cspSrcs["script-src"].push(unsafeEval);
-    },
-    disallowEval: function () {
-      ensureDirective("script-src");
-      removeCspSrc("script-src", unsafeEval);
-    },
-    allowInlineStyles: function () {
-      ensureDirective("style-src");
-      cspSrcs["style-src"].push(unsafeInline);
-    },
-    disallowInlineStyles: function () {
-      ensureDirective("style-src");
-      removeCspSrc("style-src", unsafeInline);
-    }
-  };
+  allowInlineScripts: function () {
+    ensureDirective("script-src");
+    cspSrcs["script-src"].push(unsafeInline);
+  },
+  disallowInlineScripts: function () {
+    ensureDirective("script-src");
+    removeCspSrc("script-src", unsafeInline);
+  },
+  allowEval: function () {
+    ensureDirective("script-src");
+    cspSrcs["script-src"].push(unsafeEval);
+  },
+  disallowEval: function () {
+    ensureDirective("script-src");
+    removeCspSrc("script-src", unsafeEval);
+  },
+  allowInlineStyles: function () {
+    ensureDirective("style-src");
+    cspSrcs["style-src"].push(unsafeInline);
+  },
+  disallowInlineStyles: function () {
+    ensureDirective("style-src");
+    removeCspSrc("style-src", unsafeInline);
+  }
+};
 
-  // allow<Resource>Origin, allow<Resource>Data, allow<Resource>self, and
-  // disallow<Resource> methods for each type of resource.
-  // XXX Should there also be disallow<Resource>Origin, disallow<Resource>Data,
-  // disallow<Resource>self?
-  _.each(["script", "object", "img", "media",
-          "frame", "font", "connect", "style"],
-         function (resource) {
-           var directive = resource + "-src";
-           var methodResource;
-           if (resource !== "img") {
-             methodResource = resource.charAt(0).toUpperCase() +
-               resource.slice(1);
-           } else {
-             methodResource = "Image";
-           }
-           var allowMethodName = "allow" + methodResource + "Origin";
-           var disallowMethodName = "disallow" + methodResource;
-           var allowDataMethodName = "allow" + methodResource + "DataUrl";
-           var allowSelfMethodName = "allow" + methodResource + "SameOrigin";
+// allow<Resource>Origin, allow<Resource>Data, allow<Resource>self, and
+// disallow<Resource> methods for each type of resource.
+// XXX Should there also be disallow<Resource>Origin, disallow<Resource>Data,
+// disallow<Resource>self?
+_.each(["script", "object", "img", "media",
+        "frame", "font", "connect", "style"],
+       function (resource) {
+         var directive = resource + "-src";
+         var methodResource;
+         if (resource !== "img") {
+           methodResource = resource.charAt(0).toUpperCase() +
+             resource.slice(1);
+         } else {
+           methodResource = "Image";
+         }
+         var allowMethodName = "allow" + methodResource + "Origin";
+         var disallowMethodName = "disallow" + methodResource;
+         var allowDataMethodName = "allow" + methodResource + "DataUrl";
+         var allowSelfMethodName = "allow" + methodResource + "SameOrigin";
 
-           BrowserPolicy[allowMethodName] = function (src) {
-             ensureDirective(directive);
-             cspSrcs[directive].push(src);
-           };
-           BrowserPolicy[disallowMethodName] = function () {
-             cspSrcs[directive] = [noneKeyword];
-           };
-           BrowserPolicy[allowDataMethodName] = function () {
-             ensureDirective(directive);
-             cspSrcs[directive].push("data:");
-           };
-         });
-} else if (Meteor.isClient) {
-  BrowserPolicy = {};
-}
+         BrowserPolicy[allowMethodName] = function (src) {
+           ensureDirective(directive);
+           cspSrcs[directive].push(src);
+         };
+         BrowserPolicy[disallowMethodName] = function () {
+           cspSrcs[directive] = [noneKeyword];
+         };
+         BrowserPolicy[allowDataMethodName] = function () {
+           ensureDirective(directive);
+           cspSrcs[directive].push("data:");
+         };
+       });

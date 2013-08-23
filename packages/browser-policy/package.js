@@ -1,5 +1,5 @@
 Package.describe({
-  summary: "Sets security policies enforced by the browser"
+  summary: "Configures security policies enforced by the browser"
 });
 
 Package.on_use(function (api) {
