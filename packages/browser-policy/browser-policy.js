@@ -8,7 +8,7 @@
 //
 // BrowserPolicy functions for tweaking CSP:
 // allowInlineScripts()
-// disallowInlineScripts()
+// disallowInlineScripts(): adds extra round-trip to page load time
 // allowInlineStyles)(
 // disallowInlineStyles()
 // allowEval() (allows string-to-code like eval, innerHTML, etc.)
@@ -39,7 +39,6 @@ var noneKeyword = "'none'";
 var cspSrcs;
 
 var constructCsp = function () {
-  // XXX isn't there a nicer underscore way to do this?
   _.each(_.keys(cspSrcs), function (directive) {
     if (_.isEmpty(cspSrcs[directive]))
       delete cspSrcs[directive];
@@ -53,10 +52,12 @@ var constructCsp = function () {
 };
 
 var parseCsp = function (csp) {
-  var srcs = csp.split("; ");
+  var policies = csp.split("; ");
   var result = {};
-  _.each(srcs, function (src) {
-    var srcs = srcs.split(" ");
+  _.each(policies, function (policy) {
+    if (policy[policy.length-1] === ";")
+      policy = policy.substring(0, policy.length - 1);
+    var srcs = policy.split(" ");
     var directive = srcs[0];
     result[directive] = srcs.slice(1);
   });

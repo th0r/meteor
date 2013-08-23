@@ -5,8 +5,9 @@ BrowserPolicy.allowFramingBySameOrigin();
 // the only allowable content source is the same origin or data, except for
 // connect which allows anything (since meteor.com apps make websocket
 // connections to a lot of different origins).
+
 BrowserPolicy.setContentSecurityPolicy("default-src 'self'; " +
                                        "script-src 'self' 'unsafe-inline'; " +
                                        "connect-src *; " +
                                        "img-src data: 'self'; " +
-                                       "style-src 'self' 'unsafe-inline'");
+                                       "style-src 'self' 'unsafe-inline';");
