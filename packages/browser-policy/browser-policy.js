@@ -3,10 +3,10 @@
 // 2.) No eval or other string-to-code, and content can only be loaded from the
 // same origin as the app.
 //
-// Apps should call SecurityHeaders.disallowInlineScripts() if they are not
+// Apps should call BrowserPolicy.disallowInlineScripts() if they are not
 // using any inline script tags.
 //
-// SecurityHeaders functions for tweaking CSP:
+// BrowserPolicy functions for tweaking CSP:
 // allowInlineScripts()
 // disallowInlineScripts()
 // allowInlineStyles)(
@@ -14,14 +14,18 @@
 // allowEval() (allows string-to-code like eval, innerHTML, etc.)
 // disallowEval()
 //
-// allowScriptSrc(origin): allows scripts to be loaded from the given origin
-// allowScriptData(): allows scripts to be loaded from data: URLs
+// allowScriptOrigin(origin): allows scripts to be loaded from the given origin
+// allowScriptDataUrl(): allows scripts to be loaded from data: URLs
+// allowScriptSameOrigin(): allows scripts to be loaded from the same origin
 // disallowScript(): disallows all scripts
 // and similar methods for object, img, media, frame, font, connect, style.
-
-// XXX It's a lot of functions. Maybe they should be of the form
-// allowSrc(resourceType, origin) so you'd call allowSrc("script", "*") instead
-// of allowScriptSrc("*").
+// XXX set default-src?
+//
+// For controlling which origins can frame this app,
+// BrowserPolicy.disallowFraming()
+// BrowserPolicy.allowFramingByOrigin(origin)
+// BrowserPolicy.allowFramingBySameOrigin()
+// BrowserPolicy.allowFramingByAnyOrigin();
 
 // By default, only the same origin can frame the app.
 var xFrameOptions = "SAMEORIGIN";
@@ -82,15 +86,25 @@ var ensureDirective = function (directive) {
 };
 
 WebApp.connectHandlers.use(function (req, res, next) {
-  res.setHeader("X-Frame-Options", xFrameOptions);
+  if (xFrameOptions)
+    res.setHeader("X-Frame-Options", xFrameOptions);
   res.setHeader("Content-Security-Policy", constructCsp());
   next();
 });
 
 if (Meteor.isServer) {
-  SecurityHeaders = {
-    setXFrameOptions: function (header) {
-      xFrameOptions = header;
+  BrowserPolicy = {
+    allowFramingBySameOrigin: function () {
+      xFrameOptions = "SAMEORIGIN";
+    },
+    disallowFraming: function () {
+      xFrameOptions = "DENY";
+    },
+    allowFramingByOrigin: function (origin) {
+      xFrameOptions = "ALLOW-FROM " + origin;
+    },
+    allowFramingByAnyOrigin: function () {
+      xFrameOptions = null;
     },
 
     setContentSecurityPolicy: function (csp) {
@@ -140,25 +154,30 @@ if (Meteor.isServer) {
           "frame", "font", "connect", "style"],
          function (resource) {
            var directive = resource + "-src";
-           var methodResource = resource.charAt(0).toUpperCase() +
-                 resource.slice(1);
+           var methodResource;
+           if (resource !== "img") {
+             methodResource = resource.charAt(0).toUpperCase() +
+               resource.slice(1);
+           } else {
+             methodResource = "Image";
+           }
            var allowMethodName = "allow" + methodResource + "Origin";
            var disallowMethodName = "disallow" + methodResource;
-           var allowDataMethodName = "allow" + methodResource + "Data";
-           var allowSelfMethodName = "allow" + methodResource + "Self";
+           var allowDataMethodName = "allow" + methodResource + "DataUrl";
+           var allowSelfMethodName = "allow" + methodResource + "SameOrigin";
 
-           SecurityHeaders[allowMethodName] = function (src) {
+           BrowserPolicy[allowMethodName] = function (src) {
              ensureDirective(directive);
              cspSrcs[directive].push(src);
            };
-           SecurityHeaders[disallowMethodName] = function () {
+           BrowserPolicy[disallowMethodName] = function () {
              cspSrcs[directive] = [noneKeyword];
            };
-           SecurityHeaders[allowDataMethodName] = function () {
+           BrowserPolicy[allowDataMethodName] = function () {
              ensureDirective(directive);
              cspSrcs[directive].push("data:");
            };
          });
 } else if (Meteor.isClient) {
-  SecurityHeaders = {};
+  BrowserPolicy = {};
 }
