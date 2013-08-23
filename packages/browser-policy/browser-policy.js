@@ -10,7 +10,7 @@
 // BrowserPolicy functions for tweaking CSP:
 // allowInlineScripts()
 // disallowInlineScripts(): adds extra round-trip to page load time
-// allowInlineStyles)(
+// allowInlineStyles()
 // disallowInlineStyles()
 // allowEval()
 // disallowEval()
