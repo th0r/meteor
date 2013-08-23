@@ -6,8 +6,6 @@
 
 ##RUNTIME_CONFIG##
 
-##RUNTIME_CONFIG_EXTERNAL##
-
 {{#each scripts}}  <script type="text/javascript" src="##ROOT_URL_PATH_PREFIX##{{this}}"></script>
 {{/each}}
 

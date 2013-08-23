@@ -229,9 +229,9 @@ var runWebAppServer = function () {
 
     // XXX This feels like a hack or like this is definitely not the right way
     // to do this...
-    if (typeof(SecurityHeaders) !== "undefined" &&
-        ! SecurityHeaders.inlineScriptsAllowed() &&
-        pathname === "/runtime_config.js") {
+    if (typeof(BrowserPolicy) !== "undefined" &&
+        ! BrowserPolicy.inlineScriptsAllowed() &&
+        pathname === "/meteor_runtime_config.js") {
       res.writeHead(200, { 'Content-type': 'application/javascript' });
       res.write("__meteor_runtime_config__ = " +
                 JSON.stringify(__meteor_runtime_config__) + ";");
@@ -399,20 +399,16 @@ var runWebAppServer = function () {
 
     // Include __meteor_runtime_config__ in the app html, as an inline script if
     // it's not forbidden by CSP.
-    if (typeof(SecurityHeaders) === "undefined" ||
-        SecurityHeaders.inlineScriptsAllowed()) {
+    if (typeof(BrowserPolicy) === "undefined" ||
+        BrowserPolicy.inlineScriptsAllowed()) {
       boilerplateHtml = boilerplateHtml.replace(
           /##RUNTIME_CONFIG##/,
         "<script type='text/javascript'>__meteor_runtime_config__ = " +
-          JSON.stringify(__meteor_runtime_config__) + ";</script>").replace(
-              /##RUNTIME_CONFIG_EXTERNAL##/, ""
-          );
+          JSON.stringify(__meteor_runtime_config__) + ";</script>");
     } else {
       boilerplateHtml = boilerplateHtml.replace(
-        /##RUNTIME_CONFIG##/, ""
-      ).replace(
-        /##RUNTIME_CONFIG_EXTERNAL##/,
-        "<script type='text/javascript' src='##ROOT_URL_PATH_PREFIX##/runtime_config.js'></script>"
+        /##RUNTIME_CONFIG##/,
+        "<script type='text/javascript' src='##ROOT_URL_PATH_PREFIX##/meteor_runtime_config.js'></script>"
       );
     }
     boilerplateHtml = boilerplateHtml.replace(
