@@ -101,6 +101,9 @@ BrowserPolicy = {
     xFrameOptions = "DENY";
   },
   allowFramingByOrigin: function (origin) {
+    if (xFrameOptions.indexOf("ALLOW-FROM") === 0)
+      throw new Error("You can only specify one origin that is allowed to" +
+                      " frame this app.");
     xFrameOptions = "ALLOW-FROM " + origin;
   },
   allowFramingByAnyOrigin: function () {
