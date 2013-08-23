@@ -3,23 +3,35 @@
 // 2.) No eval or other string-to-code, and content can only be loaded from the
 // same origin as the app.
 //
-// Apps should call BrowserPolicy.disallowInlineScripts() if they are not
-// using any inline script tags.
+// Apps should call BrowserPolicy.disallowInlineScripts() if they are not using
+// any inline script tags and are willing to accept an extra round trip on page
+// load.
 //
 // BrowserPolicy functions for tweaking CSP:
 // allowInlineScripts()
 // disallowInlineScripts(): adds extra round-trip to page load time
 // allowInlineStyles)(
 // disallowInlineStyles()
-// allowEval() (allows string-to-code like eval, innerHTML, etc.)
+// allowEval()
 // disallowEval()
 //
-// allowScriptOrigin(origin): allows scripts to be loaded from the given origin
-// allowScriptDataUrl(): allows scripts to be loaded from data: URLs
-// allowScriptSameOrigin(): allows scripts to be loaded from the same origin
-// disallowScript(): disallows all scripts
-// and similar methods for object, img, media, frame, font, connect, style.
-// XXX set default-src?
+// For each type of content (script, object, image, media, frame, font, connect,
+// style), there are the following functions:
+// allow<content type>Origin(origin): allows the type of content to be loaded
+// from the given origin
+// allow<content type>DataUrl(): allows the content to be loaded from data: URLs
+// allow<content type>SameOrigin(): allows the content to be loaded from the
+// same origin
+// disallow<content type>(): disallows this type of content all together (can't
+// be called for script)
+//
+// The following functions allow you to set defaults for where content can be
+// loaded from when no other rules have been specified for that type of content:
+// allowAllContentOrigin(origin)
+// allowAllContentDataUrl()
+// allowAllContentSameOrigin()
+// disallowAllContent()
+//
 //
 // For controlling which origins can frame this app,
 // BrowserPolicy.disallowFraming()
@@ -131,13 +143,28 @@ BrowserPolicy = {
   disallowInlineStyles: function () {
     ensureDirective("style-src");
     removeCspSrc("style-src", unsafeInline);
+  },
+
+  // Functions for setting defaults
+  allowAllContentSameOrigin: function () {
+    ensureDirective("default-src");
+    cspSrcs["default-src"].push(selfKeyword);
+  },
+  allowAllContentDataUrl: function () {
+    ensureDirective("default-src");
+    cspSrcs["default-src"].push("data:");
+  },
+  allowAllContentOrigin: function (origin) {
+    ensureDirective("default-src");
+    cspSrcs["default-src"].push(origin);
+  },
+  disallowAllContent: function () {
+    cspSrcs["default-src"] = [noneKeyword];
   }
 };
 
 // allow<Resource>Origin, allow<Resource>Data, allow<Resource>self, and
 // disallow<Resource> methods for each type of resource.
-// XXX Should there also be disallow<Resource>Origin, disallow<Resource>Data,
-// disallow<Resource>self?
 _.each(["script", "object", "img", "media",
         "frame", "font", "connect", "style"],
        function (resource) {
@@ -158,9 +185,11 @@ _.each(["script", "object", "img", "media",
            ensureDirective(directive);
            cspSrcs[directive].push(src);
          };
-         BrowserPolicy[disallowMethodName] = function () {
-           cspSrcs[directive] = [noneKeyword];
-         };
+         if (resource !== "script") {
+           BrowserPolicy[disallowMethodName] = function () {
+             cspSrcs[directive] = [noneKeyword];
+           };
+         }
          BrowserPolicy[allowDataMethodName] = function () {
            ensureDirective(directive);
            cspSrcs[directive].push("data:");
