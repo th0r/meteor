@@ -1,7 +1,9 @@
-// The default policies are:
+// We recommend that you use the starter-browser-policy package to enable the
+// following default policy:
 // 1.) Only the same origin can frame the app.
 // 2.) No eval or other string-to-code, and content can only be loaded from the
-// same origin as the app.
+// same origin as the app (except for XHRs and websocket connections, which can
+// go to any origin).
 //
 // Apps should call BrowserPolicy.disallowInlineScripts() if they are not using
 // any inline script tags and are willing to accept an extra round trip on page
@@ -39,16 +41,14 @@
 // BrowserPolicy.allowFramingBySameOrigin()
 // BrowserPolicy.allowFramingByAnyOrigin();
 
-// By default, only the same origin can frame the app.
 var xFrameOptions;
+var cspSrcs;
 
 // CSP keywords have to be single-quoted.
 var unsafeInline = "'unsafe-inline'";
 var unsafeEval = "'unsafe-eval'";
 var selfKeyword = "'self'";
 var noneKeyword = "'none'";
-
-var cspSrcs;
 
 var constructCsp = function () {
   _.each(_.keys(cspSrcs), function (directive) {

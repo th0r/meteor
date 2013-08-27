@@ -227,8 +227,6 @@ var runWebAppServer = function () {
       return;
     }
 
-    // XXX This feels like a hack or like this is definitely not the right way
-    // to do this...
     if (Package["browser-policy"] &&
         ! Package["browser-policy"].BrowserPolicy.inlineScriptsAllowed() &&
         pathname === "/meteor_runtime_config.js") {
@@ -399,7 +397,7 @@ var runWebAppServer = function () {
 
     // Include __meteor_runtime_config__ in the app html, as an inline script if
     // it's not forbidden by CSP.
-    if (Package["browser-policy"] &&
+    if (! Package["browser-policy"] ||
         Package["browser-policy"].BrowserPolicy.inlineScriptsAllowed()) {
       boilerplateHtml = boilerplateHtml.replace(
           /##RUNTIME_CONFIG##/,

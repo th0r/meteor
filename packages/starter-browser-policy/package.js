@@ -1,5 +1,5 @@
 Package.describe({
-  summary: "Default browser security policies"
+  summary: "Basic browser security policies"
 });
 
 Package.on_use(function (api) {
