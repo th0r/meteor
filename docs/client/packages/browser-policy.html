@@ -1,0 +1,41 @@
+<template name="pkg_browser_policy">
+{{#better_markdown}}
+## `browser-policy`
+
+The `browser-policy` package lets you set security-related policies that will be
+enforced by newer browsers. These policies help you prevent and mitigate common
+attacks like cross-site scripting and clickjacking.
+
+`browser-policy` lets you configure the HTTP headers X-Frame-Options and
+Content-Security-Policy. X-Frame-Options tells the browser which websites are
+allowed to frame your app. You should only let trusted websites frame your app,
+because malicious sites could harm your users with <a href="">clickjacking
+attacks</a>. <a href="">Content-Security-Policy</a> tells the browser where your
+app can load content from, which encourages safe practices and mitigates the
+damage of a cross-site-scripting attack.
+
+You can use the following functions to specify which websites are allowed to
+frame your app:
+<dl class="callbacks">
+{{#dtdd "BrowserPolicy.disallowFraming()"}}
+Your app will never render inside a frame or iframe.
+{{/dtdd}}
+
+{{#dtdd "BrowserPolicy.allowFramingByOrigin(origin)"}}
+Your app will only render inside frames loaded by `origin` (such as
+http://meteor.com). You can only call this function once with a single origin,
+and cannot specify multiple origins that are allowed to frame your app.
+{{/dtdd}}
+
+{{#dtdd "BrowserPolicy.allowFramingBySameOrigin()"}}
+Your app will only render inside frames loaded by webpages on the same origin as
+your app.
+{{/dtdd}}
+
+{{#dtdd "BrowserPolicy.allowFramingByAnyOrigin()"}}
+Your app can be framed by any website.
+{{/dtdd}}
+</dl>
+
+{{/better_markdown}}
+</template>
