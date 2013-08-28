@@ -17,7 +17,7 @@
 // allowEval()
 // disallowEval()
 //
-// For each type of content (script, object, image, media, frame, font, connect,
+// For each type of content (script, object, image, media, font, connect,
 // style), there are the following functions:
 // allow<content type>Origin(origin): allows the type of content to be loaded
 // from the given origin
@@ -169,7 +169,7 @@ BrowserPolicy = {
 // allow<Resource>Origin, allow<Resource>Data, allow<Resource>self, and
 // disallow<Resource> methods for each type of resource.
 _.each(["script", "object", "img", "media",
-        "frame", "font", "connect", "style"],
+        "font", "connect", "style"],
        function (resource) {
          var directive = resource + "-src";
          var methodResource;
