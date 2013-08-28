@@ -7,14 +7,12 @@ The `starter-browser-policy` package provides a recommended configuration for th
 following policies will be enforced by browsers that support the X-Frame-Options
 and Content-Security-Policy headers:
 
-<ul>
-<li> Only webpages on the same origin as your app can frame your app.</li>
-<li> Your app can only load content (images, scripts, fonts, etc.) from its own
+* Only webpages on the same origin as your app can frame your app.
+* Your app can only load content (images, scripts, fonts, etc.) from its own
 origin, except that XMLHttpRequests and WebSocket connections can go to any
-origin.</li>
-<li> Your app's client code cannot use functions such as eval that convert
-strings to Javascript code.</li>
-</ul>
+origin.
+* Your app's client code cannot use functions such as `eval()` that convert
+strings to Javascript code.
 
 If your app does not need any inline Javascript such as inline `<script>` tags,
 we recommend that you modify this policy by calling
