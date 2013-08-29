@@ -33,7 +33,8 @@ Your app will never render inside a frame or iframe.
 {{#dtdd "BrowserPolicy.allowFramingByOrigin(origin)"}}
 Your app will only render inside frames loaded by `origin` (such as
 http://meteor.com). You can only call this function once with a single origin,
-and cannot specify multiple origins that are allowed to frame your app.
+and cannot specify multiple origins that are allowed to frame your app. (This is
+a limitation of the X-Frame-Options header.)
 {{/dtdd}}
 
 {{#dtdd "BrowserPolicy.allowFramingBySameOrigin()"}}
