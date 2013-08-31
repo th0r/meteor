@@ -31,10 +31,11 @@ Your app will never render inside a frame or iframe.
 {{/dtdd}}
 
 {{#dtdd "BrowserPolicy.allowFramingByOrigin(origin)"}}
-Your app will only render inside frames loaded by `origin` (such as
-http://meteor.com). You can only call this function once with a single origin,
-and cannot specify multiple origins that are allowed to frame your app. (This is
-a limitation of the X-Frame-Options header.)
+Your app will only render inside frames loaded by `origin`. You can only call
+this function once with a single origin, and cannot use wildcards or specify
+multiple origins that are allowed to frame your app. (This is a limitation of
+the X-Frame-Options header.) Example values of `origin` include
+"http://example.com" and "https://foo.example.com".
 {{/dtdd}}
 
 {{#dtdd "BrowserPolicy.allowFramingBySameOrigin()"}}
@@ -79,17 +80,7 @@ Disallows inline CSS.
 </dl>
 
 Finally, you can configure a whitelist of allowed requests that various types of
-content can make. Examples:
-
-* `BrowserPolicy.disallowObject()` causes the browser to disallow all
-`<object>` tags.
-* `BrowserPolicy.allowImageOrigin("https://example.com")`
-allows images to have their `src` attributes point to images served from
-`https://example.com`.
-* `BrowserPolicy.allowConnectOrigin("https://example.com")` allows XMLHttpRequest
-and WebSocket connections to `https://example.com`.
-
-The following functions are defined for the content types
+content can make. The following functions are defined for the content types
 script, object, image, media, font, and connect.
 
 <dl class="callbacks">
@@ -121,6 +112,17 @@ functions. For example, if you want to allow all content to be loaded from your
 app's origin but you want to disable `<object>` tags, you can simply call
 `BrowserPolicy.allowAllContentSameOrigin()` followed by
 `BrowserPolicy.disallowObject()`.
+
+Other examples of using the `BrowserPolicy` API:
+
+* `BrowserPolicy.disallowObject()` causes the browser to disallow all
+`<object>` tags.
+* `BrowserPolicy.allowImageOrigin("https://example.com")`
+allows images to have their `src` attributes point to images served from
+`https://example.com`.
+* `BrowserPolicy.allowConnectOrigin("https://example.com")` allows XMLHttpRequest
+and WebSocket connections to `https://example.com`.
+
 
 {{/better_markdown}}
 </template>
