@@ -46,7 +46,6 @@
 
 var xFrameOptions;
 var cspSrcs;
-//var cspUnsafeAllowed;
 
 // CSP keywords have to be single-quoted.
 var unsafeInline = "'unsafe-inline'";
