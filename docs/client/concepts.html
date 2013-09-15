@@ -1,11 +1,10 @@
 <template name="concepts">
 
-<h1 id="concepts">Concepts</h1>
+<h1 id="concepts">Концепции</h1>
 
-We've written our fair share of single-page JavaScript applications by hand.
-Writing an entire application in one language (JavaScript) with one
-data format (JSON) is a real joy.  Meteor is everything we wanted
-when writing those apps.
+Мы написали большое количество одностраничных приложений на JavaScript вручную.
+Написание всего приложения на одном языке (JavaScript), используя один формат данных
+(JSON) - это сказка. И все, что нам тогда было нужно для их написания - это Meteor.
 
 {{> whatismeteor }}
 {{> structure }}
@@ -23,23 +22,22 @@ when writing those apps.
 
 {{#better_markdown}}
 
-<h2 id="whatismeteor">What is Meteor?</h2>
+<h2 id="whatismeteor">Что такое Meteor?</h2>
 
-Meteor is two things:
+Meteor - это две вещи:
 
-* A _library of packages_: pre-written, self-contained modules that
-you might need in your app.<br>
-There are about a dozen core Meteor
-packages that most any app will use (for example `webapp`, which
-handles incoming HTTP connections, and `templating`, which lets you
-make HTML templates that automatically update live as data changes).
-Then there are optional packages like `email`, which lets your app
-send emails, or the Meteor Accounts series (`account-password`,
-`accounts-facebook`, `accounts-ui`, and others) which provide a
-full-featured user account system that you can drop right into your
-app. And beyond these "official" packages, there are hundreds of
-community-written packages in [Atmosphere](https://atmosphere.meteor.com/),
-one of which might do just what you need.
+* _Библиотека пакетов_: заранее написанные независимые модули, которые
+могут вам понадобиться в вашем приложении.<br>
+Ядро Meteor состоит примерно из дюжины таких пакетов, которые будут
+использоваться в большинстве приложений (например пакет `webapp`, который
+обрабатывает входящие HTTP-подключения, и `templating`, который позволяет
+писать HTML-шаблоны, автоматически обновляемые при изменении данных).
+Также существуют дополнительные пакеты, например `email`, который позволяет
+вашему приложению посылать email-ы, или серия пакетов Meteor Accounts (`account-password`,
+`accounts-facebook`, `accounts-ui` и другие) которые предоставляют полноценную
+систему учетных записей для вашего приложения. И помимо этих "официальных" пакетов,
+в [Atmosphere](https://atmosphere.meteor.com/) присутствуют сотни других, написанных
+сообществом, и один из них, возможно, делает именно то, что вам необходимо.
 
 * A _command-line tool_ called `meteor`.<br>
 `meteor` is a build tool analogous to `make`, `rake`, or the non-visual parts of
