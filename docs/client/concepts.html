@@ -39,32 +39,32 @@ Meteor - это две вещи:
 в [Atmosphere](https://atmosphere.meteor.com/) присутствуют сотни других, написанных
 сообществом, и один из них, возможно, делает именно то, что вам необходимо.
 
-* A _command-line tool_ called `meteor`.<br>
-`meteor` is a build tool analogous to `make`, `rake`, or the non-visual parts of
-Visual Studio. It gathers up all of the source files and assets in your
-application, carries out any necessary build steps (such as compiling
-[CoffeeScript](http://coffeescript.org), minifying CSS, building
-[npm](https://npmjs.org/) modules, or generating source maps), fetches the
-packages used by your app, and outputs a standalone, ready-to-run application
-bundle. In development mode it can do all of this interactively, so that
-whenever you change a file you immediately see the changes in your browser. It's
-super easy to use out of the box, but it's also extensible: you can add support
-for new languages and compilers by adding build plugin packages to your app.
+* _Утилита командной строки_ `meteor`.<br>
+`meteor` - это утилита для сборки, аналогичная `make`, `rake`, или 
+без-интерфейсным частям Visual Studio. Она собирает воедино все исходники и
+статику вашего приложения, выполняет все необходимые шаги сборки (такие, как
+компилирование [CoffeeScript](http://coffeescript.org), минификация CSS,
+сборка [npm](https://npmjs.org/)-модулей и генерация source maps), загружает 
+все модули, используемые в вашем приложении и создает из него автономный 
+пакет, готовый к использованию. В режиме разработки она делает все это "на 
+лету", т.е. каждый раз, когда вы вносите какие-либо изменения в файл, вы
+сразу же видите это в браузере. Она очень простая в использовании и к тому же
+легко расширяемая: вы можете добавить поддержку дополнительных языков и 
+компиляторов, просто добавив в ваше приложение дополнительные пакеты для сборки.
 
-The key idea in the Meteor package system is that _everything should
-work identically in the browser and on the server_ (wherever it makes
-sense, of course: browsers can't send email and servers can't capture
-mouse events). Our whole ecosystem has been built from the ground up
-to support this.
+Основная идея пакетной системы Meteor состоит в том, что _все должно работать
+одинакого как в браузере, так и на сервере_ (конечно, если это имеет смысл: 
+браузеры не умеют посылать email-ы, а серверы - ловить события мышки). Вся 
+наша экосистема была построена с нуля, чтобы обеспечить работоспособность 
+данного подхода.
 
 {{#note}}
-`meteor` cannot yet fetch packages from Atmosphere. If you are using
-Atmosphere packages you should take a look at
-[Meteorite](http://oortcloud.github.io/meteorite/), a tool that will
-help you download and manage your Atmosphere packages.
+Утилита `meteor` пока не умеет загружать пакеты из Atmosphere. Если же вы
+хотите их использовать, то вам следует взглянуть на 
+[Meteorite](http://oortcloud.github.io/meteorite/) - эта утилита поможет вам 
+с загрузкой и управлением пакетами из Atmosphere.
 
-In Meteor 1.0, the `meteor` build tool will have full support for
-Atmosphere.
+В Meteor 1.0 утилита `meteor` будет полностью поддерживать Atmosphere.
 {{/note}}
 
 {{/better_markdown}}
@@ -73,28 +73,29 @@ Atmosphere.
 <template name="structure">
 {{#better_markdown}}
 
-<h2 id="structuringyourapp">Structuring your application</h2>
+<h2 id="structuringyourapp">Создание структуры вашего приложения</h2>
 
-A Meteor application is a mix of JavaScript that runs inside a client web
-browser, JavaScript that runs on the Meteor server inside a
-[Node.js](http://nodejs.org/) container, and all the supporting HTML fragments,
-CSS rules, and static assets.  Meteor automates the packaging and transmission
-of these different components.  And, it is quite flexible about how you choose
-to structure those components in your file tree.
+Приложение на Meteor - это смесь клиентского JavaScript, который работает в
+браузере, серверного JavaScript, который работает под управлением
+[Node.js](http://nodejs.org/) и всех поддерживаемых форматов HTML, CSS и 
+других статичных ресурсов. Meteor автоматизирует упаковку и передачу всех этих 
+компонентов и позволяет вам иметь довольно гибкую структуру файлов в
+директории вашего приложения.
 
-The only server assets are JavaScript and files in the `private` subdirectory.
-Meteor gathers all your JavaScript
-files, excluding anything under the `client`, `public`, and `private`
-subdirectories, and loads them into a Node.js
-server instance inside a fiber.  In Meteor, your server code runs in
-a single thread per request, not in the asynchronous callback style
-typical of Node.  We find the linear execution model a better fit for
-the typical server code in a Meteor application.
+Единственными статическими ресурсами со стороны сервера являются 
+JavaScript-файлы и файлы из поддиректории `private`. Meteor собирает все 
+JavaScript-файлы, кроме тех, которые находятся в поддиректориях `client`, 
+`public` и `private`, и загружает их в экземпляр Node.js-сервера, используя 
+волокна (fibers). Ваш серверный код в Meteor работает в режиме "один поток на
+один запрос", а не в привычном для Node режиме асинхронных обратных вызовов 
+(callbacks). Мы считаем, что линейная модель исполнения лучше подходит 
+для типичного серверного кода приложения на Meteor.
 
-Meteor gathers any files under the `private` subdirectory and makes the contents
-of these files available to server code via the [`Assets`](#assets) API. The
-`private` subdirectory is the place for any files that should be accessible to
-server code but not served to the client, like private data files.
+Meteor собирает все файлы из поддиректории `private` и предоставляет доступ к
+их содержимому при помощи [`Assets`](#assets) API. Поддиректория `private` 
+предназначена для хранения любых файлов, которые должны быть доступны 
+серверному коду, но недоступны клиентскому. Например, файлов с 
+конфиденциальной информацией.
 
 There are more assets to consider on the client side.  Meteor
 gathers all JavaScript files in your tree, with the exception of
