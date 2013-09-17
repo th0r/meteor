@@ -111,66 +111,61 @@ JavaScript-файлы из директории вашего приложени�
 самыми первыми.
 
 Файлы, находящиеся вне директорий `client`, `server` и `tests`, загружаются 
-как на клиент, так и на сервер!
-Files outside the `client`, `server` and `tests` subdirectories are loaded on
-both the client and the server!  That's the place for model definitions and
-other functions.  Meteor provides the variables [`isClient`](#meteor_isclient) and
-[`isServer`](#meteor_isserver) so that your code can alter its behavior depending
-on whether it's running on the client or the server. (Files in directories named
-`tests` are not loaded anywhere.)
+как на клиентe, так и на серверe! Это самое место для объявления моделей и 
+разных общих функций. У объекта Meteor есть свойства 
+[`isClient`](#meteor_isclient) и [`isServer`](#meteor_isserver), используя 
+которые вы можете определить, где сейчас выполняется ваш код - на клиенте, 
+или на сервере. (Файлы из директорий `tests` никуда не загружаются.)
 
-Any sensitive code that you don't want served to the client, such as code
-containing passwords or authentication mechanisms, should be
-kept in the `server` directory.
+Любой конфиденциальный код, который не должен попасть на клиент (например, 
+код, содержащий пароли или механизмы аутентификации), необходимо хранить в 
+директории `server`.
 
-CSS files are gathered together as well: the client will get a bundle with all
-the CSS in your tree (excluding the `server`,
-`public`, and `private` subdirectories).
+CSS файлы из всех поддиректорий проекта, кроме `server`, `public` и 
+`private`, также собираются в один пакет и отправляются на клиент.
 
-In development mode, JavaScript and CSS files are sent individually to make
-debugging easier.
+В режиме разработки, JavaScript и CSS-файлы отсылаются на клиент не в виде 
+пакета, а как индивидуальные файлы. Сделано это для того, чтобы облегчить 
+отладку приложения.
 
-HTML files in a Meteor application are treated quite a bit differently
-from a server-side framework.  Meteor scans all the HTML files in your
-directory for three top-level elements: `<head>`, `<body>`, and
-`<template>`.  The head and body sections are separately concatenated
-into a single head and body, which are transmitted to the client on
-initial page load.
+HTML-файлы Meteor обрабатывает несколько иначе, чем остальные фреймворки. 
+Meteor сканирует все HTML-файлы в поисках трех элементов верхнего
+уровня: `<head>`, `<body>` и `<template>`. Все секции `head` и `body` 
+объединяются и передаются на клиент при первоначальной загрузке страницы.
 
-Template sections, on the other hand, are converted into JavaScript
-functions, available under the `Template` namespace.  It's
-a really convenient way to ship HTML templates to the client.
-See the [templates](#templates) section for more.
+Секции `template` же преобразуются в JavaScript-функции и сохраняются в 
+объекте `Template` - это очень удобный способ передачи HTML-шаблонов на 
+клиент. Более подробно об этом можно узнать в разделе ["Шаблоны"](#templates).
 
-Lastly, the Meteor server will serve any files under the `public`
-directory, just like in a Rails or Django project.  This is the place
-for images, `favicon.ico`, `robots.txt`, and anything else.
+И наконец, Meteor будет раздавать любые файлы, находящиеся в директории 
+`public` точно так же, как это делают, например, Django или Rails. Там 
+следует хранить изображения, `favicon.ico`, `robots.txt` и прочую статику.
 
-It is best to write your application in such a way that it is
-insensitive to the order in which files are loaded, for example by
-using [Meteor.startup](#meteor_startup), or by moving load order
-sensitive code into [packages](#usingpackages), which can explicitly control both
-the load order of their contents and their load order with respect to
-other packages. However sometimes load order dependencies in your
-application are unavoidable. The JavaScript and CSS files in an
-application are loaded according to these rules:
+Лучше всего стараться писать ваше приложение таким образом, чтобы оно не 
+зависило он порядка загрузки файлов. Для этого можно использовать функцию 
+[Meteor.startup](#meteor_startup), или помещать код, зависящий от порядка 
+загрузки, в [пакеты](#usingpackages), которые позволяют явно указать не только 
+порядок загрузки их частей, но и их зависимости от других пакетов. Несмотря 
+на это бывают ситуации, когда порядок загрузки файлов важен. Для решения 
+таких проблем существует несколько правил, по которым ваше приложение 
+загружает JavaScript и CSS:
 
-* Files in the `lib` directory at the root of your application are
-  loaded first.
+* Самыми первыми загружаются файлы из директории `lib`, находящейся в корне 
+  вашего приложения.
 
-* Files that match `main.*` are loaded after everything else.
+* Самыми последними загружаются файлы с именем `main.*`.
 
-* Files in subdirectories are loaded before files in parent
-  directories, so that files in the deepest subdirectory are loaded
-  first (after `lib`), and files in the root directory are loaded last
-  (other than `main.*`).
+* Файлы из поддиректорий загружаются раньше файлов, находящихся в 
+  родительских директориях. Таким образом файлы из самой глубокой 
+  поддиректории загружаются первыми (но после `lib`), а файлы из корня
+  приложения - последними (но перед `main.*`).
 
-* Within a directory, files are loaded in alphabetical order by
-  filename.
+* В рамках одной директории файлы загружаются в алфавитном порядке по их 
+  названию.
 
-These rules stack, so that within `lib`, for example, files are still
-loaded in alphabetical order; and if there are multiple files named
-`main.js`, the ones in subdirectories are loaded earlier.
+Эти правила применяются по очереди, т.е. внутри `lib`, например, файлы
+загружаются в алфавитном порядке, а файл `main.js`, находящийся в 
+поддиректории, загружается раньше файла `main.js` из корня приложения.
 
 {{/better_markdown}}
 </template>
@@ -178,7 +173,7 @@ loaded in alphabetical order; and if there are multiple files named
 <template name="data">
 {{#better_markdown}}
 
-<h2 id="dataandsecurity">Data and security</h2>
+<h2 id="dataandsecurity">Данные и безопасность</h2>
 
 Meteor makes writing distributed client code as simple as talking to a
 local database.  It's a clean, simple, and secure approach that obviates
