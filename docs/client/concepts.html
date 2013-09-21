@@ -175,46 +175,47 @@ Meteor сканирует все HTML-файлы в поисках трех эл
 
 <h2 id="dataandsecurity">Данные и безопасность</h2>
 
-Meteor makes writing distributed client code as simple as talking to a
-local database.  It's a clean, simple, and secure approach that obviates
-the need to implement individual RPC endpoints, manually cache data on
-the client to avoid slow roundtrips to the server, and carefully
-orchestrate invalidation messages to every client as data changes.
+Общаться с локальной базой данных в Meteor так же просто, как и писать 
+клиентский код. Это простой, понятный и безопасный подход, который устраняет 
+необходимость создавать индивидуальные конечные точки RPC, вручную кешировать
+данные на клиенте, чтобы не ждать долгих ответов от сервера и аккуратно 
+оповещать клиентов о том, что данные на сервере изменились.
 
-In Meteor, the client and server share the same database API.  The same
-exact application code &mdash; like validators and computed properties &mdash; can
-often run in both places.  But while code running on the server has
-direct access to the database, code running on the client does *not*.
-This distinction is the basis for Meteor's data security model.
+Клиент и сервер в Meteor используют одинаковое API для работы с базой данных.
+Таким образом, один и тот же код, например, валидаторы или 
+вычисляемые свойства, обычно можно использовать в обоих местах. Но если у 
+серверного кода есть прямой доступ к базе данных, то у клиент его *нет*.
+И это отличие - основа модели безопасности данных в Metor.
 
 {{#note}}
-By default, a new Meteor app includes the `autopublish` and `insecure`
-packages, which together mimic the effect of each client having full
-read/write access to the server's database.  These are useful
-prototyping tools, but typically not appropriate for production
-applications.  When you're ready, just remove the packages.
+Каждое новое приложение по умолчанию использует пакеты `autopublish` и 
+`insecure`, которые в сочетании друг с другом создают эффект присутствия у 
+каждого клиента полного доступа к базе данных сервера на чтение и запись. Эти
+пакеты бывают довольно удобны при разработке приложения, но, как
+правило, не подходят для подакшена. Так что, просто удалите из, как только вы
+будете готовы.
 {{/note}}
 
-Every Meteor client includes an in-memory database cache.  To manage the
-client cache, the server *publishes* sets of JSON documents, and the
-client *subscribes* to those sets.  As documents in a set change, the
-server patches each client's cache.
+Каждый клиент в Meteor содержит кэш базы данных и хранит его в памяти. 
+Управление его содержимым происходит следующим образом: сервер *публикует* 
+некоторые наборы JSON-документов, а клиент *подписывается* на них. Как только
+документы из набора меняются, сервер обновляет (патчит) клиентский кеш.
 
-Today most Meteor apps use MongoDB as their database because it is the
-best supported, though support for other databases is coming in the
-future. The
-[`Meteor.Collection`](http://docs.meteor.com/#meteor_collection) class
-is used to declare Mongo collections and to manipulate them. Thanks to
-`minimongo`, Meteor's client-side Mongo emulator, `Meteor.Collection`
-can be used from both client and server code.
+В настощее время большиство приложений на Meteor в качестве базы данных 
+используют MongoDB, потому что она поддерживается лучше всего, но на будущее 
+запланирована поддержка и других баз данных. Для объявления Mongo-коллекций и
+работы с ними используется класс
+[`Meteor.Collection`](http://docs.meteor.com/#meteor_collection). Благодаря 
+`minimongo` (эмулятору Mongo на клиенте), его можно использовать как на 
+сервере, так и на клиенте.
 
-    // declare collections
-    // this code should be included in both the client and the server
+    // создание коллекций
+    // этот код должен быть объявлен как на сервере, так и на клиенте
     Rooms = new Meteor.Collection("rooms");
     Messages = new Meteor.Collection("messages");
     Parties = new Meteor.Collection("parties");
 
-    // server: populate collections with some initial documents
+    // сервер: наполнение коллекций несколькими начальными документами
     Rooms.insert({name: "Conference Room A"});
     var myRooms = Rooms.find({}).fetch();
     Messages.insert({text: "Hello world", room: myRooms[0]._id});
