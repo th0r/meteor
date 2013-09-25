@@ -221,112 +221,114 @@ Meteor сканирует все HTML-файлы в поисках трех эл
     Messages.insert({text: "Hello world", room: myRooms[0]._id});
     Parties.insert({name: "Super Bowl Party"});
 
-Each document set is defined by a publish function on the server.  The
-publish function runs each time a new client subscribes to a document
-set.  The data in a document set can come from anywhere, but the common
-case is to publish a database query.
+Каждый набор документов определяется функцией публикации на сервере. Она 
+вызывается каждый раз, когда клиент подписывается на этот набор. Данные для 
+него могут браться откуда угодно, но самый распространенный вариант - это 
+публиковать результаты запроса к базе данных.
 
-    // server: publish all room documents
+    // сервер: опубликовать информацию о всех чатах
     Meteor.publish("all-rooms", function () {
       return Rooms.find(); // everything
     });
 
-    // server: publish all messages for a given room
+    // сервер: опубликовать все сообщения из конкретного чата
     Meteor.publish("messages", function (roomId) {
       check(roomId, String);
       return Messages.find({room: roomId});
     });
 
-    // server: publish the set of parties the logged-in user can see.
+    // сервер: опубликовать набор групп, которые может видеть залогиненный
+    пользователь
     Meteor.publish("parties", function () {
       return Parties.find({$or: [{"public": true},
                                  {invited: this.userId},
                                  {owner: this.userId}]});
     });
 
-Publish functions can provide different results to each client.  In the
-last example, a logged in user can only see `Party` documents that
-are public, that the user owns, or that the user has been invited to.
+Функции публикации могут отдавать разным клиентам разные результаты. В 
+предыдущем примере, залогиненный пользователь может видеть только публичные 
+группы, созданные им группы и группы, в которые его пригласили.
 
-Once subscribed, the client uses its cache as a fast local database,
-dramatically simplifying client code.  Reads never require a costly
-round trip to the server.  And they're limited to the contents of the
-cache: a query for every document in a collection on a client will only
-return documents the server is publishing to that client.
+Как только клиент подписался на публикацию, он использует свой кэш в качестве 
+быстрой локальной базы данных, что значительно упрощает клиентский код. Для 
+чтения данных оттуда не нужны накладные обращения к серверу. К тому же, 
+результаты запросов к локальной базе данных всегда ограничены набором
+документов, которые сервер решил опубликовать для данного клиента.
 
-    // client: start a parties subscription
+    // клиент: начать подписку на группы
     Meteor.subscribe("parties");
 
-    // client: return array of Parties this client can read
-    return Parties.find().fetch(); // synchronous!
+    // клиент: получить массив групп, доступных данному пользователю
+    return Parties.find().fetch(); // синхронно!
 
-Sophisticated clients can turn subscriptions on and off to control how
-much data is kept in the cache and manage network traffic.  When a
-subscription is turned off, all its documents are removed from the cache
-unless the same document is also provided by another active
-subscription.
+Продвинутый клиентский код может подписываться на публикации и отписываться от
+них, тем самым контролируя объем данных, хранящихся в локальном кэше, и 
+управляя сетевым трафиком. Когда подписка прекращена, все ее документы 
+удаляются из кэша, если только они не входят в состав какой-либо другой
+активной подписки.
 
-When the client *changes* one or more documents, it sends a message to
-the server requesting the change.  The server checks the proposed change
-against a set of allow/deny rules you write as JavaScript functions.
-The server only accepts the change if all the rules pass.
+Когда клиент *изменяет* один или несколько документов, он посылает сообщение 
+серверу с запросом на это изменение. Сервер проверяет данное изменение, 
+используя набор разрешающих и запрещающих правил, которые представляют собой 
+обычные JavaScript функции. Если все правила пройдены успешно, то сервер 
+разрешает данное изменение.
 
-    // server: don't allow client to insert a party
+    // сервер: не разрешать клиенту добавлять группу
     Parties.allow({
       insert: function (userId, party) {
         return false;
       }
     });
 
-    // client: this will fail
+    // клиент: группа не будет добавлена
     var party = { ... };
     Parties.insert(party);
 
-If the server accepts the change, it applies the change to the database
-and automatically propagates the change to other clients subscribed to
-the affected documents.  If not, the update fails, the server's database
-remains untouched, and no other client sees the update.
+Если сервер разрешает изменение, он вносит его в базу данных и автоматически
+рассылает его всем остальным клиентам, подписанным на измененные документы. 
+Если же не разрешает, то база данных на сервере остается нетронутой и никто 
+из остальных клиентов этого изменения не видит.
 
-Meteor has a cute trick, though.  When a client issues a write to the
-server, it also updates its local cache immediately, without waiting for
-the server's response.  This means the screen will redraw right away.
-If the server accepted the update &mdash; what ought to happen most of the
-time in a properly behaving client &mdash; then the client got a jump on the
-change and didn't have to wait for the round trip to update its own
-screen.  If the server rejects the change, Meteor patches up the
-client's cache with the server's result.
+Однако, в Meteor есть одна уловка. Когда клиент хочет записать что-то в базу 
+данных и запрашивает разрешение на это у сервера, он не ждет от него ответа, а 
+сразу же вносит это изменение в свой локальный кэш. Это означает, что 
+интерфейс тут же перерисуется и если сервер примет данное изменение (а в 
+правильно работающем клиенте это должно происходить почти всегда), то он 
+будет уже в актуальном состоянии. Если же сервер отклонит это изменение, то 
+Meteor откатит состояние локального кэша до исходного.
 
-Putting it all together, these techniques accomplish latency
-compensation.  Clients hold a fresh copy of the data they need, and
-never need to wait for a roundtrip to the server. And when clients
-modify data, those modifications can run locally without waiting for the
-confirmation from the server, while still giving the server final say
-over the requested change.
+В итоге, все эти методы и обеспечивают компенсацию задержек: клиенты хранят 
+локально свежую копию необходимых им данных и им не нужно ждать ответа от 
+сервера. Таким образом, когда клиенту нужно изменить какие либо данные, он может 
+сделать это локально, не дожидаясь подтверждения сервера, но в то же время 
+оставляя за ним решающее слово касательно возможности этих изменений.
 
 {{#note}}
-The current release of Meteor supports MongoDB, the popular document
-database, and the examples in this section use the
-        [MongoDB API](http://www.mongodb.org/display/DOCS/Manual).  Future
-releases will include support for other databases.
+Текущая версия Meteor поддерживает MongoDB - популярную
+документо-ориентированную базу данных, а примеры в этом разделе используют 
+[MongoDB API](http://www.mongodb.org/display/DOCS/Manual). Поддержка других 
+баз данных появится в будущих версиях.
 {{/note}}
 
-<h3 id="dataandsecurity-authentication">Authentication and user accounts</h3>
+<h3 id="dataandsecurity-authentication">Аутентификация и учетные записи 
+пользователей</h3>
 
-Meteor includes [Meteor Accounts](#accounts_api), a state-of-the-art
-authentication system. It features secure password login using the
-[Secure Remote Password
-protocol](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol),
-and integration with external services including Facebook, GitHub,
-Google, Meetup, Twitter, and Weibo. Meteor Accounts defines a
-[`Meteor.users`](#meteor_users) collection where developers can store
-application-specific user data.
+Meteor включает в себя передовую систему аутентификации - [Meteor
+Accounts](#accounts_api). Она предоставляет возможность логина с 
+использованием пароля, защищенного по протоколу [Secure Remote 
+Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol), а 
+также интеграцию с внешними сервисами, включая Facebook, GitHub,
+Google, Meetup, Twitter и Weibo. Meteor Accounts создает коллекцию 
+[`Meteor.users`](#meteor_users), где разработчики приложения могут хранить 
+разнообразные данные о пользователях.
 
-Meteor also includes pre-built forms for common tasks like login, signup,
-password change, and password reset emails. You can add [Accounts
-UI](#accountsui) to your app with just one line of code. The `accounts-ui` package even provides a configuration wizard that walks you through the steps to
-set up the external login services you're using in your app.
+Meteor также содержит готовые формы для таких частых действий, как логин, 
+регистрация, смена и сброс пароля. Пакет с этими формами называется [Accounts
+UI](#accountsui). Чтобы добавить его в ваше приложение, нужно написать всего
+одну строчку кода. В состав этого пакета входит даже визард для настройки 
+внешних сервисов, поддержку которых вы хотите добавить в ваше приложение.
 
-<h3 id="dataandsecurity-validation">Input validation</h3>
+<h3 id="dataandsecurity-validation">Проверка входных данных</h3>
 
 Meteor allows your methods and publish functions to take arguments of any
 [JSON](http://json.org/) type. (In fact, Meteor's wire protocol supports
