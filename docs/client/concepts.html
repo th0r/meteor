@@ -360,64 +360,65 @@ Meteor также предоставляет легкий способ убед�
 
 <h2 id="reactivity">Реактивность</h2>
 
-Meteor embraces the concept of [reactive
-programming](http://en.wikipedia.org/wiki/Reactive_programming). This means that
-you can write your code in a simple imperative style, and the result will be
-automatically recalculated whenever data changes that your code depends on.
+Meteor реализует концепцию реактивного программирования ([reactive 
+programming](http://en.wikipedia.org/wiki/Reactive_programming)). Это 
+означает, что вы можете писать свой код в простом императивном стиле и 
+результат будет автоматически пересчитан как только изменятся данные, от 
+которых ваш код зависит.
 
     Deps.autorun(function () {
       Meteor.subscribe("messages", Session.get("currentRoomId"));
     });
 
-This example (taken from a chat room client) sets up a data
-subscription based on the session variable `currentRoomId`.
-If the value of `Session.get("currentRoomId")` changes for any reason, the
-function will be automatically re-run, setting up a new subscription that
-replaces the old one.
+Этот код, взятый из примера создания чат-клиента, подписывается на данные, 
+используя значение переменной сессии `currentRoomId`. Если значение выражения
+`Session.get("currentRoomId")` по каким-либо причинам изменится, функция 
+автоматически перевыполнится и подпишется на новый набор документов, 
+предварительно отписавшись от предыдущего.
 
-This automatic recomputation is achieved by a cooperation between
-`Session` and `Deps.autorun`.  `Deps.autorun` performs an arbitrary "reactive
-computation" inside of which data dependencies are tracked, and it
-will re-run its function argument as necessary.  Data providers like
-`Session`, on the other hand, make note of the computation they are
-called from and what data was requested, and they are prepared to send
-an invalidation signal to the computation when the data changes.
+Это автоматическое перевыполнение достигается благодаря совместному 
+использованию `Session` и `Deps.autorun`. `Deps.autorun` выполняет 
+произвольное "реактивное вычисление", отслеживая все данные, от которого оно 
+зависит, и перезапускает его в случае необходимости. С другой стороны, 
+источники данных, такие как `Session`, запоминают реактивное вычисление, из 
+которого они вызываются, и запрошенные у них данные, чтобы послать вычислению
+инвалидирующий сигнал как только эти данные изменятся.
 
-This simple pattern (reactive computation + reactive data source) has wide
-applicability.  Above, the programmer is saved from writing
-unsubscribe/resubscribe calls and making sure they are called at the
-right time.  In general, Meteor can eliminate whole classes of data
-propagation code which would otherwise clog up your application with
-error-prone logic.
+Этот простой паттерн (реактивые вычисления + реактивные источники данных) 
+имеет широкое применение. В примере выше, программист избавляется от 
+необходимости писать код для своевременной отписки от публикации и
+переподписки на нее. В целом, Meteor может устранить целые классы кода, 
+предназначенного для распространения данных, которые иначе могли бы засорить 
+ваше приложение ненадежной логикой.
 
-These Meteor functions run your code as a reactive computation:
+Эти функции в Meteor выполняют ваш код в реактивном контексте:
 
-* [Templates](#templates)
-* [`Meteor.render`](#meteor_render) and [`Meteor.renderList`](#meteor_renderlist)
+* [Шаблоны](#templates)
+* [`Meteor.render`](#meteor_render) и [`Meteor.renderList`](#meteor_renderlist)
 * [`Deps.autorun`](#deps_autorun)
 
-And the reactive data sources that can trigger changes are:
+А вот список реактивных источников данных:
 
-* [`Session`](#session) variables
-* Database queries on [Collections](#find)
+* Переменные сессии ([`Session`](#session))
+* Запросы к базе данных через [коллекции](#find)
 * [`Meteor.status`](#meteor_status)
-* The `ready()` method on a [subscription handle](#meteor_subscribe)
+* Метод `ready()` у [хэндлера подписки](#meteor_subscribe)
 * [`Meteor.user`](#meteor_user)
 * [`Meteor.userId`](#meteor_userid)
 * [`Meteor.loggingIn`](#meteor_loggingin)
 
-In addition, the following functions which return an object with a
-`stop` method, if called from a reactive computation, are stopped when
-the computation is rerun or stopped:
+К тому же, если следующие функции, возвращающие объект с методом `stop`, 
+вызываются в реактивном контексте, то они останавливаются, когда реактивное 
+вычисление перезапускается или останавливается:
 
-* [`Deps.autorun`](#deps_autorun) (nested)
+* [`Deps.autorun`](#deps_autorun) (вложенные вызовы)
 * [`Meteor.subscribe`](#meteor_subscribe)
-* [`observe()`](#observe) and [`observeChanges()`](#observe_changes) on cursors
+* [`observe()`](#observe) и [`observeChanges()`](#observe_changes) у курсоров
 
-Meteor's
-[implementation](https://github.com/meteor/meteor/blob/master/packages/deps/deps.js)
-is a package called [`Deps`](#deps) that is fairly short and straightforward.
-You can use it yourself to implement new reactive data sources.
+В Meteor реактивность 
+[реализована](https://github.com/meteor/meteor/blob/master/packages/deps/deps.js)
+в пакете [`Deps`](#deps), который довольно маленький и простой. С его помощью
+вы можете самостоятельно создавать новые реактивные источники данных.
 
 {{/better_markdown}}
 </template>
@@ -425,7 +426,7 @@ You can use it yourself to implement new reactive data sources.
 <template name="livehtml">
 {{#better_markdown}}
 
-<h2 id="livehtml">Live HTML</h2>
+<h2 id="livehtml">Живой HTML</h2>
 
 HTML templating is central to web applications. With Meteor's live
 page update technology, you can render your HTML _reactively_, meaning
