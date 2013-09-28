@@ -429,10 +429,9 @@ programming](http://en.wikipedia.org/wiki/Reactive_programming)). Это
 <h2 id="livehtml">Живой HTML</h2>
 
 HTML-шаблоны занимают важнейшее место в любом веб-приложении. В Meteor 
-используется технология обновления страниц в реальном времени, которая
-позволяет вам _реактивно_ рендерить ваши шаблоны. Это означает, что они будут
-обновляться автоматически, как только изменятся данные, необходимые для их
-отрисовки.
+используется фирменная технология "живых страниц", которая позволяет вам
+_реактивно_ рендерить ваши шаблоны. Это означает, что они будут обновляться
+автоматически, как только изменятся данные, необходимые для их отрисовки.
 
 Эта функция работает с любым HTML-шаблонизатором и даже с HTML, созданным 
 вручную из JavaScript:
@@ -499,49 +498,49 @@ templates)](http://lostechies.com/derickbailey/2011/09/15/zombies-run-managing-p
 
 <h2 id="templates">Шаблоны</h2>
 
-Meteor makes it easy to use your favorite HTML templating language,
-such as Handlebars or Jade, along with Meteor's live page update
-technology. Just write your template as you normally would, and Meteor
-will take care of making it update in realtime.
+Meteor позволяет с легкостью использовать ваш любимый шаблонизатор, например,
+Handlebars или Jade, вместе с фирменной технологией "живых страниц". Просто
+пишите шаблоны как обычно, а Meteor позаботится о том, чтобы они обновлялись 
+в реальном времени.
 
-To use this feature, create a file in your project with the `.html`
-extension. In the file, make a `<template>` tag and give it a
-`name` attribute. Put the template contents inside the tag. Meteor
-will precompile the template, ship it down to the client, and make it
-available as a function on the global `Template` object.
+Чтобы воспользоваться этой возможностью, создайте в вашем проекте файл с
+расширением `.html`. В файле создайте тэг `<template>`, положите в него ваш 
+шаблон и задайте ему имя в атрибуте `name`. Meteor скомпилирует ваш шаблон и
+отправит его на клиент, где он будет доступен в качестве функции глобаного 
+объекта `Template`.
 
 {{#note}}
-Today, the only templating system that has been packaged for Meteor is
-Handlebars. Let us know what templating systems you'd like to use with
-Meteor. Meanwhile, see the [Handlebars
-documentation](http://www.handlebarsjs.com/) and [Meteor Handlebars
-extensions](https://github.com/meteor/meteor/wiki/Handlebars).
+Единственный шаблонизатор, доступный на сегодняшний день для использования в
+Meteor - это Handlebars. Сообщите нам, какие еще шаблонизаторы вы бы хотели 
+использовать в Meteor. А пока, посмотрите [документацию к 
+Handlebars](http://www.handlebarsjs.com/) и [расширение Handlebars в 
+Meteor](https://github.com/meteor/meteor/wiki/Handlebars).
 {{/note}}
 
-A template with a `name` of `hello` is rendered by calling the
-function `Template.hello`, passing any data for the template:
+Для того, чтобы отрендерить шаблон с именем `hello`, нужно вызвать функцию 
+`Template.hello`, передав в нее все необходимые для шаблона данные:
 
     <!-- in myapp.html -->
     <template name="hello">
       <div class="greeting">Hello there, {{dstache}}first}} {{dstache}}last}}!</div>
     </{{! }}template>
 
-    // in the JavaScript console
+    // в консоле браузера
     > Template.hello({first: "Alyssa", last: "Hacker"});
      => "<div class="greeting">Hello there, Alyssa Hacker!</div>"
 
-This returns a string. To use the template along with the [`Live
-HTML`](#livehtml) system, and get DOM elements that update
-automatically in place, use [`Meteor.render`](#meteor_render):
+Результатом является строка. Чтобы превратить этот шаблон в [`Живой 
+HTML`](#livehtml) и получить самообновляющиеся DOM-элементы, используйте 
+[`Meteor.render`](#meteor_render):
 
     Meteor.render(function () {
       return Template.hello({first: "Alyssa", last: "Hacker"});
     })
-      => automatically updating DOM elements
+      => самообновляющиеся DOM-элементы
 
-The easiest way to get data into templates is by defining helper
-functions in JavaScript. Just add the helper functions directly on the
-`Template.[template name]` object. For example, in this template:
+Самый простой способ передать данные в шаблон - это объявить для него 
+функции-хэлперы. Просто добавьте их, как методы объекта `Template.[название 
+шаблона]`. Например, в этом шаблоне:
 
     <template name="players">
       {{dstache}}#each topScorers}}
@@ -549,27 +548,27 @@ functions in JavaScript. Just add the helper functions directly on the
       {{dstache}}/each}}
     </{{! }}template>
 
-instead of passing in `topScorers` as data when we call the
-template function, we could define a function on `Template.players`:
+вместо того, чтобы передавать `topScorers` в качестве данных при вызове 
+функции шаблона, мы могли бы объявить функцию в объекте `Template.players`:
 
     Template.players.topScorers = function () {
       return Users.find({score: {$gt: 100}}, {sort: {score: -1}});
     };
 
-In this case, the data is coming from a database query. When the
-database cursor is passed to `#each`, it will wire up all of the
-machinery to efficiently add and move DOM nodes as new results enter
-the query.
+В этом случае информация берется из запроса к базе данных. Когда в `#each` 
+передается курсор, этот хэлпер использует все доступные средства для 
+эффективного добавления и перемещения DOM-элементов при изменении набора 
+документов в запросе.
 
-Helpers can take arguments, and they receive the current template data
-in `this`:
+Хэлперы могут принимать аргументы, а в `this` они получают текущие данные для 
+шаблона:
 
-    // in a JavaScript file
+    // в JavaScript-файле
     Template.players.leagueIs = function (league) {
       return this.league === league;
     };
 
-    <!-- in a HTML file -->
+    <!-- в HTML-файле -->
     <template name="players">
       {{dstache}}#each topScorers}}
         {{dstache}}#if leagueIs "junior"}}
@@ -582,22 +581,22 @@ in `this`:
     </{{! }}template>
 
 {{#note}}
-Handlebars note: `{{dstache}}#if leagueIs "junior"}}` is
-allowed because of a Meteor extension that allows nesting a helper
-in a block helper. (Both `if` and `leagueIs` are
-technically helpers, and stock Handlebars would not invoke
-`leagueIs` here.)
+Примечание по Handlebars: Использование таких конструкций, как 
+`{{dstache}}#if leagueIs "junior"}}` возможно благодаря расширению Meteor, 
+которое позволяет использовать хэлпер в блок-хэлпере. (По сути, и 
+`if` и `leagueIs` здесь - хелперы, и стандартный Handlebars не вызвал бы 
+здесь хэлпер `leagueIs`.)
 {{/note}}
 
-Helpers can also be used to pass in constant data.
+Хэлперы также можно использовать для передачи неизменной информации.
 
-    // Works fine with {{dstache}}#each sections}}
+    // Прекрасно работает с {{dstache}}#each sections}}
     Template.report.sections = ["Situation", "Complication", "Resolution"];
 
-Finally, you can use an `events` declaration on a template function to set up a
-table of event handlers. The format is documented at [Event
-Maps](#eventmaps). The `this` argument to the event handler will be
-the data context of the element that triggered the event.
+И наконец, вы можете указать таблицу обработчиков событий, используя свойство
+`events` функции шаблона. Формат этой таблицы указан в разделе [Карты
+событий](#eventmaps). В обработчике события, `this` будет указывать на 
+контекст данных того элемента, который это событие вызвал.
 
     <!-- myapp.html -->
     <template name="scores">
@@ -619,29 +618,28 @@ the data context of the element that triggered the event.
       }
     });
 
-Putting it all together, here's an example of how you can inject
-arbitrary data into your templates, and have them update automatically
-whenever that data changes. See [Live HTML](#livehtml) for further
-discussion.
+Подводя итог всему сказанному, вот пример того, как вы можете передавать 
+данные в ваши шаблоны, чтобы они автоматически обновлялись при их изменении. 
+Дополнительную информацию можно найти в разделе [Живой HTML](#livehtml).
 
-    <!-- in myapp.html -->
+    <!-- в myapp.html -->
     <template name="forecast">
       <div>It'll be {{dstache}}prediction}} tonight</div>
     </{{! }}template>
 
-    <!-- in myapp.js -->
-    // JavaScript: reactive helper function
+    <!-- в myapp.js -->
+    // JavaScript: реактивный хэлпер
     Template.forecast.prediction = function () {
       return Session.get("weather");
     };
 
-    <!-- in the console -->
+    <!-- в консоле браузера -->
     > Session.set("weather", "cloudy");
     > document.body.appendChild(Meteor.render(Template.forecast));
-    In DOM:  <div>It'll be cloudy tonight</div>
+    На странице:  <div>It'll be cloudy tonight</div>
 
     > Session.set("weather", "cool and dry");
-    In DOM:  <div>It'll be cool and dry tonight</div>
+    На странице:  <div>It'll be cool and dry tonight</div>
 
 {{/better_markdown}}
 </template>
