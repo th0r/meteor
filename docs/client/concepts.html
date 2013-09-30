@@ -781,64 +781,62 @@ remove`](#meteorremove).
 <template name="deploying">
 {{#better_markdown}}
 
-<h2 id="deploying">Deploying</h2>
+<h2 id="deploying">Разворачивание приложения</h2>
 
-Meteor is a full application server.  We include everything you need
-to deploy your application on the internet: you just provide the JavaScript,
-HTML, and CSS.
+Meteor - это полноценный сервер для приложений. В нем есть все, что нужно, 
+для выкладки вашего приложения в интернет: от вас требуется только
+JavaScript, HTML и CSS.
 
-<h3 class="nosection">Running on Meteor's infrastructure</h3>
+<h3 class="nosection">Разворачивание на серверах Meteor</h3>
 
-The easiest way to deploy your application is to use `meteor
-deploy`.  We provide it because it's what, personally, we've always
-wanted: an easy way to take an app idea, flesh it out over a weekend,
-and put it out there for the world to use, with nothing getting in the
-way of creativity.
+Самый простой способ выложить ваше приложение - это использовать команду 
+`meteor deploy`. Мы предоставляем его, потому что это именно то, что мы 
+всегда хотели: легкий способ взять идею для приложения, воплотить ее в жизнь 
+за выходные и с легкостью поделиться этим со всем миром, без отрыва от 
+творческого процесса.
 
     $ meteor deploy myapp.meteor.com
 
-Your application is now available at myapp.meteor.com.  If
-this is the first time deploying to this hostname, Meteor creates a
-fresh empty database for your application.  If you want to deploy an
-update, Meteor will preserve the existing data and just refresh the
-code.
+Теперь ваше приложение доступно по адресу myapp.meteor.com. Если вы 
+выкладываетесь на этот хост впервые, то Meteor создаст для вашего приложения 
+свежую пустую базу данных. Если же вы выкладываете обновление, то Meteor 
+сохранит существующие данные и просто обновит код.
 
-You can also deploy to your own domain.  Just set up the hostname you
-want to use as a CNAME to `origin.meteor.com`,
-then deploy to that name.
+Вы также можете выложить приложение на свой домен. Просто укажите его в 
+качестве `CNAME` к `origin.meteor.com` и выложите на него приложение.
 
     $ meteor deploy www.myapp.com
 
-We provide this as a free service so you can try Meteor.  It is also
-helpful for quickly putting up internal betas, demos, and so on.
+Вы предоставляем этот сервис бесплатно. Он также полезен для быстрой выкладки
+демок, бета-версий и т.д.
 
-<h3 class="nosection">Running on your own infrastructure</h3>
+<h3 class="nosection">Разворачивание на собственных серверах</h3>
 
-You can also run your application on your own infrastructure, or any
-other hosting provider like Heroku.
+Вы также можете выложить ваше приложение на собственные сервера, либо сервера
+любого другого провайдера, например, Heroku.
 
-To get started, run
+Для начала, выполните команду
 
     $ meteor bundle myapp.tgz
 
-This command will generate a fully-contained Node.js application in the form of
-a tarball.  To run this application, you need to provide Node.js 0.8 and a
-MongoDB server.  (The current release of Meteor has been tested with Node
-0.8.24.) You can then run the application by invoking node, specifying the HTTP
-port for the application to listen on, and the MongoDB endpoint.  If you don't
-already have a MongoDB server, we can recommend our friends at
+Она создаст полноценное приложение на Node.js в виде архива (tarball). Для
+запуска этого приложения вам потребуется Node.js 0.8 и сервер MongoDB.
+(Текущая версия Meteor была протестирована под Node 0.8.24.) После этого вы
+можете запустить приложение с помощью node, указав HTTP-порт, который оно
+должно слушать, и URI доступа к MongoDB. Если у вас еще нет сервера MongoDB
+сервера, то мы можем порекомендовать вам наших друзей из
 [MongoHQ](http://mongohq.com).
 
     $ PORT=3000 MONGO_URL=mongodb://localhost:27017/myapp node bundle/main.js
 
-Other packages may require other environment variables (for example, the `email`
-package requires a `MAIL_URL` environment variable).
+Для каких-то пакетов могут потребоваться дополнительные переменные окружения
+(например, для пакета `email` нужна переменная `MAIL_URL`).
 
 {{#warning}}
-For now, bundles will only run on the platform that the bundle was
-created on.  To run on a different platform, you'll need to rebuild
-the native packages included in the bundle.  To do that, make sure you
-have `npm` available, and run the following:
+Пока упакованное приложение работает только на той платформе, на которой оно
+собиралось. Чтобы запустить его на другой платформе, вам нужно пересобрать
+нативные пакеты, входящие в состав приложения. Чтобы это сделать, выполните
+следующую команду (у вас должен быть установлен `npm`):
 
     $ cd bundle/programs/server/node_modules
     $ rm -r fibers
