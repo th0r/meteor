@@ -850,32 +850,31 @@ JavaScript, HTML и CSS.
 <template name="packages_writing">
 {{#better_markdown}}
 
-  <h2 id="writingpackages">Writing packages</h2>
+  <h2 id="writingpackages">Создание пакетов</h2>
 
-The Meteor package format isn't officially documented and will change
-before Meteor 1.0. But that hasn't stopped people like you from
-creating hundreds of packages by reading the source code of existing
-packages and following the model. If you do decide to create your own
-packages, you will have to do some detective work, but here are some
-quick tips:
+Формат пакетов в Meteor официально не документирован и до версии 1.0 
+изменится еще не раз. Но это не остановило таких людей, как вы, и они 
+написали сотни сторонних пакетов, читая исходные коды официальных и делая все
+по их подобию. Если вы решили создать собственный пакет, то вам придется 
+провести небольное расследование и, для начала, вот вам несколько простых
+советов:
 
-* A package is simply a directory with a `package.js` file in it. Look in the
-  [`packages` directory of the Meteor source
-  tree](https://github.com/meteor/meteor/tree/master/packages/) for example
-  `package.js` files. The format and name of the `package.js` file will change
-  significantly before Meteor 1.0, but the functionality will be basically the
-  same even though the syntax is different, so it will be easy to port your
-  code.
+* Пакет - это просто директория с находящимся в ней файлом `package.js`. 
+  Примеры таких файлов можно найти в [директории `packages` исходного 
+  кода Meteor](https://github.com/meteor/meteor/tree/master/packages/). До 
+  выхода версии Meteor 1.0, формат и имя файла `package.js`, наверняка, сильно 
+  изменятся, но его функции останутся в основном такими же, поэтому вам не 
+  составит труда портировать его код.
 
-* Packages explicitly list all of their source files using `api.add_files`, and
-  the files are loaded exactly in the order specified. (This is different from
-  apps, where Meteor scans a directory tree to find the source files.)  Don't
-  forget to include any build plugin packages (such as `coffeescript` or, if
-  using HTML templates, `templating`) that you require.
+* Пакет должен явно перечислить список всех его исходников, используя функцию 
+  `api.add_files` и загружены они будут именно в том порядке, в котором 
+  указаны. (В этом пакеты отличаются от приложений, для которых Meteor 
+  сканирует директории в поисках исходников). Не забывайте указывать 
+  используемые вами плагины для сборки (такие как `coffeescript` или, если 
+  используете HTML-шаблоны, `templating`).
 
-* Exporting a symbol from your package (see
-  [Namespacing](#namespacing)) is accomplished with an `api.export` call
-  from inside your `on_use` handler.
+* Внешние переменные пакета (см. [Пространство имен](#namespacing)) 
+  объявляются путем вызова функции `api.export` из обработчика `on_use`.
 
 * An esoteric point about exports: they are not lvalues. You can't set
   an exported variable to a new value after exporting it. If you
