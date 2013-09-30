@@ -647,40 +647,40 @@ HTML`](#livehtml) и получить самообновляющиеся DOM-э�
 <template name="packages_concept">
 {{#better_markdown}}
 
-  <h2 id="usingpackages">Using packages</h2>
+  <h2 id="usingpackages">Работа с пакетами</h2>
 
-All of the functionality you've read about so far is implemented as
-standard Meteor packages. This is possible thanks to Meteor's
-unusually powerful package and build system. The same packages work in
-the browser and on the server, and packages can contain plugins that
-extend the build process, such as `coffeescript` ([CoffeeScript](http://coffeescript.org)
-compilation) or `templating` (compiling HTML templates).
+Весь функционал, о котором вы читали до сих пор, реализован в виде 
+стандартных Meteor-пакетов. Это возможно благодаря тому, что Meteor обладает 
+необычано мощными системами сборки и управления пакетами. Одни и те же пакеты
+могут работать как в браузере, так и на сервере, а также могут содержать 
+плагины для расширения возможностей системы сборки, например `coffeescript`
+(компиляция [CoffeeScript](http://coffeescript.org)) или `templating` 
+(компиляция HTML-шаблонов).
 
-You can see a list of available packages
-with [`meteor list`](#meteorlist), add packages to your project
-with [`meteor add`](#meteoradd), and remove them
-with [`meteor remove`](#meteorremove).
+Вы можете посмотреть список доступных пакетов с помошью команды [`meteor 
+list`](#meteorlist), добавлять пакеты в ваш проект с помошью [`meteor 
+add`](#meteoradd), и удалять их из проекта с помошью [`meteor 
+remove`](#meteorremove).
 
-By default all apps include the `standard-app-packages` package. This
-automatically pulls in the packages that make up the core Meteor
-stack. To keep things simple, these core packages are also hidden in
-the output for `meteor list`, but you can read the
-[source code of `standard-app-packages`](https://github.com/meteor/meteor/blob/master/packages/standard-app-packages/package.js)
-to see what they are (as Meteor is pre-1.0, they may change from release to
-release). If you want to build your own custom stack, just remove
-`standard-app-packages` from your app and add back in whichever of the standard
-packages you want to keep.
+По умолчанию, все новые приложения используют пакет `standard-app-packages`. 
+Он включает в себя основные пакеты, составляющие ядро Meteor, и необходимые в
+большинстве веб-приложений. Для простоты, они не показываются в списке при
+использовании команды `meteor list`, но вы можете узнать их состав, заглянув в
+[исходники пакета `standard-app-packages`](https://github.com/meteor/meteor/blob/master/packages/standard-app-packages/package.js) 
+(так как Meteor еще не достиг версии 1.0, состав этого пакета может меняться 
+от версии к версии). Если же для вашего приложения не нужны все базовые 
+пакеты из `standard-app-packages`, то просто удалите его и добавьте из него
+только нужные.
 
-In addition to the packages in the official Meteor release being used
-by your app, `meteor list` and `meteor add` also search the `packages`
-directory at the top of your app. If you've downloaded an unofficial
-package from Atmosphere you should unpack it into that directory (the
-unofficial [Meteorite](http://oortcloud.github.io/meteorite/) tool
-streamlines this process). You can also use the `packages` directory
-to break your app into subpackages for your convenience &mdash; if you
-are willing to brave the fact that the Meteor package format is not
-documented yet and will change significantly before Meteor 1.0. See
-[Writing Packages](#writingpackages).
+Команды `meteor list`, `meteor add` и `meteor remove` работают не только с 
+официальными пакетами Meteor, но и с пакетами, находящимися в директории 
+`packages` в корне вашего приложения. В нее вы и должны распаковывать все 
+неофициальные пакеты, скачанные из Atmosphere (неофициальная утилита 
+[Meteorite](http://oortcloud.github.io/meteorite/) значительно упрощает этот 
+процесс). Также, для удобства, вы можете разбить ваше приложение на пакеты, 
+если только вас не смущает тот факт, что формат пакетов в Meteor еще не 
+документирован и наверняка сильно изменится до версии 1.0. Подробнее об этом 
+можно почитать в разделе [Написание Пакетов](#writingpackages).
 
 {{/better_markdown}}
 </template>
