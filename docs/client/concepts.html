@@ -689,91 +689,89 @@ remove`](#meteorremove).
 <template name="namespacing">
 {{#better_markdown}}
 
-  <h2 id="namespacing">Namespacing</h2>
+  <h2 id="namespacing">Пространства имен</h2>
 
-Meteor's namespacing support makes it easy to write large applications
-in JavaScript. Each package that you use in your app exists in its own
-separate namespace, meaning that it sees only its own global variables
-and any variables provided by the packages that it specifically
-uses. Here's how it works.
+Поддержка пространств имен в Meteor позволяет с легкостью писать на нем большие
+приложения. Каждый пакет, используемый в вашем приложении, находится в своем
+личном пространстве имен, т.е. ему доступны только глобальные переменные и 
+публичные переменные используемых им пакетов. Вот как это все работает.
 
-When you declare a top-level variable, you have a choice. You can make
-the variable File Scope or Package Scope.
+Когда вы объявляете переменную верхнего уровня, у вас есть выбор: вы можете
+сделать ее переменной файла или переменной пакета.
 
-    // File Scope. This variable will be visible only inside this
-    // one file. Other files in this app or package won't see it.
+    // Переменная файла. Эта переменная будет видна только в этом файле. Для 
+    // других файлов из этого пакета или приложения она будет невидима.
     var alicePerson = {name: "alice"};
 
-    // Package Scope. This variable is visible to every file inside
-    // of this package or app. The difference is that 'var' is
-    // omitted.
+    // Переменная пакета. Эта переменная доступна из любого файла пакета и 
+    // приложения. Разница в том, что здесь она объявлена без 'var'.
     bobPerson = {name: "bob"};
 
-Notice that this is just the normal JavaScript syntax for declaring a
-variable that is local or global. Meteor scans your source code for
-global variable assignments and generates a wrapper that makes sure
-that your globals don't escape their appropriate namespace.
+Обратите внимание, что это обычный способ объявления локальных и глобальных 
+переменных в JavaScript. Meteor сканирует исходный код в поисках глобальных 
+переменных и генерирует обертку над ним, чтобы эти переменные не покидали 
+свое пространство имен.
 
-In addition to File Scope and Package Scope, there are also
-Exports. An export is a variable that a package makes available to you
-when you use it. For example, the `email` package exports the `Email`
-variable. If your app uses the `email` package (and _only_ if it uses
-the `email` package!) then your app can see `Email` and you can call
-`Email.send`. Most packages have only one export, but some packages
-might have two or three (for example, a package that provides several
-classes that work together).
+В добавок к переменным файла и пакета, также существует понятие внешней 
+переменной - это переменная, доступная пользователю этого пакета. К примеру, 
+пакет `email` объявляет внешнюю переменную `Email`. Если ваше приложение 
+использует пакет `email` (и только, если оно его использует _напрямую_), то вам
+будет доступна переменная `Email` и вы сможете вызвать метод `Email.send`. 
+Большинство пакетов объявляют только одну внешнюю переменную, но некоторые 
+могут объявлять и две и три (например, пакет, который создает несколько 
+зависящих друг от друга классов).
 
-You see only the exports of the packages that you use directly. If you
-use package A, and package A uses package B, then you only see package
-A's exports. Package B's exports don't "leak" into your namespace just
-because you used package A. This keeps each namespace nice and
-tidy. Each app or package only sees their own globals plus the APIs of
-the packages that they specifically asked for.
+Вам доступны внешние переменные только тех пакетов, которые вы используете 
+напрямую, т.е. если вы используете пакет A, а он в свою очередь использует 
+пакет B, то вам будут доступны только внешние переменные пакета A. Внешние 
+переменные пакета B не попадают в ваше пространство имен, что делает его 
+аккуратным и красивым. Каждое приложение или пакет видит только свои 
+глобальные переменные, плюс API необходимых ему пакетов.
 
-When debugging your app, your browser's JavaScript console behaves as
-if it were attached to your app's namespace. You see your app's
-globals and the exports of the packages that your app uses
-directly. You don't see the variables from inside those packages, and
-you don't see the exports of your transitive dependencies (packages
-that aren't used directly by your app, but that are used by packages
-that are used by your app).
+Когда вы отлаживаете ваше приложение, браузерная консоль находится в том же 
+пространстве имен, что и ваше приложение, т.е. вам доступны только глобальные 
+переменные, объявленные в приложении, и внешние переменные явно используемых
+им пакетов. Внутренние переменные этих пакетов, а также внешние переменные 
+пакетов-зависимостей (пакетов, от которых зависят пакеты, используемые в вашем 
+приложении) вам недоступны.
 
-If you want to look inside packages from inside your in-browser
-debugger, you've got two options:
+Если же вы хотите заглянуть внутрь пакетов, используя браузерный отладчик, у 
+вас есть два варианта:
 
-* Set a breakpoint inside package code. While stopped on that
-  breakpoint, the console will be in the package's namespace. You'll
-  see the package's package-scope variables, imports, and also any
-  file-scope variables for the file you're stopped in.
+* Поставить брэйкпоинт в коде пакета. Пока отладчик будет стоять на этом 
+  брэйкпоинте, браузерная консоль будет находиться в пространстве имен 
+  пакета. Вам будут доступны переменные пакета, внешние переменные его
+  пакетов-зависимостей и локальные переменные того файла пакета, в котором вы 
+  поставили брэйкпоинт.
 
-* If a package `foo` is included in your app, regardless of whether
-  your app uses it directly, its exports are available in
-  `Package.foo`. For example, if the `email` package is loaded, then
-  you can access `Package.email.Email.send` even from namespaces that
-  don't use the `email` package directly.
+* Если пакет `foo` используется в вашем приложении (не важно, явно или нет), 
+  его внешние переменные доступны из объекта `Package.foo`. Например, если 
+  используется пакет `email`, то вы можете вызвать `Package.email.Email.send`
+  даже из пространства имен, в котором он напрямую не используется.
 
-When declaring functions, keep in mind that `function x () {}` is just
-shorthard for `var x = function () {}` in JavaScript. Consider these
-examples:
+Во время объявления функций учтите, что `function x () {}` - это
+просто сокращение для `var x = function () {}`:
 
-    // This is the same as 'var x = function () ...'. So x() is
-    // file-scope and can be called only from within this one file.
+    // Это то же самое, что и 'var x = function () ...'. Таким образом 
+    // функция x() - это переменная файла и доступна она только из него.
     function x () { ... }
 
-    // No 'var', so x() is package-scope and can be called from
-    // any file inside this app or package.
+    // Ключевое слово 'var' не указано, поэтому x() - это переменная пакета и
+    // доступна из любого файла этого пакета или приложения.
     x = function () { ... }
 
 {{#note}}
-Technically speaking, globals in an app (as opposed to in a package)
-are actually true globals. They can't be captured in a scope that is
-private to the app code, because that would mean that they wouldn't be
-visible in the console during debugging! This means that app globals
-actually end up being visible in packages. That should never be a
-problem for properly written package code (since the app globals will
-still be properly shadowed by declarations in the packages). You
-certainly shouldn't depend on this quirk, and in the future Meteor may
-check for it and throw an error if you do.
+С технической точки зрения, глобальные переменные в приложении на самом деле 
+являются настоящими глобальными переменными (чего нельзя сказать про 
+пакеты). Их нельзя преобразовывать в локальные по отношению к коду приложения, 
+т.к. в этом случае они не будут доступны из консоли браузера во время 
+отладки! Это означает, что, на самом деле, они видны из кода пакетов, но это 
+обстоятельство не должно создавать никаких проблем при правильном их 
+написании (так как глобальные переменные в пакетах должным образом 
+перекрываются необходимыми объявлениями).
+Можно сказать наверняка, что эту особенность пакетов вам использовать не 
+стоит, тем более что в будущих версиях Meteor, возможно, в данных ситуациях 
+будет выдавать ошибку.
 {{/note}}
 
 {{/better_markdown}}
