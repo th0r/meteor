@@ -74,11 +74,11 @@ Template.api.release = {
   locus: "Везде",
   descr: ["`Meteor.release` содержит название " +
           "[версии](#meteorupdate) Meteor, на которой был создан проект " +
-          "например, `\"" +
+          "(например, `\"" +
           // Put the current release in the docs as the example)
           (Meteor.release ? Meteor.release : '0.6.0') +
-          "\"`). Если же проект был создан на основе версии Meteor, полученной " +
-          "из git-репозитория, то значение переменной будет `undefined`."]
+          "\"`). Если же проект был создан на Meteor, собранном на основе " +
+          "git-коммита, то значение переменной будет `undefined`."]
 };
 
 Template.api.ejsonParse = {
