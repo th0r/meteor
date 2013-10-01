@@ -876,76 +876,78 @@ JavaScript, HTML и CSS.
 * Внешние переменные пакета (см. [Пространство имен](#namespacing)) 
   объявляются путем вызова функции `api.export` из обработчика `on_use`.
 
-* An esoteric point about exports: they are not lvalues. You can't set
-  an exported variable to a new value after exporting it. If you
-  export `a = {name: 'alice'}` then you can change `a.name` anytime
-  you want, but if after startup you set `a` to a whole new object
-  then the packages that import `a` won't see the change. Since your
-  exports are most always objects or functions, this is hardly ever an
-  issue.
+* У внешних переменных существует одна скрытая особенность - они не
+  l-значения (lvalues). Вы не можете присвоить внешней переменной другое
+  значение после того, как она уже была объявлена, т.е. если, например, вы
+  объявляете внешнюю переменную `a = {name: 'alice'}`, то вы в любой момент
+  можете изменить значение `a.name`, но если вы сразу после запуска приложения
+  запишите в `a` совершенно другой объект, то пакеты, использующие `a` не
+  увидят этих изменений.
 
-* Packages can use [npm modules](https://npmjs.org/). Use `Npm.depends` in your
-  `package.js` to list the npm modules that you need and the specific
-  versions that you want to use. Then use `Npm.require` inside your
-  package to pull in the modules when you need them. Meteor strives to
-  have 100% repeatable builds so that everyone on your team is always
-  running the same code, and that's why you must explicitly lock your
-  npm dependencies to specific versions. Behind the scenes, Meteor
-  will use `npm shrinkwrap` to also lock down the versions of the
-  transitive dependencies of all of the npm modules that you use.
+* Пакеты могут использовать [npm-модули](https://npmjs.org/). Для
+  перечисления необходимых вам модулей и их версий используйте функцию
+  `Npm.depends` в файле `package.js`. Затем в коде вашего пакета загружайте
+  необходимые модули при помощи `Npm.require`. Вам обязательно нужно
+  указывать точные версии npm-модулей, т.к. Meteor стремится к стопроцентному
+  воспроизведению вашего приложения при его пересборке. Это гарантирует, что
+  все ваши коллеги всегда будут работать с одим и тем же кодом. За кулисами,
+  Meteor использует команду `npm shrinkwrap`, чтобы дополнительно заморозить
+  зависимости всех используемых в пакете npm-модулей.
 
-* Whenever your package changes, Meteor will rebuild it (compiling
-  non-JavaScript source files, fetching npm dependencies, constructing
-  namespace wrappers, and so on). The built package will be cached and
-  rebuilt only when a source file changes (tracked by SHA1) or when
-  other dependencies such as build plugins change. To force a rebuild
-  you can use the undocumented command `meteor rebuild-all`, but this
-  should never be necessary (if it is, please send a
-  [bug report](https://github.com/meteor/meteor/blob/devel/Contributing.md#filing-bug-reports)!).
+* Всякий раз, когда ваш пакет изменяется, Meteor пересобирает его заного
+  (скомпилирует не-Javascript файлы, получит все npm-зависимости, создаст
+  обертки для поддержки пространств имен и т.д.). Собранный пакет кэшируется
+  и будет пересобран только когда изменятся его исходники (отслеживается при
+  помощи SHA1) или зависимости. Чтобы принудительно пересобрать пакет, вы
+  можете воспользоваться недокументированной командой `meteor rebuild-all`,
+  но такой ситуации у вас, по идее, быть не должно (но если она все-таки
+  произошла, обязательно пришлите нам [отчет об
+  ошибке](https://github.com/meteor/meteor/blob/devel/Contributing.md#filing-bug-reports)!).
 
-* Build plugins are created with `_transitional_registerBuildPlugin`,
-  an API that is very much in flux. See the `coffeescript` package for
-  an example. Build plugins are fully-fledged Meteor programs in their
-  own right and have their own namespace, package dependencies, source
-  files and npm requirements. The old `register_extension` API is
-  deprecated and should not be used as it will prevent your package
-  from being cached, slowing down builds.
+* Плагины для сборки создаются при помощи
+  `_transitional_registerBuildPlugin`. Этот API в данный момент находится в
+  активной разработке. В качестве примера можете посмотреть пакет
+  `coffeescript`. Плагины для сборки - это полноценные программы на Meteor, с
+  собственным пространством имен, зависимостями, исходниками и
+  npm-модулями. Старое API, использующее `register_extension`, устарело и вам
+  не следует его использовать, т.к. в этом случае пакеты не будут
+  кешироваться, замедляя тем самым сборку приожения.
 
-* It is possible to create weak dependencies between packages. If
-  package A has a weak dependency on package B, it means that
-  including A in an app does not force B to be included too &mdash;
-  but, if B _is_ included, say by the app developer or by another
-  package, then B will load before A. You can use this to make
-  packages that optionally integrate with or enhance other packages if
-  those packages are present. To create a weak dependency, pass
-  `{weak: true}` as the third argument to `api.use`. When you weakly
-  depend on a package you don't see its exports. You can detect if
-  the possibly-present weakly-depended-on package is there by seeing
-  if `Package.foo` exists, and get its exports from the same place.
+* Между пакетам можно создавать слабые зависимости. Если пакет A объявляет
+  слабую зависимость от пакета B, то при добавление пакета A в приложение,
+  пакет B в него добавлен не будет, но если он был в него включен напрямую
+  разработчиком, либо другим пакетом, то он будет загружен перед пакетом A.
+  Этот тип зависимости позволяет по возможности воспользоваться каким-либо
+  другим пакетом, если он тоже добавлен в ваше приложение, либо
+  расширить его функционал. Чтобы создать слабую зависимость, передайте
+  объект `{weak: true}` в качестве третьего аргумента функции `api.use`.
+  Если ваш пакет слабо зависит от какого-либо другого, то его внешние
+  переменные вам недоступны. Таким образом, понять, добавлен ли он в
+  приложение и получить доступ к его внешним переменным вы можете, используя
+  объект `Package.foo` где `foo` - название данного пакета.
 
-* It is also possible to create unordered dependencies by passing
-  `{unordered: true}`. An unordered dependency is the exact opposite
-  of a weak dependency. If A has an unordered dependency on B, then
-  including A forces B to be included as well, but doesn't require B
-  to load before A. This is occasionally useful for resolving circular
-  dependencies.
+* Также вы можете создавать неупорядоченные зависимости, передавая в качестве
+  аргумента `{unordered: true}`. Это полная противоположность слабой
+  зависимости. Если A создает неупорядоченную зависимость от B, то добавление
+  в приложение пакета A приводит к добавление в него и пакета B, но при этом
+  B не обязан быть загружен перед A. Это иногда полезно для разрешения
+  циклических зависимостей.
 
-* The build system also supports package implication. If package A
-  implies package B, then it means that when someone depends on
-  package A, it's as if they also depended on package B as well. In
-  particular, they get B's exports. This is done with `api.imply` and
-  can be used to create umbrella packages such as
-  `standard-app-packages` that are a shortcut for pulling in a set of
-  packages, or it can be helpful in factoring common code out of a set
-  of packages as with `accounts-base`.
+* Система сборки также поддерживает составные пакеты. Если пакет A включает в
+  себя пакет B, то это означает, что подключивший пакет A также зависит и от
+  пакета B. В частности, подключившему A становятся доступны внешние
+  переменные пакета B. Делается это при помощи функции `api.imply` и может
+  быть использовано для создания пакетов-контейнеров, таких как
+  `standard-app-packages` (которые, по сути, служат для удобного объявления
+  группы пакетов), или же для вынесения общего кода из нескольких пакетов,
+  как в случае с `accounts-base`.
 
-* The build system understands the idea of native code and has a
-  system of architecture names to ensure that packages that are
-  specific to one architecture aren't run on the wrong
-  architecture. For example, if you include an npm module that has a
-  native extension, your built Meteor package will be specific to your
-  machine architecture, but if not your built Meteor package will be
-  portable.
+* Система сборки понимает идею нативного кода и обладает системой
+  архитектурно-зависимых имен, необходимой для того, чтобы не использовать
+  пакеты, предназначенные для одной архитектуры, в другой, несовместимой в ней.
+  Например, если ваш пакет зависит от npm-модуля, в состав которого входит
+  нативное расширение, то ваше собранное Meteor-приложение будет работать
+  только на системах со схожей архитектурой, иначе оно будет портативное.
 
 {{/better_markdown}}
 </template>
