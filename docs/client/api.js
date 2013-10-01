@@ -1,55 +1,56 @@
 Template.api.isClient = {
   id: "meteor_isclient",
   name: "Meteor.isClient",
-  locus: "Anywhere",
-  descr: ["Boolean variable.  True if running in client environment."]
+  locus: "Везде",
+  descr: ["Переменная типа Boolean. True, если находимся на клиенте."]
 };
 
 Template.api.isServer = {
   id: "meteor_isserver",
   name: "Meteor.isServer",
-  locus: "Anywhere",
-  descr: ["Boolean variable.  True if running in server environment."]
+  locus: "Везде",
+  descr: ["Переменная типа Boolean. True, если находимся на сервере."]
 };
 
 Template.api.startup = {
   id: "meteor_startup",
   name: "Meteor.startup(func)",
-  locus: "Anywhere",
-  descr: ["Run code when a client or a server starts."],
+  locus: "Везде",
+  descr: ["Выполняет код сразу же после запуска клиента или сервера."],
   args: [
     {name: "func",
      type: "Function",
-     descr: "A function to run on startup."}
+     descr: "Функция, которую необходимо выполнить после запуска приложения."}
   ]
 };
 
 Template.api.absoluteUrl = {
   id: "meteor_absoluteurl",
   name: "Meteor.absoluteUrl([path], [options])",
-  locus: "Anywhere",
-  descr: ["Generate an absolute URL pointing to the application. The server "
-          + "reads from the `ROOT_URL` environment variable to determine "
-          + "where it is running. This is taken care of automatically for "
-          + "apps deployed with `meteor deploy`, but must be provided when "
-          + "using `meteor bundle`."],
+  locus: "Везде",
+  descr: ["Сгенерировать абсолютный урл для приложения. Сервер использует "
+          + "значение переменной среды `ROOT_URL`, чтобы определить, где он "
+          + "запущен. Эта переменная устанавливается автоматически при "
+          + "развертывании приложения через `meteor deploy`, но при "
+          + "использовании `meteor bundle` вы должны сделать это сами."],
   args: [
     {name: "path",
      type: "String",
-     descr: 'A path to append to the root URL. Do not include a leading "`/`".'
+     descr: 'Путь, который необходимо добавить к базовому URL. Не добавляйте ' +
+            ' вначало "`/`".'
     }
   ],
   options: [
     {name: "secure",
      type: "Boolean",
-     descr: "Create an HTTPS URL."
+     descr: "Создать HTTPS URL."
     },
     {name: "replaceLocalhost",
      type: "Boolean",
-     descr: "Replace localhost with 127.0.0.1. Useful for services that don't recognize localhost as a domain name."},
+     descr: "Заменить localhost на 127.0.0.1. Полезно при использовании сервисов, которые не определяют localhost как доменное имя."},
     {name: "rootUrl",
      type: "String",
-     descr: "Override the default ROOT_URL from the server environment. For example: \"`http://foo.example.com`\""
+     descr: "Переопределить базовый URL, полученный из переменной среды ROOT_URL. Например: \"`http://foo.example.com`\""
     }
   ]
 };
@@ -57,32 +58,33 @@ Template.api.absoluteUrl = {
 Template.api.settings = {
   id: "meteor_settings",
   name: "Meteor.settings",
-  locus: "Anywhere",
-  descr: ["`Meteor.settings` contains any deployment-specific options that were " +
-          "provided using the `--settings` option for `meteor run` or `meteor deploy`. " +
-          "If you provide the `--settings` option, `Meteor.settings` will be the " +
-          "JSON object in the file you specify.  Otherwise, `Meteor.settings` will " +
-          "be an empty object. If the object contains a key named `public`, then " +
-          "`Meteor.settings.public` will also be available on the client."]
+  locus: "Везде",
+  descr: ["`Meteor.settings` содержит все настройки приложения, переданные при " +
+          "помощи опции `--settings` команде `meteor run` или `meteor deploy`. " +
+          "Если вы укажите опцию `--settings` и передадите JSON-файл в качестве агрумента, " +
+          "то содержимое этого файла будет доступно в серверном коде в качестве " +
+          "JSON-объекта `Meteor.settings`. В противном случае этот объект будет " +
+          "пустым. Если объект содержит ключ `public`, то `Meteor.settings.public` " +
+          "будет также доступно на клиенте."]
 };
 
 Template.api.release = {
   id: "meteor_release",
   name: "Meteor.release",
-  locus: "Anywhere",
-  descr: ["`Meteor.release` is a string containing the name of the " +
-          "[release](#meteorupdate) with which the project was built (for " +
-          "example, `\"" +
+  locus: "Везде",
+  descr: ["`Meteor.release` содержит название " +
+          "[версии](#meteorupdate) Meteor, на которой был создан проект " +
+          "например, `\"" +
           // Put the current release in the docs as the example)
           (Meteor.release ? Meteor.release : '0.6.0') +
-          "\"`). It is `undefined` if the project was built using a git " +
-          "checkout of Meteor."]
+          "\"`). Если же проект был создан на основе версии Meteor, полученной " +
+          "из git-репозитория, то значение переменной будет `undefined`."]
 };
 
 Template.api.ejsonParse = {
   id: "ejson_parse",
   name: "EJSON.parse(str)",
-  locus: "Anywhere",
+  locus: "Везде",
   args: [ {name: "str", type: "String", descr: "A string to parse into an EJSON value."} ],
   descr: ["Parse a string into an EJSON value. Throws an error if the string is not valid EJSON."]
 },
@@ -90,7 +92,7 @@ Template.api.ejsonParse = {
 Template.api.ejsonStringify = {
   id: "ejson_stringify",
   name: "EJSON.stringify(val)",
-  locus: "Anywhere",
+  locus: "Везде",
   args: [ {name: "val", type: "EJSON-compatible value", descr: "A value to stringify."} ],
   descr: ["Serialize a value to a string.\n\nFor EJSON values, the serialization " +
           "fully represents the value. For non-EJSON values, serializes the " +
@@ -101,7 +103,7 @@ Template.api.ejsonStringify = {
 Template.api.ejsonFromJSONValue = {
   id: "ejson_from_json_value",
   name: "EJSON.fromJSONValue(val)",
-  locus: "Anywhere",
+  locus: "Везде",
   args: [ {name: "val", type: "JSON-compatible value", descr: "A value to deserialize into EJSON."} ],
   descr: ["Deserialize an EJSON value from its  plain JSON representation."]
 },
@@ -109,7 +111,7 @@ Template.api.ejsonFromJSONValue = {
 Template.api.ejsonToJSONValue = {
   id: "ejson_to_json_value",
   name: "EJSON.toJSONValue(val)",
-  locus: "Anywhere",
+  locus: "Везде",
   args: [ {name: "val", type: "EJSON-compatible value", descr: "A value to serialize to plain JSON."} ],
   descr: ["Serialize an EJSON-compatible value into its plain JSON representation."]
 },
@@ -117,7 +119,7 @@ Template.api.ejsonToJSONValue = {
 Template.api.ejsonEquals = {
   id: "ejson_equals",
   name: "EJSON.equals(a, b)", //doc options?
-  locus: "Anywhere",
+  locus: "Везде",
   args: [ {name: "a", type: "EJSON-compatible object"},
           {name: "b", type: "EJSON-compatible object"} ],
   descr: ["Return true if `a` and `b` are equal to each other.  Return false otherwise." +
@@ -127,7 +129,7 @@ Template.api.ejsonEquals = {
 Template.api.ejsonClone = {
   id: "ejson_clone",
   name: "EJSON.clone(val)",
-  locus: "Anywhere",
+  locus: "Везде",
   args: [ {name: "val", type: "EJSON-compatible value", descr: "A value to copy."} ],
   descr: ["Return a deep copy of `val`."]
 },
@@ -135,7 +137,7 @@ Template.api.ejsonClone = {
 Template.api.ejsonNewBinary = {
   id: "ejson_new_binary",
   name: "EJSON.newBinary(size)",
-  locus: "Anywhere",
+  locus: "Везде",
   args: [ {name: "size", type: "Number", descr: "The number of bytes of binary data to allocate."} ],
   descr: ["Allocate a new buffer of binary data that EJSON can serialize."]
 },
@@ -143,14 +145,14 @@ Template.api.ejsonNewBinary = {
 Template.api.ejsonIsBinary = {
   id: "ejson_is_binary",
   name: "EJSON.isBinary(x)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Returns true if `x` is a buffer of binary data, as returned from [`EJSON.newBinary`](#ejson_new_binary)."]
 },
 
 Template.api.ejsonAddType = {
   id: "ejson_add_type",
   name: "EJSON.addType(name, factory)",
-  locus: "Anywhere",
+  locus: "Везде",
   args: [
     {name: "name",
      type: "String",
@@ -192,7 +194,7 @@ Template.api.ejsonTypeToJSONValue = {
 Template.api.publish = {
   id: "meteor_publish",
   name: "Meteor.publish(name, func)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Publish a record set."],
   args: [
     {name: "name",
@@ -207,7 +209,7 @@ Template.api.publish = {
 Template.api.subscription_added = {
   id: "publish_added",
   name: "<i>this</i>.added(collection, id, fields)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside the publish function.  Informs the subscriber that a document has been added to the record set."],
   args: [
     {name: "collection",
@@ -228,7 +230,7 @@ Template.api.subscription_added = {
 Template.api.subscription_changed = {
   id: "publish_changed",
   name: "<i>this</i>.changed(collection, id, fields)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside the publish function.  Informs the subscriber that a document in the record set has been modified."],
   args: [
     {name: "collection",
@@ -249,7 +251,7 @@ Template.api.subscription_changed = {
 Template.api.subscription_removed = {
   id: "publish_removed",
   name: "<i>this</i>.removed(collection, id)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside the publish function.  Informs the subscriber that a document has been removed from the record set."],
   args: [
     {name: "collection",
@@ -266,7 +268,7 @@ Template.api.subscription_removed = {
 Template.api.subscription_ready = {
   id: "publish_ready",
   name: "<i>this</i>.ready()",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside the publish function.  Informs the subscriber that an initial, complete snapshot of the record set has been sent.  This will trigger a call on the client to the `onReady` callback passed to  [`Meteor.subscribe`](#meteor_subscribe), if any."]
 };
 
@@ -274,21 +276,21 @@ Template.api.subscription_ready = {
 Template.api.subscription_error = {
   id: "publish_error",
   name: "<i>this</i>.error(error)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside the publish function.  Stops this client's subscription, triggering a call on the client to the `onError` callback passed to [`Meteor.subscribe`](#meteor_subscribe), if any. If `error` is not a [`Meteor.Error`](#meteor_error), it will be [sanitized](#meteor_error)."]
 };
 
 Template.api.subscription_stop = {
   id: "publish_stop",
   name: "<i>this</i>.stop()",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside the publish function.  Stops this client's subscription; the `onError` callback is *not* invoked on the client."]
 };
 
 Template.api.subscription_onStop = {
   id: "publish_onstop",
   name: "<i>this</i>.onStop(func)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside the publish function.  Registers a callback function to run when the subscription is stopped."],
   args: [
     {name: "func",
@@ -301,7 +303,7 @@ Template.api.subscription_onStop = {
 Template.api.subscription_userId = {
   id: "publish_userId",
   name: "<i>this</i>.userId",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Access inside the publish function. The id of the logged-in user, or `null` if no user is logged in."]
 };
 
@@ -309,7 +311,7 @@ Template.api.subscription_userId = {
 Template.api.subscribe = {
   id: "meteor_subscribe",
   name: "Meteor.subscribe(name [, arg1, arg2, ... ] [, callbacks])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Subscribe to a record set.  Returns a handle that provides `stop()` and `ready()` methods."],
   args: [
     {name: "name",
@@ -327,7 +329,7 @@ Template.api.subscribe = {
 Template.api.methods = {
   id: "meteor_methods",
   name: "Meteor.methods(methods)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Defines functions that can be invoked over the network by clients."],
   args: [
     {name: "methods",
@@ -339,14 +341,14 @@ Template.api.methods = {
 Template.api.method_invocation_userId = {
   id: "method_userId",
   name: "<i>this</i>.userId",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["The id of the user that made this method call, or `null` if no user was logged in."]
 };
 
 Template.api.method_invocation_setUserId = {
   id: "method_setUserId",
   name: "<i>this</i>.setUserId(userId)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Set the logged in user."],
   args: [
     {name: "userId",
@@ -358,21 +360,21 @@ Template.api.method_invocation_setUserId = {
 Template.api.method_invocation_unblock = {
   id: "method_unblock",
   name: "<i>this</i>.unblock()",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Call inside a method invocation.  Allow subsequent method from this client to begin running in a new fiber."]
 };
 
 Template.api.method_invocation_isSimulation = {
   id: "method_issimulation",
   name: "<i>this</i>.isSimulation",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Access inside a method invocation.  Boolean value, true if this invocation is a stub."]
 };
 
 Template.api.error = {
   id: "meteor_error",
   name: "new Meteor.Error(error, reason, details)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["This class represents a symbolic error thrown by a method."],
   args: [
     {name: "error",
@@ -390,7 +392,7 @@ Template.api.error = {
 Template.api.meteor_call = {
   id: "meteor_call",
   name: "Meteor.call(name, param1, param2, ... [, asyncCallback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Invokes a method passing any number of arguments."],
   args: [
     {name: "name",
@@ -408,7 +410,7 @@ Template.api.meteor_call = {
 Template.api.meteor_apply = {
   id: "meteor_apply",
   name: "Meteor.apply(name, params [, options] [, asyncCallback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Invoke a method passing an array of arguments."],
   args: [
     {name: "name",
@@ -434,14 +436,14 @@ Template.api.meteor_apply = {
 Template.api.status = {
   id: "meteor_status",
   name: "Meteor.status()",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Get the current connection status. A reactive data source."]
 };
 
 Template.api.reconnect = {
   id: "meteor_reconnect",
   name: "Meteor.reconnect()",
-  locus: "Client",
+  locus: "Клиент",
   descr: [
     "Force an immediate reconnection attempt if the client is not connected to the server.",
     "This method does nothing if the client is already connected."]
@@ -450,7 +452,7 @@ Template.api.reconnect = {
 Template.api.disconnect = {
   id: "meteor_disconnect",
   name: "Meteor.disconnect()",
-  locus: "Client",
+  locus: "Клиент",
   descr: [
     "Disconnect the client from the server."]
 };
@@ -458,7 +460,7 @@ Template.api.disconnect = {
 Template.api.connect = {
   id: "ddp_connect",
   name: "DDP.connect(url)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Connect to the server of a different Meteor application to subscribe to its document sets and invoke its remote methods."],
   args: [
     {name: "url",
@@ -472,7 +474,7 @@ Template.api.connect = {
 Template.api.meteor_collection = {
   id: "meteor_collection",
   name: "new Meteor.Collection(name, [options])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Constructor for a Collection"],
   args: [
     {name: "name",
@@ -501,7 +503,7 @@ Template.api.meteor_collection = {
 Template.api.find = {
   id: "find",
   name: "<em>collection</em>.find(selector, [options])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Find the documents in a collection that match the selector."],
   args: [
     {name: "selector",
@@ -536,7 +538,7 @@ Template.api.find = {
 Template.api.findone = {
   id: "findone",
   name: "<em>collection</em>.findOne(selector, [options])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Finds the first document that matches the selector, as ordered by sort and skip options."],
   args: [
     {name: "selector",
@@ -569,7 +571,7 @@ Template.api.findone = {
 Template.api.insert = {
   id: "insert",
   name: "<em>collection</em>.insert(doc, [callback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Insert a document in the collection.  Returns its unique _id."],
   args: [
     {name: "doc",
@@ -584,7 +586,7 @@ Template.api.insert = {
 Template.api.update = {
   id: "update",
   name: "<em>collection</em>.update(selector, modifier, [options], [callback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Modify one or more documents in the collection"],
   args: [
     {name: "selector",
@@ -609,7 +611,7 @@ Template.api.update = {
 Template.api.remove = {
   id: "remove",
   name: "<em>collection</em>.remove(selector, [callback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Remove documents from the collection"],
   args: [
     {name: "selector",
@@ -625,7 +627,7 @@ Template.api.remove = {
 Template.api.allow = {
   id: "allow",
   name: "<em>collection</em>.allow(options)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Allow users to write directly to this collection from client code, subject to limitations you define."],
   options: [
     {name: "insert, update, remove",
@@ -643,7 +645,7 @@ Template.api.allow = {
 Template.api.deny = {
   id: "deny",
   name: "<em>collection</em>.deny(options)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Override `allow` rules."],
   options: [
     {name: "insert, update, remove",
@@ -662,21 +664,21 @@ Template.api.deny = {
 Template.api.cursor_count = {
   id: "count",
   name: "<em>cursor</em>.count()",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Returns the number of documents that match a query."]
 };
 
 Template.api.cursor_fetch = {
   id: "fetch",
   name: "<em>cursor</em>.fetch()",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Return all matching documents as an Array."]
 };
 
 Template.api.cursor_foreach = {
   id: "foreach",
   name: "<em>cursor</em>.forEach(callback)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Call `callback` once for each matching document, sequentially and synchronously."],
   args: [
     {name: "callback",
@@ -688,7 +690,7 @@ Template.api.cursor_foreach = {
 Template.api.cursor_map = {
   id: "map",
   name: "<em>cursor</em>.map(callback)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Map callback over all matching documents.  Returns an Array."],
   args: [
     {name: "callback",
@@ -700,7 +702,7 @@ Template.api.cursor_map = {
 Template.api.cursor_rewind = {
   id: "rewind",
   name: "<em>cursor</em>.rewind()",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Resets the query cursor."],
   args: [ ]
 };
@@ -708,7 +710,7 @@ Template.api.cursor_rewind = {
 Template.api.cursor_observe = {
   id: "observe",
   name: "<em>cursor</em>.observe(callbacks)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Watch a query.  Receive callbacks as the result set changes."],
   args: [
     {name: "callbacks",
@@ -720,7 +722,7 @@ Template.api.cursor_observe = {
 Template.api.cursor_observe_changes = {
   id: "observe_changes",
   name: "<em>cursor</em>.observeChanges(callbacks)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Watch a query.  Receive callbacks as the result set changes.  Only the differences between the old and new documents are passed to the callbacks."],
   args: [
     {name: "callbacks",
@@ -732,7 +734,7 @@ Template.api.cursor_observe_changes = {
 Template.api.id = {
   id: "meteor_id",
   name: "Random.id()",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Return a unique identifier."],
   args: [ ]
 };
@@ -740,7 +742,7 @@ Template.api.id = {
 Template.api.collection_object_id = {
   id: "collection_object_id",
   name: "new Meteor.Collection.ObjectID(hexString)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Create a Mongo-style `ObjectID`.  If you don't specify a `hexString`, the `ObjectID` will generated randomly (not using MongoDB's ID construction rules)."],
   args: [ {
     name: "hexString",
@@ -774,7 +776,7 @@ Template.api.fieldspecifiers = {
 Template.api.deps_autorun = {
   id: "deps_autorun",
   name: "Deps.autorun(runFunc)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Run a function now and rerun it later whenever its dependencies change. Returns a Computation object that can be used to stop or observe the rerunning."],
   args: [
     {name: "runFunc",
@@ -786,14 +788,14 @@ Template.api.deps_autorun = {
 Template.api.deps_flush = {
   id: "deps_flush",
   name: "Deps.flush()",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Process all reactive updates immediately and ensure that all invalidated computations are rerun."]
 };
 
 Template.api.deps_nonreactive = {
   id: "deps_nonreactive",
   name: "Deps.nonreactive(func)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Run a function without tracking dependencies."],
   args: [
     {name: "func",
@@ -805,21 +807,21 @@ Template.api.deps_nonreactive = {
 Template.api.deps_active = {
   id: "deps_active",
   name: "Deps.active",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["True if there is a current computation, meaning that dependencies on reactive data sources will be tracked and potentially cause the current computation to be rerun."]
 };
 
 Template.api.deps_currentcomputation = {
   id: "deps_currentcomputation",
   name: "Deps.currentComputation",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["The current computation, or `null` if there isn't one.  The current computation is the [`Deps.Computation`](#deps_computation) object created by the innermost active call to `Deps.autorun`, and it's the computation that gains dependencies when reactive data sources are accessed."]
 };
 
 Template.api.deps_oninvalidate = {
   id: "deps_oninvalidate",
   name: "Deps.onInvalidate(callback)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Registers a new [`onInvalidate`](#computation_oninvalidate) callback on the current computation (which must exist), to be called immediately when the current computation is invalidated or stopped."],
   args: [
     {name: "callback",
@@ -831,7 +833,7 @@ Template.api.deps_oninvalidate = {
 Template.api.deps_afterflush = {
   id: "deps_afterflush",
   name: "Deps.afterFlush(callback)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Schedules a function to be called during the next flush, or later in the current flush if one is in progress, after all invalidated computations have been rerun.  The function will be run once and not on subsequent flushes unless `afterFlush` is called again."],
   args: [
     {name: "callback",
@@ -843,21 +845,21 @@ Template.api.deps_afterflush = {
 Template.api.computation_stop = {
   id: "computation_stop",
   name: "<em>computation</em>.stop()",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Prevents this computation from rerunning."]
 };
 
 Template.api.computation_invalidate = {
   id: "computation_invalidate",
   name: "<em>computation</em>.invalidate()",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Invalidates this computation so that it will be rerun."]
 };
 
 Template.api.computation_oninvalidate = {
   id: "computation_oninvalidate",
   name: "<em>computation</em>.onInvalidate(callback)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Registers `callback` to run when this computation is next invalidated, or runs it immediately if the computation is already invalidated.  The callback is run exactly once and not upon future invalidations unless `onInvalidate` is called again after the computation becomes valid again."],
   args: [
     {name: "callback",
@@ -869,35 +871,35 @@ Template.api.computation_oninvalidate = {
 Template.api.computation_stopped = {
   id: "computation_stopped",
   name: "<em>computation</em>.stopped",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["True if this computation has been stopped."]
 };
 
 Template.api.computation_invalidated = {
   id: "computation_invalidated",
   name: "<em>computation</em>.invalidated",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["True if this computation has been invalidated (and not yet rerun), or if it has been stopped."]
 };
 
 Template.api.computation_firstrun = {
   id: "computation_firstrun",
   name: "<em>computation</em>.firstRun",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["True during the initial run of the computation at the time `Deps.autorun` is called, and false on subsequent reruns and at other times."]
 };
 
 Template.api.dependency_changed = {
   id: "dependency_changed",
   name: "<em>dependency</em>.changed()",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Invalidate all dependent computations immediately and remove them as dependents."]
 };
 
 Template.api.dependency_depend = {
   id: "dependency_depend",
   name: "<em>dependency</em>.depend([fromComputation])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Declares that the current computation (or `fromComputation` if given) depends on `dependency`.  The computation will be invalidated the next time `dependency` changes.", "If there is no current computation and `depend()` is called with no arguments, it does nothing and returns false.", "Returns true if the computation is a new dependent of `dependency` rather than an existing one."],
   args: [
     {name: "fromComputation",
@@ -909,7 +911,7 @@ Template.api.dependency_depend = {
 Template.api.dependency_hasdependents = {
   id: "dependency_hasdependents",
   name: "<em>dependency</em>.hasDependents()",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["True if this Dependency has one or more dependent Computations, which would be invalidated if this Dependency were to change."]
 };
 
@@ -921,7 +923,7 @@ Template.api.dependency_hasdependents = {
 Template.api.render = {
   id: "meteor_render",
   name: "Meteor.render(htmlFunc)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Create DOM nodes that automatically update themselves as data changes."],
   args: [
     {name: "htmlFunc",
@@ -933,7 +935,7 @@ Template.api.render = {
 Template.api.renderList = {
   id: "meteor_renderlist",
   name: "Meteor.renderList(observable, docFunc, [elseFunc])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Create DOM nodes that automatically update themselves based on the results of a database query."],
   args: [
     {name: "observable",
@@ -992,14 +994,14 @@ Template.api.userId = {
 Template.api.users = {
   id: "meteor_users",
   name: "Meteor.users",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["A [Meteor.Collection](#collections) containing user documents."]
 };
 
 Template.api.loggingIn = {
   id: "meteor_loggingin",
   name: "Meteor.loggingIn()",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["True if a login method (such as `Meteor.loginWithPassword`, `Meteor.loginWithFacebook`, or `Accounts.createUser`) is currently in progress. A reactive data source."]
 };
 
@@ -1015,7 +1017,7 @@ Template.api.loggingInTemplate = {
 Template.api.logout = {
   id: "meteor_logout",
   name: "Meteor.logout([callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Log the user out."],
   args: [
     {
@@ -1030,7 +1032,7 @@ Template.api.logout = {
 Template.api.loginWithPassword = {
   id: "meteor_loginwithpassword",
   name: "Meteor.loginWithPassword(user, password, [callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Log the user in with a password."],
   args: [
     {
@@ -1055,7 +1057,7 @@ Template.api.loginWithPassword = {
 Template.api.loginWithExternalService = {
   id: "meteor_loginwithexternalservice",
   name: "Meteor.loginWith<i>ExternalService</i>([options], [callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Log the user in using an external service."],
   args: [
     {
@@ -1088,7 +1090,7 @@ Template.api.loginWithExternalService = {
 Template.api.accounts_config = {
   id: "accounts_config",
   name: "Accounts.config(options)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Set global accounts options."],
   options: [
     {
@@ -1107,7 +1109,7 @@ Template.api.accounts_config = {
 Template.api.accounts_ui_config = {
   id: "accounts_ui_config",
   name: "Accounts.ui.config(options)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Configure the behavior of [`{{loginButtons}}`](#accountsui)."],
   options: [
     {
@@ -1131,7 +1133,7 @@ Template.api.accounts_ui_config = {
 Template.api.accounts_validateNewUser = {
   id: "accounts_validatenewuser",
   name: "Accounts.validateNewUser(func)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Set restrictions on new user creation."],
   args: [
     {
@@ -1145,7 +1147,7 @@ Template.api.accounts_validateNewUser = {
 Template.api.accounts_onCreateUser = {
   id: "accounts_oncreateuser",
   name: "Accounts.onCreateUser(func)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Customize new user creation."],
   args: [
     {
@@ -1161,7 +1163,7 @@ Template.api.accounts_onCreateUser = {
 Template.api.accounts_createUser = {
   id: "accounts_createuser",
   name: "Accounts.createUser(options, [callback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Create a new user."],
   args: [
     {
@@ -1197,7 +1199,7 @@ Template.api.accounts_createUser = {
 Template.api.accounts_changePassword = {
   id: "accounts_changepassword",
   name: "Accounts.changePassword(oldPassword, newPassword, [callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Change the current user's password. Must be logged in."],
   args: [
     {
@@ -1221,7 +1223,7 @@ Template.api.accounts_changePassword = {
 Template.api.accounts_forgotPassword = {
   id: "accounts_forgotpassword",
   name: "Accounts.forgotPassword(options, [callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Request a forgot password email."],
   args: [
     {
@@ -1242,7 +1244,7 @@ Template.api.accounts_forgotPassword = {
 Template.api.accounts_resetPassword = {
   id: "accounts_resetpassword",
   name: "Accounts.resetPassword(token, newPassword, [callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Reset the password for a user using a token received in email. Logs the user in afterwards."],
   args: [
     {
@@ -1266,7 +1268,7 @@ Template.api.accounts_resetPassword = {
 Template.api.accounts_setPassword = {
   id: "accounts_setpassword",
   name: "Accounts.setPassword(userId, newPassword)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Forcibly change the password for a user."],
   args: [
     {
@@ -1285,7 +1287,7 @@ Template.api.accounts_setPassword = {
 Template.api.accounts_verifyEmail = {
   id: "accounts_verifyemail",
   name: "Accounts.verifyEmail(token, [callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Marks the user's email address as verified. Logs the user in afterwards."],
   args: [
     {
@@ -1305,7 +1307,7 @@ Template.api.accounts_verifyEmail = {
 Template.api.accounts_sendResetPasswordEmail = {
   id: "accounts_sendresetpasswordemail",
   name: "Accounts.sendResetPasswordEmail(userId, [email])",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Send an email with a link the user can use to reset their password."],
   args: [
     {
@@ -1324,7 +1326,7 @@ Template.api.accounts_sendResetPasswordEmail = {
 Template.api.accounts_sendEnrollmentEmail = {
   id: "accounts_sendenrollmentemail",
   name: "Accounts.sendEnrollmentEmail(userId, [email])",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Send an email with a link the user can use to set their initial password."],
   args: [
     {
@@ -1343,7 +1345,7 @@ Template.api.accounts_sendEnrollmentEmail = {
 Template.api.accounts_sendVerificationEmail = {
   id: "accounts_sendverificationemail",
   name: "Accounts.sendVerificationEmail(userId, [email])",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Send an email with a link the user can use verify their email address."],
   args: [
     {
@@ -1364,7 +1366,7 @@ Template.api.accounts_sendVerificationEmail = {
 Template.api.accounts_emailTemplates = {
   id: "accounts_emailtemplates",
   name: "Accounts.emailTemplates",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Options to customize emails sent from the Accounts system."]
 };
 
@@ -1373,7 +1375,7 @@ Template.api.accounts_emailTemplates = {
 Template.api.check = {
   id: "check",
   name: "check(value, pattern)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Checks that a value matches a [pattern](#matchpatterns). If the value does not match the pattern, throws a `Match.Error`."],
   args: [
     {
@@ -1392,7 +1394,7 @@ Template.api.check = {
 Template.api.match_test = {
   id: "match_test",
   name: "Match.test(value, pattern)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Returns true if the value matches the [pattern](#matchpatterns)."],
   args: [
     {
@@ -1416,7 +1418,7 @@ Template.api.matchpatterns = {
 Template.api.setTimeout = {
   id: "meteor_settimeout",
   name: "Meteor.setTimeout(func, delay)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Call a function in the future after waiting for a specified delay."],
   args: [
     {
@@ -1435,7 +1437,7 @@ Template.api.setTimeout = {
 Template.api.setInterval = {
   id: "meteor_setinterval",
   name: "Meteor.setInterval(func, delay)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Call a function repeatedly, with a time delay between calls."],
   args: [
     {
@@ -1454,7 +1456,7 @@ Template.api.setInterval = {
 Template.api.clearTimeout = {
   id: "meteor_cleartimeout",
   name: "Meteor.clearTimeout(id)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Cancel a function call scheduled by `Meteor.setTimeout`."],
   args: [
     {
@@ -1468,7 +1470,7 @@ Template.api.clearTimeout = {
 Template.api.clearInterval = {
   id: "meteor_clearinterval",
   name: "Meteor.clearInterval(id)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Cancel a repeating function call scheduled by `Meteor.setInterval`."],
   args: [
     {
@@ -1482,21 +1484,21 @@ Template.api.clearInterval = {
 Template.api.EnvironmentVariable = {
   id: "meteor_environmentvariable",
   name: "new Meteor.EnvironmentVariable()",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Construct a Meteor environment variable."]
 };
 
 Template.api.environmentVariable_get = {
   id: "env_var_get",
   name: "<i>env_var</i>.get()",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Return the current value of an EnvironmentVariable."]
 };
 
 Template.api.environmentVariable_withValue = {
   id: "env_var_withvalue",
   name: "<i>env_var</i>.withValue(value, func)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Run `func` with the `env_var`'s value set to `value`."],
   args: [
     {name: "value",
@@ -1511,7 +1513,7 @@ Template.api.environmentVariable_withValue = {
 Template.api.bindEnvironment = {
   id: "env_var_bindenvironment",
   name: "<i>env_var</i>.bindEnvironment(func, onException, _this)",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Return a new function that calls `func` with `this` set to `_this`, and with environment variables set to their current values."],
   args: [
     {name: "func",
@@ -1529,7 +1531,7 @@ Template.api.bindEnvironment = {
 Template.api.set = {
   id: "session_set",
   name: "Session.set(key, value)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Set a variable in the session. Notify any listeners that the value has changed (eg: redraw templates, and rerun any [`Deps.autorun`](#deps_autorun) computations, that called [`Session.get`](#session_get) on this `key`.)"],
   args: [
     {name: "key",
@@ -1544,7 +1546,7 @@ Template.api.set = {
 Template.api.setDefault = {
   id: "session_set_default",
   name: "Session.setDefault(key, value)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Set a variable in the session if it is undefined. Otherwise works exactly the same as [`Session.set`](#session_set)."],
   args: [
     {name: "key",
@@ -1559,7 +1561,7 @@ Template.api.setDefault = {
 Template.api.get = {
   id: "session_get",
   name: "Session.get(key)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Get the value of a session variable. If inside a [reactive computation](#reactivity), invalidate the computation the next time the value of the variable is changed by [`Session.set`](#session_set). This returns a clone of the session value, so if it's an object or an array, mutating the returned value has no effect on the value stored in the session."],
   args: [
     {name: "key",
@@ -1571,7 +1573,7 @@ Template.api.get = {
 Template.api.equals = {
   id: "session_equals",
   name: "Session.equals(key, value)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Test if a session variable is equal to a value. If inside a [reactive computation](#reactivity), invalidate the computation the next time the variable changes to or from the value."],
   args: [
     {name: "key",
@@ -1586,7 +1588,7 @@ Template.api.equals = {
 Template.api.httpcall = {
   id: "http_call",
   name: "HTTP.call(method, url [, options] [, asyncCallback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Perform an outbound HTTP request."],
   args: [
     {name: "method",
@@ -1633,28 +1635,28 @@ Template.api.httpcall = {
 Template.api.http_get = {
   id: "http_get",
   name: "HTTP.get(url, [options], [asyncCallback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Send an HTTP GET request.  Equivalent to `HTTP.call(\"GET\", ...)`."]
 };
 
 Template.api.http_post = {
   id: "http_post",
   name: "HTTP.post(url, [options], [asyncCallback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Send an HTTP POST request.  Equivalent to `HTTP.call(\"POST\", ...)`."]
 };
 
 Template.api.http_put = {
   id: "http_put",
   name: "HTTP.put(url, [options], [asyncCallback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Send an HTTP PUT request.  Equivalent to `HTTP.call(\"PUT\", ...)`."]
 };
 
 Template.api.http_del = {
   id: "http_del",
   name: "HTTP.del(url, [options], [asyncCallback])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Send an HTTP DELETE request.  Equivalent to `HTTP.call(\"DELETE\", ...)`.  (Named `del` to avoid conflict with JavaScript's `delete`.)"]
 };
 
@@ -1663,7 +1665,7 @@ Template.api.http_del = {
 Template.api.template_call = {
   id: "template_call",
   name: "Template.<em>myTemplate</em>([data])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Call a template function by name to produce HTML."],
   args: [
     {name: "data",
@@ -1675,28 +1677,28 @@ Template.api.template_call = {
 Template.api.template_rendered = {
   id: "template_rendered",
   name: "Template.<em>myTemplate</em>.rendered = function ( ) { ... }",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Provide a callback when an instance of a template is rendered."]
 };
 
 Template.api.template_created = {
   id: "template_created",
   name: "Template.<em>myTemplate</em>.created = function ( ) { ... }",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Provide a callback when an instance of a template is created."]
 };
 
 Template.api.template_destroyed = {
   id: "template_destroyed",
   name: "Template.<em>myTemplate</em>.destroyed = function ( ) { ... }",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Provide a callback when an instance of a template is destroyed."]
 };
 
 Template.api.template_events = {
   id: "template_events",
   name: "Template.<em>myTemplate</em>.events(eventMap)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Specify event handlers for this template."],
   args: [
     {name: "eventMap",
@@ -1709,7 +1711,7 @@ Template.api.template_events = {
 Template.api.template_helpers = {
   id: "template_helpers",
   name: "Template.<em>myTemplate</em>.helpers(helpers)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Specify template helpers available to this template."],
   args: [
     {name: "helpers",
@@ -1721,7 +1723,7 @@ Template.api.template_helpers = {
 Template.api.template_preserve = {
   id: "template_preserve",
   name: "Template.<em>myTemplate</em>.preserve(selectors)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Specify rules for preserving individual DOM elements on re-render."],
   args: [
     {name: "selectors",
@@ -1733,7 +1735,7 @@ Template.api.template_preserve = {
 Template.api.template_findAll = {
   id: "template_findAll",
   name: "<em>this</em>.findAll(selector)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Find all elements matching `selector` in this template instance."],
   args: [
     {name: "selector",
@@ -1745,7 +1747,7 @@ Template.api.template_findAll = {
 Template.api.template_find = {
   id: "template_find",
   name: "<em>this</em>.find(selector)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Find one element matching `selector` in this template instance."],
   args: [
     {name: "selector",
@@ -1757,21 +1759,21 @@ Template.api.template_find = {
 Template.api.template_firstNode = {
   id: "template_firstNode",
   name: "<em>this</em>.firstNode",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["The first top-level DOM node in this template instance."]
 };
 
 Template.api.template_lastNode = {
   id: "template_lastNode",
   name: "<em>this</em>.lastNode",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["The last top-level DOM node in this template instance."]
 };
 
 Template.api.template_data = {
   id: "template_data",
   name: "<em>this</em>.data",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["The data context of this instance's latest invocation."]
 };
 
@@ -1782,7 +1784,7 @@ var rfc = function (descr) {
 Template.api.email_send = {
   id: "email_send",
   name: "Email.send(options)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Send an email. Throws an `Error` on failure to contact mail " +
           "server or if mail server returns an error."],
   options: [
@@ -1828,7 +1830,7 @@ Template.api.email_send = {
 Template.api.assets_getText = {
   id: "assets_getText",
   name: "Assets.getText(assetPath, [asyncCallback])",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Retrieve the contents of the static server asset as a UTF8-encoded string."],
   args: [
     {name: "assetPath",
@@ -1848,7 +1850,7 @@ Template.api.assets_getText = {
 Template.api.assets_getBinary = {
   id: "assets_getBinary",
   name: "Assets.getBinary(assetPath, [asyncCallback])",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Retrieve the contents of the static server asset as an [EJSON Binary](#ejson_new_binary)."],
   args: [
     {name: "assetPath",

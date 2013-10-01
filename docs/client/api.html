@@ -1,12 +1,12 @@
 <template name="api">
 {{#better_markdown}}
 
-<h1 id="api">The Meteor API</h1>
+<h1 id="api">Meteor API</h1>
 
-Your JavaScript code can run in two environments: the *client* (browser), and
-the *server* (a [Node.js](http://nodejs.org/) container on a server).  For each
-function in this API reference, we'll indicate if the function is available just
-on the client, just on the server, or *Anywhere*.
+Ваш JavaScript-код может работать в двух средах: на *клиенте* (в браузере) и на
+*сервере* (под управлением [Node.js](http://nodejs.org/)). Для каждой функции
+в этой документации мы будем указывать, где она доступна: только на клиенте,
+только на сервере, или же *Везде*.
 
 <h2 id="core"><span>Meteor Core</span></h2>
 
@@ -14,27 +14,26 @@ on the client, just on the server, or *Anywhere*.
 {{> api_box isServer}}
 
 {{#note}}
-`Meteor.isServer` can be used to limit where code runs, but it does not
-prevent code from being sent to the client. Any sensitive code that you
-don't want served to the client, such as code containing passwords or
-authentication mechanisms, should be kept in the `server` directory.
+`Meteor.isServer` ограничивает область действия кода, но не предотвращает его
+отправку на клиент. Любой конфиденциальный код, который не должен попасть на
+клиент (например, код, содержащий пароли или механизмы аутентификации),
+необходимо хранить в директории `server`.
 {{/note}}
 
 
 {{> api_box startup}}
 
-On a server, the function will run as soon as the server process is
-finished starting. On a client, the function will run as soon as the DOM
-is ready.
+На сервере функция выполнится как только закончится процесс запуска сервера.
+На клиенте функция выполнится как только будет готов DOM.
 
-The `startup` callbacks are called in the same order as the calls to
-`Meteor.startup` were made.
+Функции вызываются в том же порядке, в котором выполнялись соответствующие
+вызовы `Meteor.startup`.
 
-On a client, `startup` callbacks from packages will be called
-first, followed by `<body>` templates from your `.html` files,
-followed by your application code.
+На клиенте сначала выполняются `startup`-функции из пакетов, затем шаблоны
+`<body>` из `.html` файлов, а затем код приложения.
 
-    // On server startup, if the database is empty, create some initial data.
+    // После запуска сервера, если база данных пуста, заполняем ее начальными
+    данными.
     if (Meteor.isServer) {
       Meteor.startup(function () {
         if (Rooms.find().count() === 0) {
@@ -3020,12 +3019,12 @@ code can read `data.txt` by running:
 </div>
 
 {{#if args}}
-<h4>Arguments</h4>
+<h4>Аргументы</h4>
 {{> api_box_args args}}
 {{/if}}
 
 {{#if options}}
-<h4>Options</h4>
+<h4>Опции</h4>
 {{> api_box_args options}}
 {{/if}}
 
