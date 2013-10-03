@@ -195,14 +195,14 @@ Template.api.publish = {
   id: "meteor_publish",
   name: "Meteor.publish(name, func)",
   locus: "Сервер",
-  descr: ["Publish a record set."],
+  descr: ["Публикует набор данных."],
   args: [
     {name: "name",
      type: "String",
-     descr: "Name of the attribute set.  If `null`, the set has no name, and the record set is automatically sent to all connected clients."},
+     descr: "Название публикации. Если `null`, то она считается безымянной и автоматически рассылается всем подключенным клиентам."},
     {name: "func",
      type: "Function",
-     descr: "Function called on the server each time a client subscribes.  Inside the function, `this` is the publish handler object, described below.  If the client passed arguments to `subscribe`, the function is called with the same arguments."}
+     descr: "Функция, вызываемая на сервере каждый раз при подписке клиента на эту публикацию. Внутри функции `this` указывает на хэндлер публикации, описываемый ниже. Функция будет вызвана с теми же аргументами, которые были переданы в подписку (`subscribe`) на клиенте."}
   ]
 };
 
@@ -210,19 +210,19 @@ Template.api.subscription_added = {
   id: "publish_added",
   name: "<i>this</i>.added(collection, id, fields)",
   locus: "Сервер",
-  descr: ["Call inside the publish function.  Informs the subscriber that a document has been added to the record set."],
+  descr: ["Используется внутри функции публикации. Информирует подписчика о добавлении в публикацию нового документа."],
   args: [
     {name: "collection",
      type: "String",
-     descr: "The name of the collection that contains the new document."
+     descr: "Название коллекции, содержащей новый документ."
     },
     {name: "id",
      type: "String",
-     descr: "The new document's ID."
+     descr: "ID нового документа."
     },
     {name: "fields",
      type: "Object",
-     descr: "The fields in the new document.  If `_id` is present it is ignored."
+     descr: "Поля нового документа. Если присутсвует поле `_id`, то оно игнорируется."
     }
   ]
 };
@@ -231,19 +231,19 @@ Template.api.subscription_changed = {
   id: "publish_changed",
   name: "<i>this</i>.changed(collection, id, fields)",
   locus: "Сервер",
-  descr: ["Call inside the publish function.  Informs the subscriber that a document in the record set has been modified."],
+  descr: ["Используется внутри функции публикации. Информирует подписчика об изменении документа, находящегося в публикации."],
   args: [
     {name: "collection",
      type: "String",
-     descr: "The name of the collection that contains the changed document."
+     descr: "Название коллекции, содержащей измененный документ."
     },
     {name: "id",
      type: "String",
-     descr: "The changed document's ID."
+     descr: "ID измененного документа."
     },
     {name: "fields",
      type: "Object",
-     descr: "The fields in the document that have changed, together with their new values.  If a field is not present in `fields` it was left unchanged; if it is present in `fields` and has a value of `undefined` it was removed from the document.  If `_id` is present it is ignored."
+     descr: "Измененные поля документа с их новыми значениями. Если поля нет в `fields`, значит оно не было изменено; если оно присутсвует в `fields` и равно `undefined`, значит оно было удалено из документа. Если присутсвует поле `_id`, то оно игнорируется."
     }
   ]
 };
@@ -252,15 +252,15 @@ Template.api.subscription_removed = {
   id: "publish_removed",
   name: "<i>this</i>.removed(collection, id)",
   locus: "Сервер",
-  descr: ["Call inside the publish function.  Informs the subscriber that a document has been removed from the record set."],
+  descr: ["Используется внутри функции публикации. Информирует подписчика об удалении из публикации нового документа."],
   args: [
     {name: "collection",
      type: "String",
-     descr: "The name of the collection that the document has been removed from."
+     descr: "Название коллекции, из которой удалили документ."
     },
     {name: "id",
      type: "String",
-     descr: "The ID of the document that has been removed."
+     descr: "ID удаленного документа."
     }
   ]
 };
@@ -269,7 +269,7 @@ Template.api.subscription_ready = {
   id: "publish_ready",
   name: "<i>this</i>.ready()",
   locus: "Сервер",
-  descr: ["Call inside the publish function.  Informs the subscriber that an initial, complete snapshot of the record set has been sent.  This will trigger a call on the client to the `onReady` callback passed to  [`Meteor.subscribe`](#meteor_subscribe), if any."]
+  descr: ["Используется внутри функции публикации. Информирует подписчика о том, что начальный набор документов был полностью отправлен подписчику. На клиенте после этого будет вызван колбэк `onReady` метода [`Meteor.subscribe`](#meteor_subscribe) (если он был указан)."]
 };
 
 
@@ -277,21 +277,21 @@ Template.api.subscription_error = {
   id: "publish_error",
   name: "<i>this</i>.error(error)",
   locus: "Сервер",
-  descr: ["Call inside the publish function.  Stops this client's subscription, triggering a call on the client to the `onError` callback passed to [`Meteor.subscribe`](#meteor_subscribe), if any. If `error` is not a [`Meteor.Error`](#meteor_error), it will be [sanitized](#meteor_error)."]
+  descr: ["Используется внутри функции публикации.  Stops this client's subscription, triggering a call on the client to the `onError` callback passed to [`Meteor.subscribe`](#meteor_subscribe), if any. If `error` is not a [`Meteor.Error`](#meteor_error), it will be [sanitized](#meteor_error)."]
 };
 
 Template.api.subscription_stop = {
   id: "publish_stop",
   name: "<i>this</i>.stop()",
   locus: "Сервер",
-  descr: ["Call inside the publish function.  Stops this client's subscription; the `onError` callback is *not* invoked on the client."]
+  descr: ["Используется внутри функции публикации.  Stops this client's subscription; the `onError` callback is *not* invoked on the client."]
 };
 
 Template.api.subscription_onStop = {
   id: "publish_onstop",
   name: "<i>this</i>.onStop(func)",
   locus: "Сервер",
-  descr: ["Call inside the publish function.  Registers a callback function to run when the subscription is stopped."],
+  descr: ["Используется внутри функции публикации.  Registers a callback function to run when the subscription is stopped."],
   args: [
     {name: "func",
      type: "Function",
@@ -304,7 +304,7 @@ Template.api.subscription_userId = {
   id: "publish_userId",
   name: "<i>this</i>.userId",
   locus: "Сервер",
-  descr: ["Access inside the publish function. The id of the logged-in user, or `null` if no user is logged in."]
+  descr: ["Используется внутри функции публикации. Id залогиненного пользователя, либо `null`, если он не залогинен."]
 };
 
 

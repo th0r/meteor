@@ -48,41 +48,43 @@
 
 {{> api_box release}}
 
-<h2 id="publishandsubscribe"><span>Publish and subscribe</span></h2>
+<h2 id="publishandsubscribe"><span>Публикации и подписки</span></h2>
 
-These functions control how Meteor servers publish sets of records and
-how clients can subscribe to those sets.
+Эти функции служат для публикации наборов данных сервером и для подписки на
+эти данные со стороны клиента.
 
 {{> api_box publish}}
 
-To publish records to clients, call `Meteor.publish` on the server with
-two parameters: the name of the record set, and a *publish function*
-that Meteor will call each time a client subscribes to the name.
+Чтобы опубликовать набор документов, вызовите на сервере `Meteor.publish` с
+двумя аргументами: названием набора и *функцией публикации*, которою Meteor
+будет вызывать каждый раз при подписке клиента на этот набор.
 
-Publish functions can return a
-[`Collection.Cursor`](#meteor_collection_cursor), in which case Meteor
-will publish that cursor's documents. You can also return an array of
-`Collection.Cursor`s, in which case Meteor will publish all of the
-cursors.
+Функции публикации могут возвращать
+[`Collection.Cursor`](#meteor_collection_cursor), в случае чего Meteor
+опубликует все документы, на которые этот курсор указывает. Также вы можете
+вернуть массив курсоров и Meteor их все опубликует.
 
 {{#warning}}
-If you return multiple cursors in an array, they currently must all be from
-different collections. We hope to lift this restriction in a future release.
+Если вы возвращаете массив курсоров, то все они должны быть из разных
+коллекций. Это временное ограничение и мы постараемся его убрать в будущих
+версиях Meteor.
 {{/warning}}
 
-    // server: publish the rooms collection, minus secret info.
+    // сервер: опубликовать коллекцию чатов (Rooms), за исключением секретной
+    // информации
     Meteor.publish("rooms", function () {
       return Rooms.find({}, {fields: {secretInfo: 0}});
     });
 
-    // ... and publish secret info for rooms where the logged-in user
-    // is an admin. If the client subscribes to both streams, the records
-    // are merged together into the same documents in the Rooms collection.
+    // ... и опубликовать секретную информацию для чатов, в которых текущий
+    // пользователь является админом. Если клиент подписывается на обе
+    // публикации, то данные из них объединятся и записываются в
+    // соответстующие документы коллекции Rooms.
     Meteor.publish("adminSecretInfo", function () {
       return Rooms.find({admin: this.userId}, {fields: {secretInfo: 1}});
     });
 
-    // publish dependent documents and simulate joins
+    // опубликовать зависимые документы, имитируя join-ы
     Meteor.publish("roomAndMessages", function (roomId) {
       check(roomId, String);
       return [
@@ -91,20 +93,22 @@ different collections. We hope to lift this restriction in a future release.
       ];
     });
 
-Otherwise, the publish function should call the functions
-[`added`](#publish_added) (when a new document is added to the published record
-set), [`changed`](#publish_changed) (when some fields on a document in the
-record set are changed or cleared), and [`removed`](#publish_removed) (when
-documents are removed from the published record set) to inform subscribers about
-documents.  These methods are provided by `this` in your publish function.
+
+В противном случае, функции публикации должны вызывать методы
+[`added`](#publish_added) (когда в опубликованный набор добавляется новый
+докумен), [`changed`](#publish_changed) (когда в опубликованном документе
+изменяются или удаляются поля) и [`removed`](#publish_removed) (когда из
+опубликованного набора удаляются документы), информирмируя подписчика об
+изменениях в документах. Все эти методы доступны у объекта `this` в вашей
+функции публикации.
 
 
 
 <!-- TODO discuss ready -->
 
-Example:
+Пример:
 
-    // server: publish the current size of a collection
+    // сервер: публикуем текущий размер коллекции
     Meteor.publish("counts-by-room", function (roomId) {
       var self = this;
       check(roomId, String);
@@ -120,47 +124,49 @@ Example:
           count--;
           self.changed("counts", roomId, {count: count});
         }
-        // don't care about moved or changed
+        // изменения сообщений нам не важны
       });
 
-      // Observe only returns after the initial added callbacks have
-      // run.  Now return an initial value and mark the subscription
-      // as ready.
+      // Функция `observeChanges` завершается только после вызова колбэков
+      // `added` для всех текущих документов в коллекции. Теперь возвращаем
+      // начальное значение и информируем о готовности подписки.
       initializing = false;
       self.added("counts", roomId, {count: count});
       self.ready();
 
-      // Stop observing the cursor when client unsubs.
-      // Stopping a subscription automatically takes
-      // care of sending the client any removed messages.
+      // Перестаем следить за курсором когда клиент отписывается.
+      // Остановка подписки автоматически отсылает клиенту все сообщения об
+      // удалении из нее документов.
       self.onStop(function () {
         handle.stop();
       });
     });
 
-    // client: declare collection to hold count object
+    // клиент: объявляем коллекци для хранения количества сообщений в чатах
     Counts = new Meteor.Collection("counts");
 
-    // client: subscribe to the count for the current room
+    // клиент: подписываемся на информацию о количество сообщений в текущем
+    // чате
     Deps.autorun(function () {
       Meteor.subscribe("counts-by-room", Session.get("roomId"));
     });
 
-    // client: use the new collection
-    console.log("Current room has " +
+    // клиент: используем новую коллекцию
+    console.log("В текущем чате " +
                 Counts.findOne(Session.get("roomId")).count +
-                " messages.");
+                " сообщений.");
 
 {{#warning}}
-Meteor will emit a warning message if you call `Meteor.publish` in a
-project that includes the `autopublish` package.  Your publish function
-will still work.
+Meteor покажет предупреждение, если вы вызовите `Meteor.publish` в проекте,
+используеющем пакет `autopublish`, но ваша функция публикации все же будет
+работать.
 {{/warning}}
 
 {{> api_box subscription_userId}}
 
-This is constant. However, if the logged-in user changes, the publish
-function is rerun with the new value.
+Это константа, но если состояние пользователя изменится (он
+разлогинится или залогинится), функция публикации будет перезапущена с новым
+значением.
 
 {{> api_box subscription_added}}
 {{> api_box subscription_changed}}
