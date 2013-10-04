@@ -330,11 +330,11 @@ Template.api.methods = {
   id: "meteor_methods",
   name: "Meteor.methods(methods)",
   locus: "Везде",
-  descr: ["Defines functions that can be invoked over the network by clients."],
+  descr: ["Объявляет функции, которые могут вызываться по сети клиентами."],
   args: [
     {name: "methods",
      type: "Object",
-     descr: "Dictionary whose keys are method names and values are functions."}
+     descr: "Словарь методов, ключами в котором являются их названия, а значениями - сами функции."}
   ]
 };
 
@@ -342,18 +342,18 @@ Template.api.method_invocation_userId = {
   id: "method_userId",
   name: "<i>this</i>.userId",
   locus: "Везде",
-  descr: ["The id of the user that made this method call, or `null` if no user was logged in."]
+  descr: ["Id пользователя, вызвавшего этот метод, или `null`, если пользователь не был залогинен."]
 };
 
 Template.api.method_invocation_setUserId = {
   id: "method_setUserId",
   name: "<i>this</i>.setUserId(userId)",
   locus: "Сервер",
-  descr: ["Set the logged in user."],
+  descr: ["Устанавливает Id текущего залогиненного пользователя."],
   args: [
     {name: "userId",
      type: "String or null",
-     descr: "The value that should be returned by `userId` on this connection."}
+     descr: "Значение, которое должно быть присвоено `userId` для данного подключения."}
   ]
 };
 
@@ -361,31 +361,31 @@ Template.api.method_invocation_unblock = {
   id: "method_unblock",
   name: "<i>this</i>.unblock()",
   locus: "Сервер",
-  descr: ["Call inside a method invocation.  Allow subsequent method from this client to begin running in a new fiber."]
+  descr: ["Используется внутри метода. Разрешает запуск следующего метода от данного клиента в новом волокне."]
 };
 
 Template.api.method_invocation_isSimulation = {
   id: "method_issimulation",
   name: "<i>this</i>.isSimulation",
   locus: "Везде",
-  descr: ["Access inside a method invocation.  Boolean value, true if this invocation is a stub."]
+  descr: ["Используется внутри метода. Значение типа Boolean. Равно `true`, если вызывается не настоящий метод, а заглушка."]
 };
 
 Template.api.error = {
   id: "meteor_error",
   name: "new Meteor.Error(error, reason, details)",
   locus: "Везде",
-  descr: ["This class represents a symbolic error thrown by a method."],
+  descr: ["Класс для ошибок, кидаемых методами."],
   args: [
     {name: "error",
      type: "Number",
-     descr: "A numeric error code, likely similar to an HTTP code (eg, 404, 500)."},
+     descr: "Цифровой код ошибки, в большинстве случаев совпадающий с HTTP-кодами (например, 404, 500)."},
     {name: "reason",
      type: "String",
-     descr: "Необязательный аргумент.  A short human-readable summary of the error, like 'Not Found'."},
+     descr: "Необязательный аргумент. Короткое описание ошибки, например 'Not found'."},
     {name: "details",
      type: "String",
-     descr: "Необязательный аргумент.  Additional information about the error, like a textual stack trace."}
+     descr: "Необязательный аргумент. Дополнительная информация об ошибке, например, стек вызовов."}
   ]
 };
 

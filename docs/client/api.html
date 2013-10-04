@@ -240,95 +240,91 @@ Meteor отложит обработку данных из публикации 
 "new-room")`, Meteor подпишется на сообщения из нового чата, отпишется от
 предыдущего и останется подписанным на ваши личные сообщения.
 
-Если разные подписки устанавливают одному и тому же полю определенного
-документа разные значения, то итоговое значение выбирается из них
+Если разные подписки устанавливают разные значения одному и тому же полю
+определенного документа, то итоговое значение выбирается из них
 произвольным образом.
 
-<h2 id="methods_header"><span>Methods</span></h2>
+<h2 id="methods_header"><span>Методы</span></h2>
 
-Methods are remote functions that Meteor clients can invoke.
+Методы - это удаленные функции, которые могут вызывать клиенты.
 
 {{> api_box methods}}
 
-Example:
+Пример:
 
     Meteor.methods({
       foo: function (arg1, arg2) {
         check(arg1, String);
         check(arg2, [Number]);
-        // .. do stuff ..
-        if (you want to throw an error)
-          throw new Meteor.Error(404, "Can't find my pants");
-        return "some return value";
+        // .. тут что-то делаем ..
+        if (вы хотите кинуть ошибку)
+          throw new Meteor.Error(404, "Не могу найти свои штаны");
+        return "возвращаем что-нибудь";
       },
 
       bar: function () {
-        // .. do other stuff ..
+        // .. тут делаем что-то другое ..
         return "baz";
       }
     });
 
-Calling `methods` on the server defines functions that can be called remotely by
-clients.  They should return an [EJSON](#ejson)-able value or throw an
-exception.  Inside your method invocation, `this` is bound to a method
-invocation object, which provides the following:
+Вызов `methods` на сервере объявляет функции, которые клиенты могут выполнять
+удаленно. Они должны либо возвращать значение, поддерживаемое
+форматом [EJSON](#ejson), либо кидать исключение. Внутри метода, `this`
+ссылается на объект, содержащий следующие свойства:
 
-* `isSimulation`: a boolean value, true if this invocation is a stub.
-* `unblock`: when called, allows the next method from this client to
-begin running.
-* `userId`: the id of the current user.
-* `setUserId`: a function that associates the current client with a user.
+* `isSimulation`: значение типа `Boolean`. Принимает значение `true`, если
+вызывается заглушка метода.
+* `unblock`: вызов этой функции разрешает выполнение следующего метода от
+того же клиента.
+* `userId`: id текущего пользователя.
+* `setUserId`: функция, ассоциирующая текущего клиента с каким-либо юзером.
 
-Calling `methods` on the client defines *stub* functions associated with
-server methods of the same name.  You don't have to define a stub for
-your method if you don't want to.  In that case, method calls are just
-like remote procedure calls in other systems, and you'll have to wait
-for the results from the server.
+Вызов `methods` на клиенте объявляет *заглушки* для одноименных серверных
+методов. Их объявление необязательно, и вы можете этого не делать. В этом
+случае, вызов методова полностью идентичен технологии удаленного вызова
+процедур, используемой в других системах, и вам придется ждать результатов его
+выполнения от сервера.
 
-If you do define a stub, when a client invokes a server method it will
-also run its stub in parallel.  On the client, the return value of a
-stub is ignored.  Stubs are run for their side-effects: they are
-intended to *simulate* the result of what the server's method will do,
-but without waiting for the round trip delay.  If a stub throws an
-exception it will be logged to the console.
+Если же вы объявите заглушку, то она будет вызвана параллельно с серверным
+методом. Возвращаемое ей значение клиентом игнорируется. Заглушки
+предназначены для *имитирования* результатов вызова серверного метода, не
+дожидаясь ответа от него. Если заглушка кинет исключение, оно будет показано
+в консоли.
 
-You use methods all the time, because the database mutators
-([`insert`](#insert), [`update`](#update), [`remove`](#remove)) are implemented
-as methods. When you call any of these functions on the client, you're invoking
-their stub version that update the local cache, and sending the same write
-request to the server. When the server responds, the client updates the local
-cache with the writes that actually occurred on the server.
+Вы используете методы постоянно, т.к. все функции для работы с базой данных
+([`insert`](#insert), [`update`](#update), [`remove`](#remove)) на самом деле
+являются методами. Когда вы используете одну из этих функций на клиенте, вы
+вызываете ее заглушку, которая обновляет локульную базу данных, и параллельно
+посылаете запрос на изменение этой информации на сервер. После ответа
+сервера, Meteor актуализирует локальную базу данных клиента в соотвествии с
+реально произошедшими на сервере изменениями.
 
 {{> api_box method_invocation_userId}}
 
-The user id is an arbitrary string &mdash; typically the id of the user record
-in the database. You can set it with the `setUserId` function. If you're using
-the [Meteor accounts system](#accounts_api) then this is handled for you.
+Id пользователя - это произвольная строка. Как правило, это id записи
+пользователя в базе данных. Вы можете установить его при помощи функции
+`setUserId`. Если же вы используете [систему учетных записей
+Meteor](#accounts_api), то он устанавливается автоматически.
 
 {{> api_box method_invocation_setUserId}}
 
-Call this function to change the currently logged in user on the
-connection that made this method call. This simply sets the value of
-`userId` for future method calls received on this connection. Pass
-`null` to log out the connection.
+Используйте эту функцию, чтобы сменить залогиненного пользователя для текущего
+подключения. Она всего лишь устанавливает значение `userId` для всех
+последующих вызовов методов. Передайте `null`, чтобы разлогинить пользователя.
 
-If you are using the [built-in Meteor accounts system](#accounts_api) then this
-should correspond to the `_id` field of a document in the
-[`Meteor.users`](#meteor_users) collection.
-
-`setUserId` is not retroactive. It affects the current method call and
-any future method calls on the connection. Any previous method calls on
-this connection will still see the value of `userId` that was in effect
-when they started.
+Если вы используете [встроенную систему учетных записей
+Meteor](#accounts_api), то устанавливаемое значение должно соответствовать
+полю `_id` записи пользователя из коллекции [`Meteor.users`](#meteor_users).
 
 {{> api_box method_invocation_isSimulation}}
 
 {{> api_box method_invocation_unblock}}
 
-On the server, methods from a given client run one at a time. The N+1th
-invocation from a client won't start until the Nth invocation
-returns. However, you can change this by calling `this.unblock`. This
-will allow the N+1th invocation to start running in a new fiber.
+Методы от одного и того же клиента запускаются на сервере по очереди,
+т.е. N+1-ый метод не запустится до тех пор, пока не завершится N-ый. Однако,
+вы можете это изменить, вызвав `this.unblock` - это запустит N+1-ый метод в
+новом волокне.
 
 {{> api_box error}}
 
