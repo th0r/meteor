@@ -330,7 +330,7 @@ Template.api.methods = {
   id: "meteor_methods",
   name: "Meteor.methods(methods)",
   locus: "Везде",
-  descr: ["Объявляет функции, которые могут вызываться по сети клиентами."],
+  descr: ["Объявляет функции, которые могут удаленно вызываться клиентами."],
   args: [
     {name: "methods",
      type: "Object",
@@ -375,7 +375,7 @@ Template.api.error = {
   id: "meteor_error",
   name: "new Meteor.Error(error, reason, details)",
   locus: "Везде",
-  descr: ["Класс для ошибок, кидаемых методами."],
+  descr: ["Класс ошибок, кидаемых методами."],
   args: [
     {name: "error",
      type: "Number",
