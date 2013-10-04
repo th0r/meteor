@@ -175,78 +175,74 @@ Meteor покажет предупреждение, если вы вызовит
 
 {{> api_box subscription_onStop}}
 
-If you call [`observe`](#observe) or [`observeChanges`](#observe_changes) in your
-publish handler, this is the place to stop the observes.
+Если в вашей публикации вы использовали функции [`observe`](#observe) или
+[`observeChanges`](#observe_changes) для отслеживания изменений в курсорах, то
+это самое подходящее место для прекращения слежки.
 
 {{> api_box subscription_error}}
 {{> api_box subscription_stop}}
 
 {{> api_box subscribe}}
 
-When you subscribe to a record set, it tells the server to send records to the
-client.  The client stores these records in local [Minimongo
-collections](#meteor_collection), with the same name as the `collection`
-argument used in the publish handler's `added`, `changed`, and `removed`
-callbacks.  Meteor will queue incoming attributes until you declare the
-[`Meteor.Collection`](#meteor_collection) on the client with the matching
-collection name.
+Подписка на набор данных означает, что сервер должен отослать эти данные на
+клиент. Клиент сохраняет эти данные в локальных [коллекциях
+Minimongo](#meteor_collection), названия которых берутся из аргумента
+`collection` методов `added`, `changed`, и `removed` хэндлера публикации.
+Meteor отложит обработку данных из публикации до тех пор, пока на клиенте не
+будут объявлены [коллекции](#meteor_collection), необходимые для их сохранения.
 
-    // okay to subscribe (and possibly receive data) before declaring
-    // the client collection that will hold it.  assume "allplayers"
-    // publishes data from server's "players" collection.
+    // Допустим, "allplayers" публикует данные из серверной коллекции "players".
+    // На клиенте можно подписаться на эту публикацию (и даже получить данные
+    // из нее) перед объявлением коллекции "players".
     Meteor.subscribe("allplayers");
     ...
-    // client queues incoming players records until ...
-    ...
+    // Клиент откладывает обработку данных до тех пор, пока не
+    // объявляется коллекция, необходимая для их сохранения.
     Players = new Meteor.Collection("players");
 
-The client will see a document if the document is currently in the published
-record set of any of its subscriptions.
+Документ будет доступен на клиенте, если он находится хотя бы в одной из
+опубликованных ему подписок.
 
-The `onReady` callback is called with no arguments when the server
-[marks the subscription as ready](#publish_ready). The `onError` callback is
-called with a [`Meteor.Error`](#meteor_error) if the subscription fails or is
-terminated by the server.
+Колбэк `onReady` вызывается, как только сервер [завершает
+публикацию](#publish_ready). Колбэк `onError` вызывается с ошибкой
+[`Meteor.Error`](#meteor_error), если подписаться не удается или же сервер
+завершает ее, используя метод `error` хэндлера публикации.
 
-`Meteor.subscribe` returns a subscription handle, which is an object with the
-following methods:
+`Meteor.subscribe` возвращает хэндлер подписки, обладающий следующими методами:
 
 <dl class="callbacks">
 {{#dtdd "stop()"}}
-Cancel the subscription. This will typically result in the server directing the
-client to remove the subscription's data from the client's cache.
+Отменяет подписку. Обычно это приводит к тому, что сервер информирует клиента
+о необходимости удалить все данные этой подписки из его локального кэша.
 {{/dtdd}}
 
 {{#dtdd "ready()"}}
-True if the server has [marked the subscription as ready](#publish_ready). A
-reactive data source.
+Результат будет `true`, если сервер [завершил публикацию для данной
+подписки](#publish_ready). Реактивный источник данных.
 {{/dtdd}}
 </dl>
 
-If you call `Meteor.subscribe` within a [reactive computation](#reactivity),
-for example using
-[`Deps.autorun`](#deps_autorun), the subscription will automatically be
-cancelled when the computation is invalidated or stopped; it's not necessary
-to call `stop` on
-subscriptions made from inside `autorun`. However, if the next iteration
-of your run function subscribes to the same record set (same name and
-parameters), Meteor is smart enough to skip a wasteful
-unsubscribe/resubscribe. For example:
+Если вы вызвали `Meteor.subscribe` из [реактивного контекста](#reactivity),
+например, из [`Deps.autorun`](#deps_autorun), то эта подписка будет
+автоматически отменена, как только данный контекст инвалидируется или будет
+остановлен. Поэтому вызывать метод `stop` при использовании `Deps.autorun`
+необязательно. Однако, если при следующем запуске ваша функция подпишется на
+тот же набор данных, Meteor это поймет и не будет бессмысленно отписываться и
+переподписываться заново. Например:
 
     Deps.autorun(function () {
       Meteor.subscribe("chat", {room: Session.get("current-room")});
       Meteor.subscribe("privateMessages");
     });
 
-This subscribes you to the chat messages in the current room and to your private
-messages. When you change rooms by calling `Session.set("current-room",
-"new-room")`, Meteor will subscribe to the new room's chat messages,
-unsubscribe from the original room's chat messages, and continue to
-stay subscribed to your private messages.
+Этот код подписывает вас на сообщения из текущего чата и на ваши личные
+сообщения. Когда вы смените активный чат при помощи `Session.set("current-room",
+"new-room")`, Meteor подпишется на сообщения из нового чата, отпишется от
+предыдущего и останется подписанным на ваши личные сообщения.
 
-If more than one subscription sends conflicting values for a field (same
-collection name, document ID, and field name), then the value on the client will
-be one of the published values, chosen arbitrarily.
+Если разные подписки устанавливают одному и тому же полю определенного
+документа разные значения, то итоговое значение выбирается из них
+произвольным образом.
 
 <h2 id="methods_header"><span>Methods</span></h2>
 

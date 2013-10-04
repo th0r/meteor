@@ -277,25 +277,25 @@ Template.api.subscription_error = {
   id: "publish_error",
   name: "<i>this</i>.error(error)",
   locus: "Сервер",
-  descr: ["Используется внутри функции публикации.  Stops this client's subscription, triggering a call on the client to the `onError` callback passed to [`Meteor.subscribe`](#meteor_subscribe), if any. If `error` is not a [`Meteor.Error`](#meteor_error), it will be [sanitized](#meteor_error)."]
+  descr: ["Используется внутри функции публикации. Останавливает клиентскую подписку и вызывет на клиенте колбэк `onError` метода [`Meteor.subscribe`](#meteor_subscribe) (если он был указан). Если аргумент `error` не является экземпляром объекта [`Meteor.Error`](#meteor_error), то он будет, по возможности, [в него преобразован](#meteor_error)."]
 };
 
 Template.api.subscription_stop = {
   id: "publish_stop",
   name: "<i>this</i>.stop()",
   locus: "Сервер",
-  descr: ["Используется внутри функции публикации.  Stops this client's subscription; the `onError` callback is *not* invoked on the client."]
+  descr: ["Используется внутри функции публикации. Останавливает клиентскую подписку, *не* вызывая при этом на клиенте колбэк `onError`."]
 };
 
 Template.api.subscription_onStop = {
   id: "publish_onstop",
   name: "<i>this</i>.onStop(func)",
   locus: "Сервер",
-  descr: ["Используется внутри функции публикации.  Registers a callback function to run when the subscription is stopped."],
+  descr: ["Используется внутри функции публикации. Регистрирует колбэк, вызываемый при остановке подписки."],
   args: [
     {name: "func",
      type: "Function",
-     descr: "The callback function"
+     descr: "Функция, вызываемая при остановке подписки"
     }
   ]
 };
@@ -312,17 +312,17 @@ Template.api.subscribe = {
   id: "meteor_subscribe",
   name: "Meteor.subscribe(name [, arg1, arg2, ... ] [, callbacks])",
   locus: "Клиент",
-  descr: ["Subscribe to a record set.  Returns a handle that provides `stop()` and `ready()` methods."],
+  descr: ["Подписывает на набор данных. Возвращает хэндлер, содержащий методы `stop()` и `ready()`."],
   args: [
     {name: "name",
      type: "String",
-     descr: "Name of the subscription.  Matches name of server's publish() call."},
+     descr: "Название подписки. Должно совпадать с названием публикации, созданной с помощью `Meteor.publish` на сервере."},
     {name: "arg1, arg2, ...",
      type: "Any",
-     descr: "Optional arguments passed to publisher function on server."},
+     descr: "Необязательные аргументы, которые будут переданы на сервер в функцию публикации."},
     {name: "callbacks",
      type: "Function or Object",
-     descr: "Optional. May include `onError` and `onReady` callbacks. If a function is passed instead of an object, it is interpreted as an `onReady` callback."}
+     descr: "Необязательный аргумент. Объект может содержать колбэки `onError` и `onReady`. Если вместо объекта передана функция, то она считается колбэком `onReady`."}
   ]
 };
 
@@ -382,10 +382,10 @@ Template.api.error = {
      descr: "A numeric error code, likely similar to an HTTP code (eg, 404, 500)."},
     {name: "reason",
      type: "String",
-     descr: "Optional.  A short human-readable summary of the error, like 'Not Found'."},
+     descr: "Необязательный аргумент.  A short human-readable summary of the error, like 'Not Found'."},
     {name: "details",
      type: "String",
-     descr: "Optional.  Additional information about the error, like a textual stack trace."}
+     descr: "Необязательный аргумент.  Additional information about the error, like a textual stack trace."}
   ]
 };
 
@@ -579,7 +579,7 @@ Template.api.insert = {
      descr: "The document to insert. May not yet have an _id attribute, in which case Meteor will generate one for you."},
     {name: "callback",
      type: "Function",
-     descr: "Optional.  If present, called with an error object as the first argument and, if no error, the _id as the second."}
+     descr: "Необязательный аргумент.  If present, called with an error object as the first argument and, if no error, the _id as the second."}
   ]
 };
 
@@ -599,7 +599,7 @@ Template.api.update = {
      descr: "Specifies how to modify the documents"},
     {name: "callback",
      type: "Function",
-     descr: "Optional.  If present, called with an error object as its argument."}
+     descr: "Необязательный аргумент.  If present, called with an error object as its argument."}
   ],
   options: [
     {name: "multi",
@@ -620,7 +620,7 @@ Template.api.remove = {
      descr: "Specifies which documents to remove"},
     {name: "callback",
      type: "Function",
-     descr: "Optional.  If present, called with an error object as its argument."}
+     descr: "Необязательный аргумент.  If present, called with an error object as its argument."}
   ]
 };
 
@@ -747,7 +747,7 @@ Template.api.collection_object_id = {
   args: [ {
     name: "hexString",
     type: "String",
-    descr: ["Optional.  The 24-character hexadecimal contents of the ObjectID to create"]
+    descr: ["Необязательный аргумент.  The 24-character hexadecimal contents of the ObjectID to create"]
   }]
 };
 
@@ -947,7 +947,7 @@ Template.api.renderList = {
      descr: "Render function to be called for each document."},
     {name: "elseFunc",
      type: "Function returning HTML",
-     descr: "Optional.  Render function to be called when query is empty."}
+     descr: "Необязательный аргумент.  Render function to be called when query is empty."}
   ]
 };
 
@@ -1318,7 +1318,7 @@ Template.api.accounts_sendResetPasswordEmail = {
     {
       name: "email",
       type: "String",
-      descr: "Optional. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first email in the list."
+      descr: "Необязательный аргумент. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first email in the list."
     }
   ]
 };
@@ -1337,7 +1337,7 @@ Template.api.accounts_sendEnrollmentEmail = {
     {
       name: "email",
       type: "String",
-      descr: "Optional. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first email in the list."
+      descr: "Необязательный аргумент. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first email in the list."
     }
   ]
 };
@@ -1356,7 +1356,7 @@ Template.api.accounts_sendVerificationEmail = {
     {
       name: "email",
       type: "String",
-      descr: "Optional. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first unverified email in the list."
+      descr: "Необязательный аргумент. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first unverified email in the list."
     }
   ]
 };
@@ -1670,7 +1670,7 @@ Template.api.template_call = {
   args: [
     {name: "data",
      type: "Object",
-     descr: 'Optional. The data context object with which to call the template.'}
+     descr: 'Необязательный аргумент. The data context object with which to call the template.'}
   ]
 };
 
