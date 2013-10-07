@@ -393,7 +393,7 @@ Template.api.meteor_call = {
   id: "meteor_call",
   name: "Meteor.call(name, param1, param2, ... [, asyncCallback])",
   locus: "Везде",
-  descr: ["Вызывает серверный метод."],
+  descr: ["Вызывает метод."],
   args: [
     {name: "name",
      type: "String",
@@ -403,7 +403,7 @@ Template.api.meteor_call = {
      descr: "Аргументы для вызываемого метода. Могут отсутствовать."},
     {name: "asyncCallback",
      type: "Function",
-     descr: "Необязательный колбэк, вызываемый асинхронно после завершения работы метода. В него передается результат, или ошибка. Если колбэк не указан, то метод вызывается синхронно, если это возможно (подробности ниже)."}
+     descr: "Необязательный колбэк, вызываемый асинхронно после завершения работы метода. В него передается результат метода, или ошибка. Если колбэк не указан, то метод вызывается синхронно, если это возможно (подробности ниже)."}
   ]
 };
 
@@ -411,25 +411,25 @@ Template.api.meteor_apply = {
   id: "meteor_apply",
   name: "Meteor.apply(name, params [, options] [, asyncCallback])",
   locus: "Везде",
-  descr: ["Invoke a method passing an array of arguments."],
+  descr: ["Вызывает метод, передавая в него массив аргументов."],
   args: [
     {name: "name",
      type: "String",
-     descr: "Name of method to invoke"},
+     descr: "Название вызываемого метода."},
     {name: "params",
      type: "Array",
-     descr: "Method arguments"},
+     descr: "Массив аргументов для метода."},
     {name: "asyncCallback",
      type: "Function",
-     descr: "Optional callback; same semantics as in [`Meteor.call`](#meteor_call)."}
+     descr: "Необязательный колбэк; используется так же, как и в [`Meteor.call`](#meteor_call)."}
   ],
   options: [
     {name: "wait",
      type: "Boolean",
-     descr: "(Client only) If true, don't send this method until all previous method calls have completed, and don't send any subsequent method calls until this one is completed."},
+     descr: "(Только на клиенте) If true, don't send this method until all previous method calls have completed, and don't send any subsequent method calls until this one is completed."},
     {name: "onResultReceived",
      type: "Function",
-     descr: "(Client only) This callback is invoked with the error or result of the method (just like `asyncCallback`) as soon as the error or result is available. The local cache may not yet reflect the writes performed by the method."}
+     descr: "(Только на клиенте) This callback is invoked with the error or result of the method (just like `asyncCallback`) as soon as the error or result is available. The local cache may not yet reflect the writes performed by the method."}
   ]
 };
 
