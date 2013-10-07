@@ -393,17 +393,17 @@ Template.api.meteor_call = {
   id: "meteor_call",
   name: "Meteor.call(name, param1, param2, ... [, asyncCallback])",
   locus: "Везде",
-  descr: ["Invokes a method passing any number of arguments."],
+  descr: ["Вызывает серверный метод."],
   args: [
     {name: "name",
      type: "String",
-     descr: "Name of method to invoke"},
+     descr: "Название вызываемого метода."},
     {name: "param1, param2, ...",
      type: "EJSON",
-     descr: "Optional method arguments"},
+     descr: "Аргументы для вызываемого метода. Могут отсутствовать."},
     {name: "asyncCallback",
      type: "Function",
-     descr: "Optional callback, which is called asynchronously with the error or result after the method is complete. If not provided, the method runs synchronously if possible (see below)."}
+     descr: "Необязательный колбэк, вызываемый асинхронно после завершения работы метода. В него передается результат, или ошибка. Если колбэк не указан, то метод вызывается синхронно, если это возможно (подробности ниже)."}
   ]
 };
 
