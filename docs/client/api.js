@@ -426,10 +426,10 @@ Template.api.meteor_apply = {
   options: [
     {name: "wait",
      type: "Boolean",
-     descr: "(Только на клиенте) If true, don't send this method until all previous method calls have completed, and don't send any subsequent method calls until this one is completed."},
+     descr: "(Только на клиенте) Если `true`, Meteor не будет начинать вызов удаленного метода до тех пор, пока не завершатся все предыдущие. Также Meteor не будет начинать вызов последующих методов до тех пор, пока не выполнится этот."},
     {name: "onResultReceived",
      type: "Function",
-     descr: "(Только на клиенте) This callback is invoked with the error or result of the method (just like `asyncCallback`) as soon as the error or result is available. The local cache may not yet reflect the writes performed by the method."}
+     descr: "(Только на клиенте) Этот колбэк будет вызван сразу же, как только будет доступен результат работы метода. Так же, как и в случае с `asyncCallback`, в него будет передана либо ошибка, либо результат. Локальный кэш в этот момент может быть еще не в актуальном состоянии."}
   ]
 };
 
