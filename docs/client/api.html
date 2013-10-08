@@ -398,62 +398,63 @@ Meteor отслеживает все сделанные из методов за
 нее передаются в виде массива и она предоставляет возможность указать
 дополнительные опций для его вызова.
 
-<h2 id="connections"><span>Server connections</span></h2>
+<h2 id="connections"><span>Соединение с сервером</span></h2>
 
-These functions manage and inspect the network connection between the
-Meteor client and server.
+Эти функции отвечают за управление и мониторинг соединения между клиентом и
+сервером в Meteor.
 
 {{> api_box status}}
 
-This method returns the status of the connection between the client and
-the server. The return value is an object with the following fields:
+Этот метод возвращает текущий статус соединения между клиентом и сервером.
+Возвращаемый объект содержит следующие свойства:
 
 <dl class="objdesc">
 {{#dtdd name="connected" type="Boolean"}}
-  True if currently connected to the server. If false, changes and
-  method invocations will be queued up until the connection is
-  reestablished.
+  Принимает значение `true`, если соединение с сервером установлено. Если
+  соединения нет, то все изменения данных и вызовы методов будут помещены в
+  очередь до тех пор, пока оно не восстановится.
 {{/dtdd}}
 
 {{#dtdd name="status" type="String"}}
-  Describes the current reconnection status. The possible
-  values are `connected` (the connection is up and
-  running), `connecting` (disconnected and trying to open a
-  new connection), `failed` (permanently failed to connect; e.g., the client
-  and server support different versions of DDP), `waiting` (failed
-  to connect and waiting to try to reconnect) and `offline` (user has disconnected the connection).
+  Содержит текущий статус соединения. Принимает одно из следующих значений:
+  `connected` (соединение установлено и активно), `connecting` (соединение
+  разорвано и Meteor пытается его восстановить), `failed` (подключение не
+  удалось, например, из-за разных версий DDP на клиенте и сервере), `waiting`
+  (подключение не удалось, но скоро Meteor снова попытается его восстановить)
+  и `offline` (пользователь разорвал подключение).
 {{/dtdd}}
 
 {{#dtdd name="retryCount" type="Number"}}
-  The number of times the client has tried to reconnect since the
-  connection was lost. 0 when connected.
+  Количество попыток восстановления подключения, сделанных клиентом после его
+  разрыва. Сбрасывается в 0 после подключения.
 {{/dtdd}}
 
-{{#dtdd name="retryTime" type="Number or undefined"}}
-  The estimated time of the next reconnection attempt. To turn this
-  into an interval until the next reconnection, use
-  `retryTime - (new Date()).getTime()`. This key will
-  be set only when `status` is `waiting`.
+{{#dtdd name="retryTime" type="Number или undefined"}}
+  Примерное время следующей попытки восстановления подключения. Чтобы получить
+  время, через которое она произойдет, используйте выражение `retryTime - (new
+  Date()).getTime()`. Это свойство доступно, только когда `status` имеет
+  значение `waiting`.
 {{/dtdd}}
 
-{{#dtdd name="reason" type="String or undefined"}}
-  If `status` is `failed`, a description of why the connection failed.
+{{#dtdd name="reason" type="String или undefined"}}
+  Если `status` имеет значение `failed`, это свойство содержит описание
+  причины, по которой соединение не удалось.
 {{/dtdd}}
 </dl>
 
-Instead of using callbacks to notify you on changes, this is
-a [reactive](#reactivity) data source. You can use it in a
-[template](#templates) or [computation](#deps_autorun)
-to get realtime updates.
+[Реактивная](#reactivity) природа этого объекта позволяет не использовать
+колбэки для информирования вас об изменении статуса подключения. Вы можете
+использовать его в [шаблонах](#templates), или же в любом другом [реактивном
+контексте](#deps_autorun) чтобы отслеживать его изменения в реальном времени.
 
 {{> api_box reconnect}}
 
 {{> api_box disconnect}}
 
-Call this method to disconnect from the server and stop all
-live data updates. While the client is disconnected it will not receive
-updates to collections, method calls will be queued until the
-connection is reestablished, and hot code push will be disabled.
+Используйте этот метод, чтобы разорвать соединение между клиентом и сервером
+и остановить обновление данных в реальном времени. До тех пор, пока клиент не
+подключится к серверу, он не будет получать обновления в коллекциях, вызовы
+методов будут помещены в очередь и горячее обновление кода будет отключено.
 
 Call [Meteor.reconnect](#meteor_reconnect) to reestablish the connection
 and resume data transfer.

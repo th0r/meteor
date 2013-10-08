@@ -437,7 +437,7 @@ Template.api.status = {
   id: "meteor_status",
   name: "Meteor.status()",
   locus: "Клиент",
-  descr: ["Get the current connection status. A reactive data source."]
+  descr: ["Возвращает текущий статус соединения. Реактивный источник данных."]
 };
 
 Template.api.reconnect = {
@@ -445,8 +445,8 @@ Template.api.reconnect = {
   name: "Meteor.reconnect()",
   locus: "Клиент",
   descr: [
-    "Force an immediate reconnection attempt if the client is not connected to the server.",
-    "This method does nothing if the client is already connected."]
+    "Незамедлительно пытается восстановить подключение к серверу, если оно разорвано.",
+    "Если соединение уже установлено, то метод ничего не делает."]
 };
 
 Template.api.disconnect = {
@@ -454,7 +454,7 @@ Template.api.disconnect = {
   name: "Meteor.disconnect()",
   locus: "Клиент",
   descr: [
-    "Disconnect the client from the server."]
+    "Разрывает подключение между клиентом и сервером."]
 };
 
 Template.api.connect = {
@@ -973,7 +973,7 @@ Template.api.user = {
   id: "meteor_user",
   name: "Meteor.user()",
   locus: "Anywhere but publish functions",
-  descr: ["Get the current user record, or `null` if no user is logged in. A reactive data source."]
+  descr: ["Get the current user record, or `null` if no user is logged in. Реактивный источник данных."]
 };
 
 Template.api.currentUser = {
@@ -987,7 +987,7 @@ Template.api.userId = {
   id: "meteor_userid",
   name: "Meteor.userId()",
   locus: "Anywhere but publish functions",
-  descr: ["Get the current user id, or `null` if no user is logged in. A reactive data source."]
+  descr: ["Get the current user id, or `null` if no user is logged in. Реактивный источник данных."]
 };
 
 
@@ -1002,7 +1002,7 @@ Template.api.loggingIn = {
   id: "meteor_loggingin",
   name: "Meteor.loggingIn()",
   locus: "Клиент",
-  descr: ["True if a login method (such as `Meteor.loginWithPassword`, `Meteor.loginWithFacebook`, or `Accounts.createUser`) is currently in progress. A reactive data source."]
+  descr: ["True if a login method (such as `Meteor.loginWithPassword`, `Meteor.loginWithFacebook`, or `Accounts.createUser`) is currently in progress. Реактивный источник данных."]
 };
 
 Template.api.loggingInTemplate = {
