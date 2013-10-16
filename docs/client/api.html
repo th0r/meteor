@@ -498,111 +498,111 @@ Meteor отслеживает все сделанные из методов за
 
 <h2 id="collections"><span>Коллекции</span></h2>
 
-Meteor stores data in *collections*.  To get started, declare a
-collection with `new Meteor.Collection`.
+Meteor хранит данные в *коллекциях*. Для начала, обявите коллекцию, используя
+`new Meteor.Collection`.
 
 {{> api_box meteor_collection}}
 
-Calling this function is analogous to declaring a model in a traditional ORM
-(Object-Relation Mapper)-centric framework. It sets up a *collection* (a storage
-space for records, or "documents") that can be used to store a particular type
-of information, like users, posts, scores, todo items, or whatever matters to
-your application.  Each document is a EJSON object.  It includes an `_id`
-property whose value is unique in the collection, which Meteor will set when you
-first create the document.
+Вызов этой функции аналогичен объявлению модели во фреймворке, использующем
+ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пространство для
+хранения данных, или "документов"), которая используется для хранения
+определенных типов информации, например данных о пользователях, постов,
+оценок, комментариев и всего того, что потребуется вашему приложению.
+Каждый документ - это EJSON-объект. Он содержит поле `_id`, уникальное для
+каждого документа в коллекции, которое Meteor установит автоматически при его
+создании.
 
-    // common code on client and server declares livedata-managed mongo
-    // collection.
+    // Общий для клиента и сервера код, объявляющий "живые" (синхронизируемые)
+    // Mongo-коллекции.
     Chatrooms = new Meteor.Collection("chatrooms");
     Messages = new Meteor.Collection("messages");
 
-The function returns an object with methods to [`insert`](#insert)
-documents in the collection, [`update`](#update) their properties, and
-[`remove`](#remove) them, and to [`find`](#find) the documents in the
-collection that match arbitrary criteria. The way these methods work is
-compatible with the popular Mongo database API.  The same database API
-works on both the client and the server (see below).
+Созданный объект содержит методы для добавления документов в коллекцию
+([`insert`](#insert)), их изменения ([`update`](#update)), удаления
+([`remove`](#remove)) и поиска ([`find`](#find)). Синтаксис этих методов
+совместим с API баз данных Mongo, а доступны они как на сервере, так и
+на клиенте:
 
-    // return array of my messages
+    // Получить массив моих сообщений
     var myMessages = Messages.find({userId: Session.get('myUserId')}).fetch();
 
-    // create a new message
+    // Создать новое сообщение
     Messages.insert({text: "Hello, world!"});
 
-    // mark my first message as "important"
+    // Пометить мое первое сообщение, как важное
     Messages.update(myMessages[0]._id, {$set: {important: true}});
 
-If you pass a `name` when you create the collection, then you are
-declaring a persistent collection &mdash; one that is stored on the
-server and seen by all users. Client code and server code can both
-access the same collection using the same API.
+Если при создании коллекции вы укажете ее имя (параметр `name`), то данная
+коллекция будет постоянной &mdash;, т.е. будет храниться на сервере и будет
+доступна всем пользователям. Вы сможете получить к ней доступ как с клиента,
+так и с сервера, используя один и тот же API.
 
-Specifically, when you pass a `name`, here's what happens:
+Вот что происходит, если вы указываете название коллекции:
 
-* On the server, a collection with that name is created on a backend
-Mongo server. When you call methods on that collection on the server,
-they translate directly into normal Mongo operations (after checking that
-they match your [access control rules](#allow)).
+* Одноименная коллекция создается на сервере в базе данных Mongo. Когда вы
+вызываете методы этой коллекции на сервере, они преобразовываются в
+соответствующие операции с базой данных Mongo (правда, только после проверки
+указанных вами [правил контроля доступа](#allow)).
 
-* On the client, a Minimongo instance is
-created. Minimongo is essentially an in-memory, non-persistent
-implementation of Mongo in pure JavaScript. It serves as a local cache
-that stores just the subset of the database that this client is working
-with. Queries on the client ([`find`](#find)) are served directly out of
-this cache, without talking to the server.
+* На клиенте создается экземпляр Minimongo - это частичная реализация Mongo
+на чистом JavaScript, хранящая данные в оперативной памяти. Он используется
+в качестве локального кэша, хранящего только ту часть базы, которая
+необходима данному клиенту. Поиск документов ([`find`](#find)) на клиенте
+происходит только в этом локальном кэше, без обращения к серверу.
 
-* When you write to the database on the client ([`insert`](#insert),
-[`update`](#update), [`remove`](#remove)), the command is executed
-immediately on the client, and, simultaneously, it's shipped up to the
-server and executed there too.  The `livedata` package is
-responsible for this.
+* Когда на клиенте вы хотите внести какие-либо изменения в базу данных
+(используя методы [`insert`](#insert), [`update`](#update) и
+[`remove`](#remove)), то они сразу же вносятся в локальный кэш и
+параллельно посылается запрос на их внесение в БД на сервере. За это отвечает
+пакет `livedata`.
 
-If you pass `null` as the `name`, then you're creating a local
-collection. It's not synchronized anywhere; it's just a local scratchpad
-that supports Mongo-style [`find`](#find), [`insert`](#insert),
-[`update`](#update), and [`remove`](#remove) operations.  (On both the
-client and the server, this scratchpad is implemented using Minimongo.)
+Если в качестве названия коллекции вы укажете `null`, тогда будет создана
+локальная коллекция. Она ни с чем не синхронизируется - это просто локальное
+хранилище документов, позволяющее работать с ними в стиле Mongo (используя
+методы [`find`](#find), [`insert`](#insert), [`update`](#update) и
+[`remove`](#remove)). Как на клиенте, так и на сервере оно реализовано с
+помошью Minimongo.
 
-By default, Meteor automatically publishes every document in your
-collection to each connected client.  To turn this behavior off, remove
-the `autopublish` package:
+По-умолчанию Meteor автоматически публикует все документы из коллекции для
+всех подключенных клиентов. Чтобы это отключить, удалите из приложения пакет
+`autopublish`:
 
     $ meteor remove autopublish
 
-and instead call [`Meteor.publish`](#meteor_publish) to specify which parts of
-your collection should be published to which users.
+и вместо этого используйте [`Meteor.publish`](#meteor_publish), чтобы
+опубликовать для конкретных пользователей только необходимые им части
+коллекции.
 
-    // Create a collection called Posts and put a document in it. The
-    // document will be immediately visible in the local copy of the
-    // collection. It will be written to the server-side database
-    // a fraction of a second later, and a fraction of a second
-    // after that, it will be synchronized down to any other clients
-    // that are subscribed to a query that includes it (see
-    // Meteor.subscribe and autopublish)
+    // Создаем коллекцию Posts и добавляем в нее новый документ.
+    // Он мгновенно появляется в локальной копии этой коллекции.
+    // В серверную базу данных он запишется буквально через долю
+    // секунды, а еще через долю секунды он уже будет синхронизирован
+    // со всеми клиентами, которые подписаны на содержащий его запрос
+    // (смотрите Meteor.subscribe and autopublish)
     Posts = new Meteor.Collection("posts");
     Posts.insert({title: "Hello world", body: "First post"});
 
-    // Changes are visible immediately -- no waiting for a round trip to
-    // the server.
+    // Изменения доступны мгновенно -- ответ от сервера ждать не надо.
     assert(Posts.find().count() === 1);
 
-    // Create a temporary, local collection. It works just like any other
-    // collection, but it doesn't send changes to the server, and it
-    // can't receive any data from subscriptions.
+    // Создаем локальную коллекцию. Она работает так же, как и любая другая
+    // коллекция, за исключением того, что не отсылает изменения на сервер и
+    // не получает данные из публикаций.
     Scratchpad = new Meteor.Collection;
     for (var i = 0; i < 10; i++)
       Scratchpad.insert({number: i * 2});
     assert(Scratchpad.find({number: {$lt: 9}}).count() === 5);
 
 
-If you specify a `transform` option to the `Collection` or any of its retrieval
-methods, documents are passed through the `transform` function before being
-returned or passed to callbacks.  This allows you to add methods or otherwise
-modify the contents of your collection from their database representation.  You
-can also specify `transform` on a particular `find`, `findOne`, `allow`, or
-`deny` call.
+Если вы укажете функцию трансформации (опция `transform`) документов при
+создании коллекции, или же при вызове ее некоторых методов, то она будет
+использоваться для преобразования документов перед их возвращением из
+соответствующих функций, или перед их передачей в колбэки. Это позволяет
+расширить возможности при работе с документами (например, обернуть их в
+класс и т.п.). Опцию `transform` поддерживают функции `find`, `findOne`,
+`allow` и `deny`.
 
-    // An Animal class that takes a document in its constructor
+    // Создаем класс Animal, конструктор которого принимает документ
     Animal = function (doc) {
       _.extend(this, doc);
     };
@@ -612,19 +612,21 @@ can also specify `transform` on a particular `find`, `findOne`, `allow`, or
       }
     });
 
-    // Define a Collection that uses Animal as its document
+    // Объявляем коллекцию, которая преобразует свои документы в объекты
+    // класса Animal
     Animals = new Meteor.Collection("Animals", {
       transform: function (doc) { return new Animal(doc); }
     });
 
-    // Create an Animal and call its makeNoise method
+    // Создаем новый документ, получаем его преобразованную версию в виде
+    // объекта класса Animal и вызываем у него метод makeNoise
     Animals.insert({name: "raptor", sound: "roar"});
     Animals.findOne({name: "raptor"}).makeNoise(); // prints "roar"
 
-`transform` functions are not called reactively.  If you want to add a
-dynamically changing attribute to an object, do it with a function that computes
-the value at the time it's called, not by computing the attribute at `transform`
-time.
+Функции `transform` реактивно не вызываются, поэтому если вы хотите добавить
+в объект динамически изменяющийся атрибут, то сделайте его в виде метода,
+вычисляющего свое значение во время вызова, а не в виде свойства, значение
+которого вычисляется в момент трансформации.
 
 {{#warning}}
 In this release, Minimongo has some limitations:

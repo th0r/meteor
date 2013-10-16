@@ -475,27 +475,27 @@ Template.api.meteor_collection = {
   id: "meteor_collection",
   name: "new Meteor.Collection(name, [options])",
   locus: "Везде",
-  descr: ["Constructor for a Collection"],
+  descr: ["Конструктор коллекции"],
   args: [
     {name: "name",
      type: "String",
-     descr: "The name of the collection.  If null, creates an unmanaged (unsynchronized) local collection."}
+     descr: "Название коллекции. Если `null`, то будет создана несинхронизируемая локальная коллекция."}
   ],
   options: [
     {name: "connection",
      type: "Object",
-     descr: "The Meteor connection that will manage this collection. Uses the default connection if not specified. Pass `null` to specify no connection. Unmanaged (`name` is null) collections cannot specify a connection."
+     descr: "Подключение, которое будет управлять этой коллекцией. Если не указано, будет использоваться подключение по-умолчанию. Укажите `null`, чтобы не использовать подключение. Несинхронизируемые коллекции (параметр `name` равен `null`) не могут использовать подключение."
     },
     {name: "idGeneration",
      type: "String",
-     descr: "The method of generating the `_id` fields of new documents in this collection.  Possible values:\n\n" +
-     " - **`'STRING'`**: random strings\n" +
-     " - **`'MONGO'`**:  random [`Meteor.Collection.ObjectID`](#collection_object_id) values\n\n" +
-     "The default id generation technique is `'STRING'`."
+     descr: "Метод генерации поля `_id` для новых документов коллекции. Возможные значения:\n\n" +
+     " - **`'STRING'`**: произвольные строки\n" +
+     " - **`'MONGO'`**: значения произвольных объектов [`Meteor.Collection.ObjectID`](#collection_object_id)\n\n" +
+     "По-умолчанию используется метод `'STRING'`."
     },
     {name: "transform",
      type: "Function",
-     descr: "An optional transformation function. Documents will be passed through this function before being returned from `fetch` or `findOne`, and before being passed to callbacks of `observe`, `allow`, and `deny`."
+     descr: "Необязательная функция трансформации. Она служит для преобразования документов перед тем, как они будут возвращены функциями `fetch` и `findOne`, а также перед передачей их в колбэки функций `observe`, `allow` и `deny`."
     }
   ]
 };
@@ -504,10 +504,10 @@ Template.api.find = {
   id: "find",
   name: "<em>collection</em>.find(selector, [options])",
   locus: "Везде",
-  descr: ["Find the documents in a collection that match the selector."],
+  descr: ["Ищет в коллекции документы, соответствующие селектору."],
   args: [
     {name: "selector",
-     type: "Mongo selector, or String",
+     type: "Mongo-селектор или String",
      type_link: "selectors",
      descr: "The query"}
   ],
