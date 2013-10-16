@@ -456,47 +456,47 @@ Meteor отслеживает все сделанные из методов за
 подключится к серверу, он не будет получать обновления в коллекциях, вызовы
 методов будут помещены в очередь и горячее обновление кода будет отключено.
 
-Call [Meteor.reconnect](#meteor_reconnect) to reestablish the connection
-and resume data transfer.
+Чтобы восстановить соединение и возобновить передачу данных используйте
+[Meteor.reconnect](#meteor_reconnect).
 
-This can be used to save battery on mobile devices when real time
-updates are not required.
+Это может быть полезно для экономии энергии на мобильных устройствах, когда
+обновление информации в реальном времени не обязательно.
 
 {{> api_box connect}}
 
-To call methods on another Meteor application or subscribe to its data
-sets, call `DDP.connect` with the URL of the application.
-`DDP.connect` returns an object which provides:
+Используйте этот метод для подключения к серверу другого Meteor-приложения.
+Это позволит вам подписываться на его публикации и вызывать его удаленые
+методы.
+`DDP.connect` возвращает объект со следующими свойствами:
 
 * `subscribe` -
-  Subscribe to a record set. See
-  [Meteor.subscribe](#meteor_subscribe).
+  Подписывает на публикации. Смотрите [Meteor.subscribe](#meteor_subscribe).
 * `call` -
-  Invoke a method. See [Meteor.call](#meteor_call).
+  Вызывает удаленный метод. Смотрите [Meteor.call](#meteor_call).
 * `apply` -
-  Invoke a method with an argument array. See
+  Вызывает удаленный метод, передавая массив аргументов. Смотрите
   [Meteor.apply](#meteor_apply).
 * `methods` -
-  Define client-only stubs for methods defined on the remote server. See
+  Объявляет клиентские заглушки для удаленных методов. Смотрите
   [Meteor.methods](#meteor_methods).
 * `status` -
-  Get the current connection status. See
+  Возвращает текущий статус соединения. Смотрите
   [Meteor.status](#meteor_status).
 * `reconnect` -
-  See [Meteor.reconnect](#meteor_reconnect).
+  Смотрите [Meteor.reconnect](#meteor_reconnect).
 * `disconnect` -
-  See [Meteor.disconnect](#meteor_disconnect).
-* `onReconnect` - Set this to a function to be called as the first step of
-  reconnecting. This function can call methods which will be executed before
-  any other outstanding methods. For example, this can be used to re-establish
-  the appropriate authentication context on the new connection.
+  Смотрите [Meteor.disconnect](#meteor_disconnect).
+* `onReconnect` -
+  Вы можете присвоить этому свойству функцию, которая будет вызываться в
+  качестве первого шага восстановления соединения. Она может вызывать удаленные
+  методы, которые будут выполнены перед всеми остальными. Например, это можно
+  использовать для восстановления аутентификации для нового соединения.
 
-By default, clients open a connection to the server from which they're loaded.
-When you call `Meteor.subscribe`, `Meteor.status`, `Meteor.call`, and
-`Meteor.apply`, you are using a connection back to that default
-server.
+По умолчанию, клиенты устанавливают соединения с тем сервером, откуда они
+были загружены, и вы работаете именно с ним, когда вызываете
+`Meteor.subscribe`, `Meteor.status`, `Meteor.call` и `Meteor.apply`.
 
-<h2 id="collections"><span>Collections</span></h2>
+<h2 id="collections"><span>Коллекции</span></h2>
 
 Meteor stores data in *collections*.  To get started, declare a
 collection with `new Meteor.Collection`.

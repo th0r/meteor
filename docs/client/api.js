@@ -461,11 +461,11 @@ Template.api.connect = {
   id: "ddp_connect",
   name: "DDP.connect(url)",
   locus: "Везде",
-  descr: ["Connect to the server of a different Meteor application to subscribe to its document sets and invoke its remote methods."],
+  descr: ["Служит для подключения к серверу другого приложения на Meteor, что позволяет подписываться на его публикации и вызывать его методы."],
   args: [
     {name: "url",
      type: "String",
-     descr: "The URL of another Meteor application."}
+     descr: "URL другого приложения на Meteor."}
   ]
 };
 
