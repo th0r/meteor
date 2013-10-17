@@ -75,8 +75,7 @@ Template.api.release = {
   descr: ["`Meteor.release` содержит название " +
           "[версии](#meteorupdate) Meteor, на которой был создан проект " +
           "(например, `\"" +
-          // Put the current release in the docs as the example)
-          (Meteor.release ? Meteor.release : '0.6.0') +
+          Meteor.release +
           "\"`). Если же проект был создан на Meteor, собранном на основе " +
           "git-коммита, то значение переменной будет `undefined`."]
 };
@@ -91,9 +90,17 @@ Template.api.ejsonParse = {
 
 Template.api.ejsonStringify = {
   id: "ejson_stringify",
-  name: "EJSON.stringify(val)",
+  name: "EJSON.stringify(val, [options])",
   locus: "Везде",
   args: [ {name: "val", type: "EJSON-compatible value", descr: "A value to stringify."} ],
+  options: [
+    {name: "indent",
+     type: "Boolean, Integer, or String",
+     descr: "Indents objects and arrays for easy readability.  When `true`, indents by 2 spaces; when an integer, indents by that number of spaces; and when a string, uses the string as the indentation pattern."},
+    {name: "canonical",
+     type: "Boolean",
+     descr: "When `true`, stringifies keys in an object in sorted order."}
+  ],
   descr: ["Serialize a value to a string.\n\nFor EJSON values, the serialization " +
           "fully represents the value. For non-EJSON values, serializes the " +
           "same way as `JSON.stringify`."]
@@ -118,10 +125,15 @@ Template.api.ejsonToJSONValue = {
 
 Template.api.ejsonEquals = {
   id: "ejson_equals",
-  name: "EJSON.equals(a, b)", //doc options?
+  name: "EJSON.equals(a, b, [options])",
   locus: "Везде",
   args: [ {name: "a", type: "EJSON-compatible object"},
           {name: "b", type: "EJSON-compatible object"} ],
+  options: [
+    {name: "keyOrderSensitive",
+     type: "Boolean",
+     descr: "Compare in key sensitive order, if supported by the JavaScript implementation.  For example, `{a: 1, b: 2}` is equal to `{b: 2, a: 1}` only when `keyOrderSensitive` is `false`.  The default is `false`."}
+  ],
   descr: ["Return true if `a` and `b` are equal to each other.  Return false otherwise." +
           "  Uses the `equals` method on `a` if present, otherwise performs a deep comparison."]
 },
@@ -484,7 +496,7 @@ Template.api.meteor_collection = {
   options: [
     {name: "connection",
      type: "Object",
-     descr: "Подключение, которое будет управлять этой коллекцией. Если не указано, будет использоваться подключение по-умолчанию. Укажите `null`, чтобы не использовать подключение. Несинхронизируемые коллекции (параметр `name` равен `null`) не могут использовать подключение."
+     descr: "Подключение, которое будет управлять этой коллекцией. Если не указано, будет использоваться подключение по-умолчанию. Чтобы использовать другой Meteor-сервер, передайте сюда результат вызова [`DDP.connect`](#ddp_connect). Укажите `null`, чтобы не использовать подключение. Несинхронизируемые коллекции (параметр `name` равен `null`) не могут использовать подключение."
     },
     {name: "idGeneration",
      type: "String",
@@ -525,7 +537,7 @@ Template.api.find = {
     {name: "fields",
      type: "Field specifier",
      type_link: "fieldspecifiers",
-     descr: "(Server only) Dictionary of fields to return or exclude."},
+     descr: "Dictionary of fields to return or exclude."},
     {name: "reactive",
      type: "Boolean",
      descr: "(Client only) Default `true`; pass `false` to disable reactivity"},
@@ -557,7 +569,7 @@ Template.api.findone = {
     {name: "fields",
      type: "Field specifier",
      type_link: "fieldspecifiers",
-     descr: "(Server only) Dictionary of fields to return or exclude."},
+     descr: "Dictionary of fields to return or exclude."},
     {name: "reactive",
      type: "Boolean",
      descr: "(Client only) Default true; pass false to disable reactivity"},
@@ -587,7 +599,7 @@ Template.api.update = {
   id: "update",
   name: "<em>collection</em>.update(selector, modifier, [options], [callback])",
   locus: "Везде",
-  descr: ["Modify one or more documents in the collection"],
+  descr: ["Modify one or more documents in the collection. Returns the number of affected documents."],
   args: [
     {name: "selector",
      type: "Mongo selector, or object id",
@@ -599,7 +611,37 @@ Template.api.update = {
      descr: "Specifies how to modify the documents"},
     {name: "callback",
      type: "Function",
-     descr: "Необязательный аргумент.  If present, called with an error object as its argument."}
+     descr: "Необязательный аргумент. If present, called with an error object as the first argument and, if no error, the number of affected documents as the second."}
+  ],
+  options: [
+    {name: "multi",
+     type: "Boolean",
+     descr: "True to modify all matching documents; false to only modify one of the matching documents (the default)."},
+    {name: "upsert",
+     type: "Boolean",
+     descr: "True to insert a document if no matching documents are found."}
+  ]
+};
+
+Template.api.upsert = {
+  id: "upsert",
+  name: "<em>collection</em>.upsert(selector, modifier, [options], [callback])",
+  locus: "Anywhere",
+  descr: ["Modify one or more documents in the collection, or insert one if no matching documents were found. " +
+          "Returns an object with keys `numberAffected` (the number of documents modified) " +
+          " and `insertedId` (the unique _id of the document that was inserted, if any)."],
+  args: [
+    {name: "selector",
+     type: "Mongo selector, or object id",
+     type_link: "selectors",
+     descr: "Specifies which documents to modify"},
+    {name: "modifier",
+     type: "Mongo modifier",
+     type_link: "modifiers",
+     descr: "Specifies how to modify the documents"},
+    {name: "callback",
+     type: "Function",
+     descr: "Optional.  If present, called with an error object as the first argument and, if no error, the number of affected documents as the second."}
   ],
   options: [
     {name: "multi",
@@ -607,6 +649,7 @@ Template.api.update = {
      descr: "True to modify all matching documents; false to only modify one of the matching documents (the default)."}
   ]
 };
+
 
 Template.api.remove = {
   id: "remove",
@@ -677,25 +720,31 @@ Template.api.cursor_fetch = {
 
 Template.api.cursor_foreach = {
   id: "foreach",
-  name: "<em>cursor</em>.forEach(callback)",
-  locus: "Везде",
+  name: "<em>cursor</em>.forEach(callback, [thisArg])",
+  locus: "Anywhere",
   descr: ["Call `callback` once for each matching document, sequentially and synchronously."],
   args: [
     {name: "callback",
      type: "Function",
-     descr: "Function to call."}
+     descr: "Function to call. It will be called with three arguments: the document, a 0-based index, and <em>cursor</em> itself."},
+    {name: "thisArg",
+     type: "Any",
+     descr: "An object which will be the value of `this` inside `callback`."}
   ]
 };
 
 Template.api.cursor_map = {
   id: "map",
-  name: "<em>cursor</em>.map(callback)",
-  locus: "Везде",
+  name: "<em>cursor</em>.map(callback, [thisArg])",
+  locus: "Anywhere",
   descr: ["Map callback over all matching documents.  Returns an Array."],
   args: [
     {name: "callback",
      type: "Function",
-     descr: "Function to call."}
+     descr: "Function to call. It will be called with three arguments: the document, a 0-based index, and <em>cursor</em> itself."},
+    {name: "thisArg",
+     type: "Any",
+     descr: "An object which will be the value of `this` inside `callback`."}
   ]
 };
 
@@ -1028,6 +1077,20 @@ Template.api.logout = {
   ]
 };
 
+Template.api.logoutOtherClients = {
+  id: "meteor_logoutotherclients",
+  name: "Meteor.logoutOtherClients([callback])",
+  locus: "Client",
+  descr: ["Log out other clients logged in as the current user, but does not log out the client that calls this function."],
+  args: [
+    {
+      name: "callback",
+      type: "Function",
+      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+    }
+  ]
+};
+
 
 Template.api.loginWithPassword = {
   id: "meteor_loginwithpassword",
@@ -1102,6 +1165,16 @@ Template.api.accounts_config = {
       name: "forbidClientAccountCreation",
       type: "Boolean",
       descr: "Calls to [`createUser`](#accounts_createuser) from the client will be rejected. In addition, if you are using [accounts-ui](#accountsui), the \"Create account\" link will not be available."
+    },
+    {
+      name: "restrictCreationByEmailDomain",
+      type: "String Or Function",
+      descr: "If set, only allow new users with an email in the specified domain or if the predicate function returns true. Works with password-based sign-in and external services that expose email addresses (Google, Facebook, GitHub). All existing users still can log in after enabling this option. Example: `Accounts.config({ restrictCreationByEmailDomain: 'school.edu' })`."
+    },
+    {
+      name: "loginExpirationInDays",
+      type: "Number",
+      descr: "The number of days from when a user logs in until their token expires and they are logged out. Defaults to 90. Set to `null` to disable login expiration."
     }
   ]
 };
