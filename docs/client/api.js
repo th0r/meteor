@@ -521,29 +521,29 @@ Template.api.find = {
     {name: "selector",
      type: "Mongo-селектор или String",
      type_link: "selectors",
-     descr: "The query"}
+     descr: "Запрос."}
   ],
   options: [
     {name: "sort",
-     type: "Sort specifier",
+     type: "Указатель сортировки",
      type_link: "sortspecifiers",
-     descr: "Sort order (default: natural order)"},
+     descr: "Порядок сортировки (по-умолчанию: естественный порядок)"},
     {name: "skip",
      type: "Number",
-     descr: "Number of results to skip at the beginning"},
+     descr: "Количество результатов, которое необходимо пропустить (считая с начала)."},
     {name: "limit",
      type: "Number",
-     descr: "Maximum number of results to return"},
+     descr: "Максимальное количество возвращаемых результатов."},
     {name: "fields",
-     type: "Field specifier",
+     type: "Указатель полей",
      type_link: "fieldspecifiers",
-     descr: "Dictionary of fields to return or exclude."},
+     descr: "Словарь возвращаемых или исключаемых полей."},
     {name: "reactive",
      type: "Boolean",
-     descr: "(Client only) Default `true`; pass `false` to disable reactivity"},
+     descr: "(Только на клиенте) По-умолчанию `true`; укажите `false`, чтобы отключить реактивность."},
     {name: "transform",
      type: "Function",
-     descr: "Overrides `transform` on the  [`Collection`](#collections) for this cursor.  Pass `null` to disable transformation."}
+     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections), для этого курсора. Укажите `null`, чтобы отключить трансформацию."}
   ]
 };
 
@@ -551,31 +551,31 @@ Template.api.findone = {
   id: "findone",
   name: "<em>collection</em>.findOne(selector, [options])",
   locus: "Везде",
-  descr: ["Finds the first document that matches the selector, as ordered by sort and skip options."],
+  descr: ["Ищет первый документ, удовлетворяющий серектору, с учетом параметров сортировки и пропуска результатов."],
   args: [
     {name: "selector",
-     type: "Mongo selector, or String",
+     type: "Mongo-селектор или String",
      type_link: "selectors",
-     descr: "The query"}
+     descr: "Запрос."}
   ],
   options: [
     {name: "sort",
-     type: "Sort specifier",
+     type: "Указатель сортировки",
      type_link: "sortspecifiers",
-     descr: "Sort order (default: natural order)"},
+     descr: "Порядок сортировки (по-умолчанию: естественный порядок)"},
     {name: "skip",
      type: "Number",
-     descr: "Number of results to skip at the beginning"},
+     descr: "Количество результатов, которое необходимо пропустить (считая с начала)."},
     {name: "fields",
-     type: "Field specifier",
+     type: "Указатель полей",
      type_link: "fieldspecifiers",
-     descr: "Dictionary of fields to return or exclude."},
+     descr: "Словарь возвращаемых или исключаемых полей."},
     {name: "reactive",
      type: "Boolean",
-     descr: "(Client only) Default true; pass false to disable reactivity"},
+     descr: "(Только на клиенте) По-умолчанию `true`; укажите `false`, чтобы отключить реактивность."},
     {name: "transform",
      type: "Function",
-     descr:  "Overrides `transform` on the [`Collection`](#collections) for this cursor.  Pass `null` to disable transformation."
+     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections), для этого курсора. Укажите `null`, чтобы отключить трансформацию."
     }
   ]
 };
@@ -584,14 +584,14 @@ Template.api.insert = {
   id: "insert",
   name: "<em>collection</em>.insert(doc, [callback])",
   locus: "Везде",
-  descr: ["Insert a document in the collection.  Returns its unique _id."],
+  descr: ["Добавляет документ в коллекцию. Возвращает его уникальный _id."],
   args: [
     {name: "doc",
      type: "Object",
-     descr: "The document to insert. May not yet have an _id attribute, in which case Meteor will generate one for you."},
+     descr: "Добавляемый документ. Может не содержать _id, в случае чего его автоматически сгенерирует Meteor."},
     {name: "callback",
      type: "Function",
-     descr: "Необязательный аргумент.  If present, called with an error object as the first argument and, if no error, the _id as the second."}
+     descr: "Необязательный аргумент. Первым параметром в колбэк будет передан объект ошибки, а вторым, если ошибки не было, _id добавленного документа."}
   ]
 };
 
@@ -599,54 +599,54 @@ Template.api.update = {
   id: "update",
   name: "<em>collection</em>.update(selector, modifier, [options], [callback])",
   locus: "Везде",
-  descr: ["Modify one or more documents in the collection. Returns the number of affected documents."],
+  descr: ["Изменяет один или несколько документов в коллекции. Возвращает количество измененных документов."],
   args: [
     {name: "selector",
-     type: "Mongo selector, or object id",
+     type: "Mongo-селектор или String",
      type_link: "selectors",
-     descr: "Specifies which documents to modify"},
+     descr: "Указывает документы, которые необходимо изменить."},
     {name: "modifier",
-     type: "Mongo modifier",
+     type: "Mongo-модификатор",
      type_link: "modifiers",
-     descr: "Specifies how to modify the documents"},
+     descr: "Указывает, каким образом изменять документы."},
     {name: "callback",
      type: "Function",
-     descr: "Необязательный аргумент. If present, called with an error object as the first argument and, if no error, the number of affected documents as the second."}
+     descr: "Необязательный аргумент. Первым параметром в колбэк будет передан объект ошибки, а вторым, если ошибки не было, количество измененных документов."}
   ],
   options: [
     {name: "multi",
      type: "Boolean",
-     descr: "True to modify all matching documents; false to only modify one of the matching documents (the default)."},
+     descr: "По-умолчанию `false`. Укажите `true`, чтобы изменить все найденные документы."},
     {name: "upsert",
      type: "Boolean",
-     descr: "True to insert a document if no matching documents are found."}
+     descr: "Укажите `true`, чтобы добавить новый документ в случае, если ни один соответствующий документ не найден."}
   ]
 };
 
 Template.api.upsert = {
   id: "upsert",
   name: "<em>collection</em>.upsert(selector, modifier, [options], [callback])",
-  locus: "Anywhere",
-  descr: ["Modify one or more documents in the collection, or insert one if no matching documents were found. " +
-          "Returns an object with keys `numberAffected` (the number of documents modified) " +
-          " and `insertedId` (the unique _id of the document that was inserted, if any)."],
+  locus: "Везде",
+  descr: ["Изменяет один или несколько документов в коллекции, а в случае, если ни один не найден, добавляет новый. " +
+          "Возвращает объект, содержащий свойства `numberAffected` (количество измененных документов) " +
+          "и, если новый документ был добавлен в коллекцию, `insertedId` (его уникальный _id)."],
   args: [
     {name: "selector",
-     type: "Mongo selector, or object id",
+     type: "Mongo-селектор или String",
      type_link: "selectors",
-     descr: "Specifies which documents to modify"},
+     descr: "Указывает документы, которые необходимо изменить."},
     {name: "modifier",
-     type: "Mongo modifier",
+     type: "Mongo-модификатор",
      type_link: "modifiers",
-     descr: "Specifies how to modify the documents"},
+     descr: "Указывает, каким образом изменять документы."},
     {name: "callback",
      type: "Function",
-     descr: "Optional.  If present, called with an error object as the first argument and, if no error, the number of affected documents as the second."}
+     descr: "Необязательный аргумент. Первым параметром в колбэк будет передан объект ошибки, а вторым, если ошибки не было, количество измененных документов."}
   ],
   options: [
     {name: "multi",
      type: "Boolean",
-     descr: "True to modify all matching documents; false to only modify one of the matching documents (the default)."}
+     descr: "По-умолчанию `false`. Укажите `true`, чтобы изменить все найденные документы."}
   ]
 };
 
@@ -655,15 +655,15 @@ Template.api.remove = {
   id: "remove",
   name: "<em>collection</em>.remove(selector, [callback])",
   locus: "Везде",
-  descr: ["Remove documents from the collection"],
+  descr: ["Удаляет документы из коллекции."],
   args: [
     {name: "selector",
-     type: "Mongo selector, or object id",
+     type: "Mongo-селектор или String",
      type_link: "selectors",
-     descr: "Specifies which documents to remove"},
+     descr: "Указывает документы, которые необходимо удалить."},
     {name: "callback",
      type: "Function",
-     descr: "Необязательный аргумент.  If present, called with an error object as its argument."}
+     descr: "Необязательный аргумент. Первым параметром в колбэк будет передан объект ошибки."}
   ]
 };
 
@@ -721,7 +721,7 @@ Template.api.cursor_fetch = {
 Template.api.cursor_foreach = {
   id: "foreach",
   name: "<em>cursor</em>.forEach(callback, [thisArg])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Call `callback` once for each matching document, sequentially and synchronously."],
   args: [
     {name: "callback",
@@ -736,7 +736,7 @@ Template.api.cursor_foreach = {
 Template.api.cursor_map = {
   id: "map",
   name: "<em>cursor</em>.map(callback, [thisArg])",
-  locus: "Anywhere",
+  locus: "Везде",
   descr: ["Map callback over all matching documents.  Returns an Array."],
   args: [
     {name: "callback",

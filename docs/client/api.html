@@ -635,82 +635,77 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 которого вычисляется в момент трансформации.
 
 {{#warning}}
-In this release, Minimongo has some limitations:
+В данном релизе у Minimongo присутствуют некоторые ограничения:
 
-* `$pull` in modifiers can only accept certain kinds
-of selectors.
-* `$` to denote the matched array position is not
-supported in modifier.
-* `findAndModify`, aggregate functions, and
-map/reduce aren't supported.
+* `$pull` в модификаторах принимает только определенные виды селекторов.
+* не поддерживает позиционный оператор `$` в модификаторах (указывающий
+на позицию первого найденного элемента в массиве).
+* не поддерживаются `findAndModify`, функции группировки, и map/reduce.
 
-All of these will be addressed in a future release. For full
-Minimongo release notes, see packages/minimongo/NOTES
-in the repository.
+Их поддержка будет рассмотрена в будущих версиях. Полная информация касательно
+релиза Minimongo находится в репозитории в файле packages/minimongo/NOTES.
 {{/warning}}
 
 {{#warning}}
-Minimongo doesn't currently have indexes. It's rare for this to be an
-issue, since it's unusual for a client to have enough data that an
-index is worthwhile.
+В данный момент Minimongo не поддерживает индексы. Это сложно назвать
+проблемой, т.к. клиенту несвойственно иметь настолько большие объемы данных,
+что для них понадобился бы индекс.
 {{/warning}}
 
 {{> api_box find}}
 
-`find` returns a cursor.  It does not immediately access the database or return
-documents.  Cursors provide `fetch` to return all matching documents, `map` and
-`forEach` to iterate over all matching documents, and `observe` and
-`observeChanges` to register callbacks when the set of matching documents
-changes.
+Метод `find` возвращает курсор. К базе данных он обращается не сразу, а
+предоставляет метод `fetch` для получения всех найденных документов, методы `map` и
+`forEach` для последовательной обработки найденных документов и методы
+`observe` и `observeChanges` для отслеживания изменений в них.
 
 {{#warning}}
-Collection cursors are not query snapshots.  If the database changes
-between calling `Collection.find` and fetching the
-results of the cursor, or while fetching results from the cursor,
-those changes may or may not appear in the result set.
+Курсоры не являются снимками запросов, т.е. если база данных изменится между
+вызовом `Collection.find` и получением найденных документов при помощи метода
+`fetch` курсора (или во время получения документов), то невозможно с
+уверенностью сказать, попадут ли эти изменения в результат, или нет.
 {{/warning}}
 
-Cursors are a reactive data source.  The first time you retrieve a
-cursor's documents with `fetch`, `map`, or `forEach` inside a
-reactive computation (eg, a template or
-[`autorun`](#deps_autorun)), Meteor will register a
-dependency on the underlying data.  Any change to the collection that
-changes the documents in a cursor will trigger a recomputation.  To
-disable this behavior, pass `{reactive: false}` as an option to
-`find`.
+Курсоры - это реактивный источник данных. Когда вы, находясь в реактивном
+контексте, первый раз получаете документы курсора с помощью методов `fetch`,
+`map` и `forEach`, Meteor устанавливает зависимость между этим контекстом и
+полученными данными. Любое изменение коллекции, которое вызывает изменение
+документов курсора, ведет к перевыполнению этого контекста. Чтобы отключить
+такое поведение, передайте в метод `find` опцию `{reactive: false}`.
 
 {{> api_box findone}}
 
-Equivalent to `find(selector, options).fetch()[0]` with
-`options.limit = 1`.
+Это эквивалентно вызову `find(selector, options).fetch()[0]` с опцией `limit = 1`.
 
 {{> api_box insert}}
 
-Add a document to the collection. A document is just an object, and
-its fields can contain any combination of EJSON-compatible datatypes
-(arrays, objects, numbers, strings, `null`, true, and false).
+Добавляет документ в коллекцию. Документ - это всего лишь объект, состоящий
+из любых EJSON-совместивых данных (массивов, объектов, чисел, строк, значений
+`null`, `true` и `false`).
 
-`insert` will generate a unique ID for the object you pass, insert it
-in the database, and return the ID. When `insert` is called from
-untrusted client code, it will be allowed only if passes any
-applicable [`allow`](#allow) and [`deny`](#deny) rules.
+Для переданного в функцию `insert` объекта она генерирует уникальный ID,
+добавляет получившийся документ в базу данных и возвращает его ID. Когда
+`insert` вызывается на клиенте, документ будет добавлен только в том случае,
+если успешно пройдены все разрешающие ([`allow`](#allow)) и запрещающие
+([`deny`](#deny)) правила.
 
-On the server, if you don't provide a callback, then `insert` blocks
-until the database acknowledges the write, or throws an exception if
-something went wrong.  If you do provide a callback, `insert` still
-returns the ID immediately.  Once the insert completes (or fails), the
-callback is called with error and result arguments.  In an error case,
-`result` is undefined.  If the insert is successful, `error` is
-undefined and `result` is the new document ID.
+На сервере, если вы не укажете колбэк, `insert` заблокирует выполнение кода до
+тех пор, пока база данных не подтвердит факт записи, или же не бросит
+исключение, если запись не удалась. Если вы укажете колбэк, то, несмотря
+на это, `insert` так же отдаст вам ID нового документа. Как только запись
+будет произведена (или закончится неудачей), колбэк вызовется с двумя
+аргументами: объектом ошибки (`error`) и результатом (`result`). В случае
+ошибки, `result` будет `undefined`. В случае успешной записи, `error` будет
+`undefined`, а `result` будет содержать ID добавленного документа.
 
-On the client, `insert` never blocks.  If you do not provide a callback
-and the insert fails on the server, then Meteor will log a warning to
-the console.  If you provide a callback, Meteor will call that function
-with `error` and `result` arguments.  In an error case, `result` is
-undefined.  If the insert is successful, `error` is undefined and
-`result` is the new document ID.
+На клиенте, `insert` никогда не блокирует выполнение кода. Если вы не укажете
+колбэк и добавление документа на сервере закончится неудачей, то Meteor
+выведет в консоль предупреждение. Если вы укажете колбэк, он будет вызван с
+двумя аргументами: объектом ошибки (`error`) и результатом (`result`). В случае
+ошибки, `result` будет `undefined`. В случае успешной записи, `error` будет
+`undefined`, а `result` будет содержать ID добавленного документа.
 
-Example:
+Пример:
 
     var groceriesId = Lists.insert({name: "Groceries"});
     Items.insert({list: groceriesId, name: "Watercress"});
