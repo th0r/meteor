@@ -713,56 +713,60 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 
 {{> api_box update}}
 
-Modify documents that match `selector` according to `modifier` (see
-[modifier documentation](#modifiers)).
+Изменяет документы, удовлетворяющие селектору, согласно модификатору
+(смотрите [документацию по модификаторам](#modifiers)).
 
-The behavior of `update` differs depending on whether it is called by
-trusted or untrusted code. Trusted code includes server code and
-method code. Untrusted code includes client-side code such as event
-handlers and a browser's JavaScript console.
+Поведение метода `update` различается в зависимости от того, используется ли
+он в доверенном, или недоверенном коде. Доверенным кодом является серверный
+код и код методов. Недоверенный код - это клиентский код (включая код,
+вводимый в консоли браузера).
 
-- Trusted code can modify multiple documents at once by setting
-  `multi` to true, and can use an arbitrary [Mongo
-  selector](#selectors) to find the documents to modify. It bypasses
-  any access control rules set up by [`allow`](#allow) and
-  [`deny`](#deny). The number of affected documents will be returned
-  from the `update` call if you don't pass a callback.
+- Из доверенного кода можно изменять несколько документов за раз, указав
+  `true` в качестве значения опции `multi`, а также использовать произвольный
+  [Mongo-селектор](#selectors) для поиска изменяемых документов. Правила
+  контроля доступа, объявленные при помощи методов [`allow`](#allow) и
+  [`deny`](#deny), не проверяются. Если вы не укажите колбэк, `update` вернет
+  вам количество измененных документов.
 
-- Untrusted code can only modify a single document at once, specified
-  by its `_id`. The modification is allowed only after checking any
-  applicable [`allow`](#allow) and [`deny`](#deny) rules. The number
-  of affected documents will be returned to the callback. Untrusted
-  code cannot perform upserts, except in insecure mode.
+- Из недоверенного кода можно модифицировать только один документ, указав его
+  `_id`. Он будет изменен только после успешной проверки всех разрешающих
+  ([`allow`](#allow) и запрещающих ([`deny`](#deny)) правил. Количество
+  измененных документов будет передано в колбэк. Опция `upsert` работает
+  только в небезопасном режиме работы приложения.
 
-On the server, if you don't provide a callback, then `update` blocks
-until the database acknowledges the write, or throws an exception if
-something went wrong.  If you do provide a callback, `update` returns
-immediately.  Once the update completes, the callback is called with a
-single error argument in the case of failure, or a second argument
-indicating the number of affected documents if the update was successful.
+На сервере, если вы не укажете колбэк, `update` заблокирует выполнение кода до
+тех пор, пока база данных не подтвердит факт записи, или же не бросит
+исключение, если запись не удалась. Если же вы укажете колбэк, `update`
+завершится незамедлительно. Как только изменение будет произведено (или
+закончится неудачей), колбэк вызовется с двумя аргументами: объектом ошибки
+(`error`) и результатом (`result`). В случае ошибки, `result` будет
+`undefined`. В случае успешной записи, `error` будет `undefined`, а `result`
+будет содержать количество измененных документов.
 
-On the client, `update` never blocks.  If you do not provide a callback
-and the update fails on the server, then Meteor will log a warning to
-the console.  If you provide a callback, Meteor will call that function
-with an error argument if there was an error, or a second argument
-indicating the number of affected documents if the update was successful.
+На клиенте, `update` никогда не блокирует выполнение кода. Если вы не укажете
+колбэк и изменение документа на сервере закончится неудачей, то Meteor
+выведет в консоль предупреждение. Если же вы укажете колбэк, то он будет
+вызван с двумя аргументами: объектом ошибки (`error`) и результатом
+(`result`). В случае ошибки, `result` будет `undefined`. В случае успешной
+записи, `error` будет `undefined`, а `result` будет содержать количество
+измененных документов.
 
-Client example:
+Пример кода на клиенте:
 
-    // When the givePoints button in the admin dashboard is pressed,
-    // give 5 points to the current player. The new score will be
-    // immediately visible on everyone's screens.
+    // Даем 5 очков текущему игроку при нажатии соответствующей кнопки на
+    // панеле админа. Количество очков незамедлительно обновится у всех
+    // пользователей.
     Template.adminDashboard.events({
       'click .givePoints': function () {
         Players.update(Session.get("currentPlayer"), {$inc: {score: 5}});
       }
     });
 
-Server example:
+Пример кода на сервере:
 
-    // Give the "Winner" badge to each user with a score greater than
-    // 10. If they are logged in and their badge list is visible on the
-    // screen, it will update automatically as they watch.
+    // Даем значок победителя каждому пользователю, у которого более 10 очков.
+    // Если они залогинены и в данный момент на экране видят список своих
+    // значков, то он будет автоматически обновлен прямо у них на глазах.
     Meteor.methods({
       declareWinners: function () {
         Players.update({score: {$gt: 10}},
@@ -771,10 +775,10 @@ Server example:
       }
     });
 
-You can use `update` to perform a Mongo upsert by setting the `upsert`
-option to true. You can also use the [`upsert`](#upsert) method to perform an
-upsert that returns the _id of the document that was inserted (if there was one)
-in addition to the number of affected documents.
+Вы можете использовать `update` в режиме `upsert`, установив одноименной
+опции значение `true`. Также вы можете воспользоваться методом
+[`upsert`](#upsert), который дополнительно возвращает `_id` добавленного
+документа (если таковой имеется).
 
 {{> api_box upsert}}
 
