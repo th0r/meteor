@@ -716,8 +716,8 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 Изменяет документы, удовлетворяющие селектору, согласно модификатору
 (смотрите [документацию по модификаторам](#modifiers)).
 
-Поведение метода `update` различается в зависимости от того, используется ли
-он в доверенном, или недоверенном коде. Доверенным кодом является серверный
+Поведение метода `update` различается в зависимости от того, вызывется ли он
+из доверенного, или недоверенного кода. Доверенным кодом является серверный
 код и код методов. Недоверенный код - это клиентский код (включая код,
 вводимый в консоли браузера).
 
@@ -728,27 +728,28 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
   [`deny`](#deny), не проверяются. Если вы не укажите колбэк, `update` вернет
   вам количество измененных документов.
 
-- Из недоверенного кода можно модифицировать только один документ, указав его
-  `_id`. Он будет изменен только после успешной проверки всех разрешающих
-  ([`allow`](#allow) и запрещающих ([`deny`](#deny)) правил. Количество
-  измененных документов будет передано в колбэк. Опция `upsert` работает
-  только в небезопасном режиме работы приложения.
+- Из недоверенного кода можно изменять только по одному документу за раз,
+  указывая их `_id`. Документ изменяется только после успешной проверки
+  всех разрешающих ([`allow`](#allow)) и запрещающих ([`deny`](#deny)) правил.
+  Количество измененных документов будет передано в колбэк. Опция `upsert`
+  работает только в небезопасном режиме работы приложения.
 
 На сервере, если вы не укажете колбэк, `update` заблокирует выполнение кода до
-тех пор, пока база данных не подтвердит факт записи, или же не бросит
-исключение, если запись не удалась. Если же вы укажете колбэк, `update`
-завершится незамедлительно. Как только изменение будет произведено (или
-закончится неудачей), колбэк вызовется с двумя аргументами: объектом ошибки
-(`error`) и результатом (`result`). В случае ошибки, `result` будет
-`undefined`. В случае успешной записи, `error` будет `undefined`, а `result`
-будет содержать количество измененных документов.
+тех пор, пока база данных не подтвердит факт изменения и метод не вернет
+количество измененных документов, или же не бросит исключение, если изменение
+не удалось. Если же вы укажете колбэк, `update` завершится немедленно.
+Как только изменение будет произведено (или закончится неудачей), колбэк
+вызовется с двумя аргументами: объектом ошибки (`error`) и результатом
+(`result`). В случае ошибки, `result` будет `undefined`. В случае успешного
+изменения, `error` будет `undefined`, а `result` будет содержать количество
+измененных документов.
 
 На клиенте, `update` никогда не блокирует выполнение кода. Если вы не укажете
 колбэк и изменение документа на сервере закончится неудачей, то Meteor
 выведет в консоль предупреждение. Если же вы укажете колбэк, то он будет
 вызван с двумя аргументами: объектом ошибки (`error`) и результатом
-(`result`). В случае ошибки, `result` будет `undefined`. В случае успешной
-записи, `error` будет `undefined`, а `result` будет содержать количество
+(`result`). В случае ошибки, `result` будет `undefined`. В случае успешного
+изменения, `error` будет `undefined`, а `result` будет содержать количество
 измененных документов.
 
 Пример кода на клиенте:
@@ -775,73 +776,76 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
       }
     });
 
-Вы можете использовать `update` в режиме `upsert`, установив одноименной
-опции значение `true`. Также вы можете воспользоваться методом
+Вы можете использовать `update` в режиме `upsert`, установив значение `true`
+одноименной опции. Также вы можете воспользоваться методом
 [`upsert`](#upsert), который дополнительно возвращает `_id` добавленного
 документа (если таковой имеется).
 
 {{> api_box upsert}}
 
-Modify documents that match `selector` according to `modifier`, or insert
-a document if no documents were modified. `upsert` is the same as calling
-`update` with the `upsert` option set to true, except that the return
-value of `upsert` is an object that contain the keys `numberAffected`
-and `insertedId`. (`update` returns only the number of affected documents.)
+Согласно модификатору, изменяет документы, удовлетворяющие селектору, или же,
+добавляет новый документ, если ни один из них не был изменен. Использование
+метода `upsert` равносильно использованию `update` с опцией `upsert`, за
+исключением того, что `upsert` возвращает объект, содержищий свойства
+`numberAffected` и `insertedId` (`update` возвращает лишь количество
+измененных документов).
 
 {{> api_box remove}}
 
-Find all of the documents that match `selector` and delete them from
-the collection.
+Находит все документы, удовлетворяющие селектору, и удаляет их из коллекции.
 
-The behavior of `remove` differs depending on whether it is called by
-trusted or untrusted code. Trusted code includes server code and
-method code. Untrusted code includes client-side code such as event
-handlers and a browser's JavaScript console.
+Поведение метода `remove` различается в зависимости от того, вызывется ли он
+из доверенного, или недоверенного кода. Доверенным кодом является серверный
+код и код методов. Недоверенный код - это клиентский код (включая код,
+вводимый в консоли браузера).
 
-- Trusted code can use an arbitrary [Mongo selector](#selectors) to
-  find the documents to remove, and can remove more than one document
-  at once by passing a selector that matches multiple documents. It
-  bypasses any access control rules set up by [`allow`](#allow) and
-  [`deny`](#deny). The number of removed documents will be returned
-  from `remove` if you don't pass a callback.
+- Из доверенного кода можно удалять несколько документов за раз, указав
+  `true` в качестве значения опции `multi`, а также использовать произвольный
+  [Mongo-селектор](#selectors) для поиска удаляемых документов. Правила
+  контроля доступа, объявленные при помощи методов [`allow`](#allow) и
+  [`deny`](#deny), не проверяются. Если вы не укажите колбэк, `remove` вернет
+  вам количество удаленных документов.
 
-  As a safety measure, if `selector` is omitted (or is `undefined`),
-  no documents will be removed. Set `selector` to `{}` if you really
-  want to remove all documents from your collection.
+  В целях безопасности, если селектор не указан (или он `undefined`), то ни
+  один документ удален не будет. Если вы действительно хотите удалить из
+  коллекции все документы, используйте селектор `{}`.
 
-- Untrusted code can only remove a single document at a time,
-  specified by its `_id`. The document is removed only after checking
-  any applicable [`allow`](#allow) and [`deny`](#deny) rules. The
-  number of removed documents will be returned to the callback.
+- Из недоверенного кода можно удалять только по одному документу за раз,
+  указывая их `_id`. Документ удаляется только после успешной проверки
+  всех разрешающих ([`allow`](#allow)) и запрещающих ([`deny`](#deny)) правил.
+  Количество удаленных документов будет передано в колбэк.
 
-On the server, if you don't provide a callback, then `remove` blocks
-until the database acknowledges the write and then returns the number
-of removed documents, or throws an exception if
-something went wrong.  If you do provide a callback, `remove` returns
-immediately.  Once the remove completes, the callback is called with a
-single error argument in the case of failure, or a second argument
-indicating the number of removed documents if the remove was successful.
+На сервере, если вы не укажете колбэк, `remove` заблокирует выполнение кода до
+тех пор, пока база данных не подтвердит факт удаления и метод не вернет
+количество удаленных документов, или же не бросит исключение, если удаление
+не удалось. Если же вы укажете колбэк, `remove` завершится немедленно.
+Как только удаление будет произведено (или закончится неудачей), колбэк
+вызовется с двумя аргументами: объектом ошибки (`error`) и результатом
+(`result`). В случае ошибки, `result` будет `undefined`. В случае успешного
+удаления, `error` будет `undefined`, а `result` будет содержать количество
+удаленных документов.
 
-On the client, `remove` never blocks.  If you do not provide a callback
-and the remove fails on the server, then Meteor will log a warning to the
-console.  If you provide a callback, Meteor will call that function with an
-error argument if there was an error, or a second argument indicating the number
-of removed documents if the remove was successful.
+На клиенте, `remove` никогда не блокирует выполнение кода. Если вы не укажете
+колбэк и удаление документа на сервере закончится неудачей, то Meteor
+выведет в консоль предупреждение. Если же вы укажете колбэк, то он будет
+вызван с двумя аргументами: объектом ошибки (`error`) и результатом
+(`result`). В случае ошибки, `result` будет `undefined`. В случае успешного
+удаления, `error` будет `undefined`, а `result` будет содержать количество
+удаленных документов.
 
-Client example:
+Пример кода на клиенте:
 
-    // When the remove button is clicked on a chat message, delete
-    // that message.
+    // Удаляем сообщение при нажатии соответствующей кнопки.
     Template.chat.events({
       'click .remove': function () {
         Messages.remove(this._id);
       }
     });
 
-Server example:
+Пример кода на сервере:
 
-    // When the server starts, clear the log, and delete all players
-    // with a karma of less than -2.
+    // После запуска сервера, очищаем журнал и удаляем всех игроков, у которых
+    // карма меньше -2.
     Meteor.startup(function () {
       if (Meteor.isServer) {
         Logs.remove({});
@@ -851,90 +855,85 @@ Server example:
 
 {{> api_box allow}}
 
-When a client calls `insert`, `update`, or `remove` on a collection, the
-collection's `allow` and [`deny`](#deny) callbacks are called
-on the server to determine if the write should be allowed. If at least
-one `allow` callback allows the write, and no `deny` callbacks deny the
-write, then the write is allowed to proceed.
+Когда на клиенте вызываются методы `insert`, `update`, или `remove`, на
+сервере проверяются все разрешающие (`allow`) и запрещающие ([`deny`](#deny))
+правила и только в случае удачной проверки разрешается запись в БД. Если хотя
+бы одно разрешающее правило разрешает запись, и ни одно запрещающее правило
+ее не запрещает, то запись разрешется.
 
-These checks are run only when a client tries to write to the database
-directly, for example by calling `update` from inside an event
-handler. Server code is trusted and isn't subject to `allow` and `deny`
-restrictions. That includes methods that are called with `Meteor.call`
-&mdash; they are expected to do their own access checking rather than
-relying on `allow` and `deny`.
+Эти проверки проводятся только в случае прямой записи в базу данных c
+клиента, т.е., например, при вызове `update` из обработчика события.
+Серверный код является доверенным и правилами не проверяется. Это также
+распространияется и на вызов удаленных методов при помощи `Meteor.call` &mdash;
+они должны сами проверять права доступа, а не полагаться на `allow` и `deny`.
 
-You can call `allow` as many times as you like, and each call can
-include any combination of `insert`, `update`, and `remove`
-functions. The functions should return `true` if they think the
-operation should be allowed. Otherwise they should return `false`, or
-nothing at all (`undefined`). In that case Meteor will continue
-searching through any other `allow` rules on the collection.
+Вы можете вызывать `allow` сколько угодно раз, используя любую комбинацию
+функций `insert`, `update` и `remove`. Функции должны возвращать `true`, если
+операция может быть разрешена. В противном случае они должны возвращать
+`false`, или же не возвращать ничего (`undefined`). В этом случае Meteor
+продолжит проверку, используя остальные разрешающие правила.
 
-The available callbacks are:
+Список возможных функций:
 
 <dl class="callbacks">
 {{#dtdd "insert(userId, doc)"}}
-The user `userId` wants to insert the document `doc` into the
-collection. Return `true` if this should be allowed.
+Пользователь `userId` хочет добавить документ `doc` в коллекцию.
+Верните `true`, чтобы разрешить добавление.
 {{/dtdd}}
 
 {{#dtdd "update(userId, doc, fieldNames, modifier)"}}
 
-The user `userId` wants to update a document `doc`. (`doc` is the
-current version of the document from the database, without the
-proposed update.) Return `true` to permit the change.
+Пользователь `userId` хочет изменить документ `doc` (`doc` - это текущая
+версия документа из БД, без проверяемого изменения). Верните `true`, чтобы
+разрешить это изменение.
 
-`fieldNames` is an array of the (top-level) fields in `doc` that the
-client wants to modify, for example
-`['name',`&nbsp;`'score']`. `modifier` is the raw Mongo modifier that
-the client wants to execute, for example `{$set: {'name.first':
-"Alice"}, $inc: {score: 1}}`.
+`fieldNames` - это массив изменяемых полей верхнего уровня документа `doc`,
+например `['name',`&nbsp;`'score']`. `modifier` - это необработанный
+Mongo-модификатор, который хочет применить клиент, например `{$set:
+{'name.first': "Alice"}, $inc: {score: 1}}`.
 
-Only Mongo modifiers are supported (operations like `$set` and `$push`).
-If the user tries to replace the entire document rather than use
-$-modifiers, the request will be denied without checking the `allow`
-functions.
+Разрешены только Mongo-модификаторы (операции, вроде `$set` и `$push`).
+Если пользователь вместо этого попытается заменить целый документ, то такое
+изменение будет отклонено без проверки разрешающих правил.
 
 {{/dtdd}}
 
 {{#dtdd "remove(userId, doc)"}}
 
-The user `userId` wants to remove `doc` from the database. Return
-`true` to permit this.
+Пользователь `userId` хочет удалить документ `doc` из коллекции.
+Верните `true`, чтобы разрешить удаление.
 
 {{/dtdd}}
 
 </dl>
+Когда Meteor вызывает `update` или `remove`, он по-умолчанию получает из БД
+весь документ `doc`. Если же документ большой, то, возможно, вы захотите
+получить только те его поля, которые используются в вашей функции. Этого
+можно добиться, указав список необходимых полей в качестве значения опции
+`fetch`.
 
-When calling `update` or `remove` Meteor will by default fetch the
-entire document `doc` from the database. If you have large documents
-you may wish to fetch only the fields that are actually used by your
-functions. Accomplish this by setting `fetch` to an array of field
-names to retrieve.
+Пример:
 
-Example:
-
-    // Create a collection where users can only modify documents that
-    // they own. Ownership is tracked by an 'owner' field on each
-    // document. All documents must be owned by the user that created
-    // them and ownership can't be changed. Only a document's owner
-    // is allowed to delete it, and the 'locked' attribute can be
-    // set on a document to prevent its accidental deletion.
+    // Создаем коллекцию, в которой пользователи могут изменять только
+    // собственные документы. Владелец документа указывается в его поле
+    // 'owner'. Владельцем документа считается его создатель и сменить его
+    // нельзя. Удалить документ может только его владелец. Документу можно
+    // устанавливать атрибут 'locked', предотвращающий его случайное удаление.
 
     Posts = new Meteor.Collection("posts");
 
     Posts.allow({
       insert: function (userId, doc) {
-        // the user must be logged in, and the document must be owned by the user
+        // пользователь должен быть залогинен и должен быть владельцем этого
+        // документа
         return (userId && doc.owner === userId);
       },
       update: function (userId, doc, fields, modifier) {
-        // can only change your own documents
+        // пользователь может изменять только собственные документы
         return doc.owner === userId;
       },
       remove: function (userId, doc) {
-        // can only remove your own documents
+        // пользователь может удалять только собственные документы
         return doc.owner === userId;
       },
       fetch: ['owner']
@@ -942,42 +941,42 @@ Example:
 
     Posts.deny({
       update: function (userId, docs, fields, modifier) {
-        // can't change owners
+        // нельзя менять владельцев
         return _.contains(fields, 'owner');
       },
       remove: function (userId, doc) {
-        // can't remove locked documents
+        // нельзя удалять защищенные документы
         return doc.locked;
       },
-      fetch: ['locked'] // no need to fetch 'owner'
+      fetch: ['locked'] // не нужно получать из БД поле 'owner'
     });
 
-If you never set up any `allow` rules on a collection then all client
-writes to the collection will be denied, and it will only be possible to
-write to the collection from server-side code. In this case you will
-have to create a method for each possible write that clients are allowed
-to do. You'll then call these methods with `Meteor.call` rather than
-having the clients call `insert`, `update`, and `remove` directly on the
-collection.
+Если вы не объявите для коллекции ни одного разрешающего правила, то все
+записи в эту коллекцию с клиента будут запрещены и запись будет доступна
+только с сервера. В этом случае все возможные записи в БД с клиента вам
+необходимо будет осуществлять посредством вызова удаленных методов, а не
+используя напрямую функции `insert`, `update` и `remove`.
 
-Meteor also has a special "insecure mode" for quickly prototyping new
-applications. In insecure mode, if you haven't set up any `allow` or `deny`
-rules on a collection, then all users have full write access to the
-collection. This is the only effect of insecure mode. If you call `allow` or
-`deny` at all on a collection, even `Posts.allow({})`, then access is checked
-just like normal on that collection. __New Meteor projects start in insecure
-mode by default.__ To turn it off just run `$ meteor remove insecure`.
+Для быстрого прототипирования новых приложений, Meteor поддерживает так
+называемый "небезопасный" режим работы. В этом режиме, если вы не объявили
+для коллекции ни одного разрешающего или запрещающего правила, то все
+пользователи будут иметь к ней полный доступ на запись с клиента. Это
+единственная особенность небезопасного режима. Если же вы объявите для
+коллекции хотя бы одно правило, даже пустое (например, `Posts.allow({})`), то
+проверка правил для нее будет включена. __По-умолчанию все новые проекты на
+Meteor работают в небезопасном режиме.__ Чтобы его отключить, выполните
+команду `$ meteor remove insecure`.
 
 {{> api_box deny}}
 
-This works just like [`allow`](#allow), except it lets you
-make sure that certain writes are definitely denied, even if there is an
-`allow` rule that says that they should be permitted.
+Этот метод работает так же, как и [`allow`](#allow), только он позволяет вам
+указать, какие изменения абсолютно точно будут запрещены, даже если они
+удовлетворяют какому-то разрешающему правилу.
 
-When a client tries to write to a collection, the Meteor server first
-checks the collection's `deny` rules. If none of them return true then
-it checks the collection's `allow` rules. Meteor allows the write only
-if no `deny` rules return `true` and at least one `allow` rule returns
+Когда клиент хочет изменить коллекцию, Meteor сначала проверяет запрещающие
+правила. Если ни одно из них не вернуло `true`, он проверяет разрешающие
+правила. Meteor разрешает изменение только в том случае, если ни одно
+запрещающее правило не вернуло `true` и хотя бы одно разрешающее вернуло
 `true`.
 
 <h2 id="meteor_collection_cursor"><span>Cursors</span></h2>

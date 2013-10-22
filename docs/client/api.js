@@ -543,7 +543,7 @@ Template.api.find = {
      descr: "(Только на клиенте) По-умолчанию `true`; укажите `false`, чтобы отключить реактивность."},
     {name: "transform",
      type: "Function",
-     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections), для этого курсора. Укажите `null`, чтобы отключить трансформацию."}
+     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections). Укажите `null`, чтобы отключить трансформацию."}
   ]
 };
 
@@ -575,7 +575,7 @@ Template.api.findone = {
      descr: "(Только на клиенте) По-умолчанию `true`; укажите `false`, чтобы отключить реактивность."},
     {name: "transform",
      type: "Function",
-     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections), для этого курсора. Укажите `null`, чтобы отключить трансформацию."
+     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections). Укажите `null`, чтобы отключить трансформацию."
     }
   ]
 };
@@ -671,17 +671,17 @@ Template.api.allow = {
   id: "allow",
   name: "<em>collection</em>.allow(options)",
   locus: "Сервер",
-  descr: ["Allow users to write directly to this collection from client code, subject to limitations you define."],
+  descr: ["Разрешает пользователям изменять данную коллекцию прямо из клиентского кода, с учетом указанных вами ограничений."],
   options: [
     {name: "insert, update, remove",
      type: "Function",
-     descr: "Functions that look at a proposed modification to the database and return true if it should be allowed."},
+     descr: "Функции, которые анализируют предлагаемые изменения в БД и возвращают `true`, если их можно разрешить."},
     {name: "fetch",
-     type: "Array of String",
-     descr: "Optional performance enhancement. Limits the fields that will be fetched from the database for inspection by your `update` and `remove` functions."},
+     type: "Array или String",
+     descr: "Необязательная оптимизация производительности. Ограничивает набор полей, которые будут получены из БД для анализа функциями `update` и `remove`."},
     {name: "transform",
      type: "Function",
-     descr: "Overrides `transform` on the  [`Collection`](#collections).  Pass `null` to disable transformation."}
+     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections). Укажите `null`, чтобы отключить трансформацию."}
   ]
 };
 
@@ -689,17 +689,17 @@ Template.api.deny = {
   id: "deny",
   name: "<em>collection</em>.deny(options)",
   locus: "Сервер",
-  descr: ["Override `allow` rules."],
+  descr: ["Отменяет разрешающие правила."],
   options: [
     {name: "insert, update, remove",
      type: "Function",
-     descr: "Functions that look at a proposed modification to the database and return true if it should be denied, even if an `allow` rule says otherwise."},
+     descr: "Функции, которые анализируют предлагаемые изменения в БД и возвращают `true`, если они должны быть запрещены, даже несмотря на то, что разрешающие правила их разрешили."},
     {name: "fetch",
-     type: "Array of Strings",
-     descr: "Optional performance enhancement. Limits the fields that will be fetched from the database for inspection by your `update` and `remove` functions."},
+     type: "Array или Strings",
+     descr: "Необязательная оптимизация производительности. Ограничивает набор полей, которые будут получены из БД для анализа функциями `update` и `remove`."},
     {name: "transform",
      type: "Function",
-     descr:  "Overrides `transform` on the  [`Collection`](#collections).  Pass `null` to disable transformation."}
+     descr: "Переопределяет `transform`, указанный при создании [коллекции](#collections). Укажите `null`, чтобы отключить трансформацию."}
   ]
 };
 
