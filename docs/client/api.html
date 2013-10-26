@@ -979,21 +979,22 @@ Meteor работают в небезопасном режиме.__ Чтобы �
 запрещающее правило не вернуло `true` и хотя бы одно разрешающее вернуло
 `true`.
 
-<h2 id="meteor_collection_cursor"><span>Cursors</span></h2>
+<h2 id="meteor_collection_cursor"><span>Курсоры</span></h2>
 
-To create a cursor, use [`find`](#find).  To access the documents in a
-cursor, use [`forEach`](#foreach), [`map`](#map), or [`fetch`](#fetch).
+Курсор создается при помощи метода [`find`](#find). Для получения документов 
+из курсора используйте методы [`forEach`](#foreach), [`map`](#map), или
+[`fetch`](#fetch).
 
 {{> api_box cursor_foreach}}
 
-This interface is compatible with [Array.forEach](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach).
+Интерфейс этого метода совместим с [Array.forEach](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach).
 
-When called from a reactive computation, `forEach` registers dependencies on
-the matching documents.
+Если `forEach` вызывается в реактивном контексте, то он регистрирует 
+зависимости между этим контекстом и документами.
 
-Examples:
+Пример:
 
-    // Print the titles of the five top-scoring posts
+    // Выводим заголовки пяти самых популярных постов
     var topPosts = Posts.find({}, {sort: {score: -1}, limit: 5});
     var count = 0;
     topPosts.forEach(function (post) {
@@ -1003,10 +1004,10 @@ Examples:
 
 {{> api_box cursor_map}}
 
-This interface is compatible with [Array.map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map).
+Интерфейс этого метода совместим с [Array.map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map).
 
-When called from a reactive computation, `map` registers dependencies on
-the matching documents.
+Если `map` вызывается в реактивном контексте, то он регистрирует
+зависимости между этим контекстом и документами.
 
 <!-- The following is not yet implemented, but users shouldn't assume
      sequential execution anyway because that will break. -->

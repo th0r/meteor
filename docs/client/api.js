@@ -722,14 +722,14 @@ Template.api.cursor_foreach = {
   id: "foreach",
   name: "<em>cursor</em>.forEach(callback, [thisArg])",
   locus: "Везде",
-  descr: ["Call `callback` once for each matching document, sequentially and synchronously."],
+  descr: ["Вызывает колбэк поочередно для каждого документа из курсора."],
   args: [
     {name: "callback",
      type: "Function",
-     descr: "Function to call. It will be called with three arguments: the document, a 0-based index, and <em>cursor</em> itself."},
+     descr: "Функиця-колбэк. Вызывается с тремя агрументами: документом, его индексом (начиная с нуля) и самим объектом курсора."},
     {name: "thisArg",
-     type: "Any",
-     descr: "An object which will be the value of `this` inside `callback`."}
+     type: "Любой",
+     descr: "Объект, на который будет указывать `this` внутри колбэка."}
   ]
 };
 
@@ -737,14 +737,14 @@ Template.api.cursor_map = {
   id: "map",
   name: "<em>cursor</em>.map(callback, [thisArg])",
   locus: "Везде",
-  descr: ["Map callback over all matching documents.  Returns an Array."],
+  descr: ["Преобразует документы курсора в массив объектов, используя колбэк."],
   args: [
     {name: "callback",
      type: "Function",
-     descr: "Function to call. It will be called with three arguments: the document, a 0-based index, and <em>cursor</em> itself."},
+     descr: "Функция-колбэк. Вызывается с тремя агрументами: документом, его индексом (начиная с нуля) и самим объектом курсора."},
     {name: "thisArg",
-     type: "Any",
-     descr: "An object which will be the value of `this` inside `callback`."}
+     type: "Любой",
+     descr: "Объект, на который будет указывать `this` внутри колбэка."}
   ]
 };
 
