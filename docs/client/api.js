@@ -708,14 +708,14 @@ Template.api.cursor_count = {
   id: "count",
   name: "<em>cursor</em>.count()",
   locus: "Везде",
-  descr: ["Returns the number of documents that match a query."]
+  descr: ["Возвращает количество документов, на которые ссылается курсор."]
 };
 
 Template.api.cursor_fetch = {
   id: "fetch",
   name: "<em>cursor</em>.fetch()",
   locus: "Везде",
-  descr: ["Return all matching documents as an Array."]
+  descr: ["Возвращает все документы курсора в виде массива."]
 };
 
 Template.api.cursor_foreach = {
@@ -752,7 +752,7 @@ Template.api.cursor_rewind = {
   id: "rewind",
   name: "<em>cursor</em>.rewind()",
   locus: "Везде",
-  descr: ["Resets the query cursor."],
+  descr: ["Сбрасывает курсор."],
   args: [ ]
 };
 
@@ -760,11 +760,11 @@ Template.api.cursor_observe = {
   id: "observe",
   name: "<em>cursor</em>.observe(callbacks)",
   locus: "Везде",
-  descr: ["Watch a query.  Receive callbacks as the result set changes."],
+  descr: ["Следит за запросом. Вызывает колбэки при изменении документов в нем."],
   args: [
     {name: "callbacks",
      type: "Object",
-     descr: "Functions to call to deliver the result set as it changes"}
+     descr: "Колбэки, вызываемые при изменении документов в запросе."}
   ]
 };
 
@@ -772,11 +772,11 @@ Template.api.cursor_observe_changes = {
   id: "observe_changes",
   name: "<em>cursor</em>.observeChanges(callbacks)",
   locus: "Везде",
-  descr: ["Watch a query.  Receive callbacks as the result set changes.  Only the differences between the old and new documents are passed to the callbacks."],
+  descr: ["Следит за запросом. Вызывает колбэки при изменении документов в нем. В колбэки передаются только изменения в документах."],
   args: [
     {name: "callbacks",
      type: "Object",
-     descr: "Functions to call to deliver the result set as it changes"}
+     descr: "Колбэки, вызываемые при изменении документов в запросе."}
   ]
 };
 
