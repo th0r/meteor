@@ -1605,14 +1605,14 @@ Template.api.set = {
   id: "session_set",
   name: "Session.set(key, value)",
   locus: "Клиент",
-  descr: ["Set a variable in the session. Notify any listeners that the value has changed (eg: redraw templates, and rerun any [`Deps.autorun`](#deps_autorun) computations, that called [`Session.get`](#session_get) on this `key`.)"],
+  descr: ["Устанавливает значение переменной сессии. Информирует слушателей, что значение изменилось (при этом будут перерисованы все шаблоны и перезапущены все колбэки [`Deps.autorun`](#deps_autorun), в которых вызывался метод [`Session.get`](#session_get) с данным ключем)."],
   args: [
     {name: "key",
      type: "String",
-     descr: "The key to set, eg, `selectedItem`"},
+     descr: "Устанавливаемый ключ, например `selectedItem`"},
     {name: "value",
-     type: "EJSON-able object or undefined",
-     descr: "The new value for `key`"}
+     type: "EJSON-совместимый объект или undefined",
+     descr: "Устанавливаемое значение для ключа `key`"}
   ]
 };
 
@@ -1620,14 +1620,14 @@ Template.api.setDefault = {
   id: "session_set_default",
   name: "Session.setDefault(key, value)",
   locus: "Клиент",
-  descr: ["Set a variable in the session if it is undefined. Otherwise works exactly the same as [`Session.set`](#session_set)."],
+  descr: ["Устанавливает значение переменной сессии, если оно еще не установлено. Во всем остальном работает точно так же, как и [`Session.set`](#session_set)."],
   args: [
     {name: "key",
      type: "String",
-     descr: "The key to set, eg, `selectedItem`"},
+     descr: "Устанавливаемый ключ, например `selectedItem`"},
     {name: "value",
-     type: "EJSON-able object or undefined",
-     descr: "The new value for `key`"}
+     type: "EJSON-совместимый объект или undefined",
+     descr: "Устанавливаемое значение для ключа `key`"}
   ]
 };
 
@@ -1635,11 +1635,11 @@ Template.api.get = {
   id: "session_get",
   name: "Session.get(key)",
   locus: "Клиент",
-  descr: ["Get the value of a session variable. If inside a [reactive computation](#reactivity), invalidate the computation the next time the value of the variable is changed by [`Session.set`](#session_set). This returns a clone of the session value, so if it's an object or an array, mutating the returned value has no effect on the value stored in the session."],
+  descr: ["Получает значение переменной сессии. Если используется в [реактивном контексте](#reactivity), то он будет инвалидирован, как только значение переменной будет изменено при помощи [`Session.set`](#session_set). Возвращает клон хранящегося значения, т.е., если это массив или объект, то изменение возвращенного значения не изменит значение, хранящееся в сессии."],
   args: [
     {name: "key",
      type: "String",
-     descr: "The name of the session variable to return"}
+     descr: "Название переменной сессии, значение которой необходимо получить."}
   ]
 };
 
@@ -1647,14 +1647,14 @@ Template.api.equals = {
   id: "session_equals",
   name: "Session.equals(key, value)",
   locus: "Клиент",
-  descr: ["Test if a session variable is equal to a value. If inside a [reactive computation](#reactivity), invalidate the computation the next time the variable changes to or from the value."],
+  descr: ["Проверяет, содержит ли переменная сессии указанное значение. Если используется в [реактивном контексте](#reactivity), то он будет инвалидирован при изменении результата сравнения."],
   args: [
     {name: "key",
      type: "String",
-     descr: "The name of the session variable to test"},
+     descr: "Название проверяемой переменной сессии"},
     {name: "value",
-     type: "String, Number, Boolean, null, or undefined",
-     descr: "The value to test against"}
+     type: "String, Number, Boolean, null или undefined",
+     descr: "Проверяемое значение"}
   ]
 };
 
