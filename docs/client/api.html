@@ -1181,110 +1181,117 @@ the first call is waiting. If strict sequential execution is necessary, use
 
 {{> api_box collection_object_id}}
 
-`Meteor.Collection.ObjectID` follows the same API as the [Node MongoDB driver
-`ObjectID`](http://mongodb.github.com/node-mongodb-native/api-bson-generated/objectid.html)
-class. Note that you must use the `equals` method (or [`EJSON.equals`](#ejson_equals)) to
-compare them; the `===` operator will not work. If you are writing generic code
-that needs to deal with `_id` fields that may be either strings or `ObjectID`s, use
-[`EJSON.equals`](#ejson_equals) instead of `===` to compare them.
+Класс `Meteor.Collection.ObjectID` предоставляет такое же API, как и [драйвер
+MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-generated/objectid.html).
+Учтите, что для сравнения экземпляров этих объектов нужно использовать метод
+`equals` (или [`EJSON.equals`](#ejson_equals)); оператор `===` работать не
+будет. Если вы пишете универсальный код, который должен поддерживать работу с
+полями `_id` как в виде строк, так и в виде объектов `ObjectID`, то для их
+сравнения вам следует использовать [`EJSON.equals`](#ejson_equals).
 
 {{#note}}
-  `ObjectID` values created by Meteor will not have meaningful answers to their `getTimestamp`
-  method, since Meteor currently constructs them fully randomly.
+  Так как объекты `ObjectID` создаются в Meteor случайным образом, результаты
+  вызова их методов `getTimestamp` на данный момент являются бессмысленными.
 {{/note}}
 
 {{#api_box_inline selectors}}
 
-In its simplest form, a selector is just a set of keys that must
-match in a document:
+В своей простейшей форме, селектор - это просто набор полей, которые должны
+находиться в документе:
 
-    // Matches all documents where deleted is false
+    // Соответствует всем документам, у которых поле "deleted"
+    // имеет значение false
     {deleted: false}
 
-    // Matches all documents where the name and cognomen are as given
+    // Соответствует всем документам, у которых поля "name" и "cognomen" имеют
+    // указанные значения
     {name: "Rhialto", cognomen: "the Marvelous"}
 
-    // Matches every document
+    // Соответствует всем документам
     {}
 
-But they can also contain more complicated tests:
+Но селекторы могут содержать и более сложные условия:
 
-    // Matches documents where age is greater than 18
+    // Соответствует документам, у которых значение поля "age" больше 18
     {age: {$gt: 18}}
 
-    // Also matches documents where tags is an array containing "popular"
+    // Соответствует документам, у которых поле "tags" является массивом,
+    // содержащим значение "popular"
     {tags: "popular"}
 
-    // Matches documents where fruit is one of three possibilities
+    // Соответствует документам, у которых поле "fruit" может содержать одно
+    // из трех указанных значений
     {fruit: {$in: ["peach", "plum", "pear"]}}
 
-See the [complete
-documentation](http://www.mongodb.org/display/DOCS/Advanced+Queries).
+Полную документацию по селекторам можно прочитать
+[здесь](http://www.mongodb.org/display/DOCS/Advanced+Queries).
 
 {{/api_box_inline}}
 
 {{#api_box_inline modifiers}}
 
-A modifier is an object that describes how to update a document in
-place by changing some of its fields. Some examples:
+Модификатор - это объект, описывающий то, как должен быть изменен документ.
+Вот несколько примеров:
 
-    // Set the 'admin' property on the document to true
+    // Устанавливает полю "admin" документа значение true
     {$set: {admin: true}}
 
-    // Add 2 to the 'votes' property, and add "Traz"
-    // to the end of the 'supporters' array
+    // Увеличивает значение поля "votes" на 2 и добавляет значение "Traz"
+    // в конец массива, хранящегося в поле "supporters"
     {$inc: {votes: 2}, $push: {supporters: "Traz"}}
 
-But if a modifier doesn't contain any $-operators, then it is instead
-interpreted as a literal document, and completely replaces whatever was
-previously in the database. (Literal document modifiers are not currently
-supported by [validated updates](#allow).)
+Но если модификатор не содержит ни одного $-оператора, то он считается
+полноценным документом и заменяет собой модифицируемые документы. (Такие
+модификаторы в данный момент не поддерживаются [правилами изменения
+коллекции]((#allow)).
 
-    // Find the document with id "123", and completely replace it.
+    // Находим документ с id "123" и полностью его заменяем.
     Users.update({_id: "123"}, {name: "Alice", friends: ["Bob"]});
 
-See the [full list of
-modifiers](http://www.mongodb.org/display/DOCS/Updating#Updating-ModifierOperations).
+Полный список возможных модификаторов можно посмотреть
+[здесь](http://www.mongodb.org/display/DOCS/Updating#Updating-ModifierOperations).
 
 {{/api_box_inline}}
 
 {{#api_box_inline sortspecifiers}}
 
-Sorts may be specified using your choice of several syntaxes:
+Сортировка может быть указана несколькими различными способами:
 
-    // All of these do the same thing (sort in ascending order by
-    // key "a", breaking ties in descending order of key "b")
+    // Использование всех этих указателей эквивалентно: они сортируют по ключу
+    // "a" в порядке возрастания и по ключу "b" в порядке убывания.
 
     [["a", "asc"], ["b", "desc"]]
     ["a", ["b", "desc"]]
     {a: 1, b: -1}
 
-The last form will only work if your JavaScript implementation
-preserves the order of keys in objects. Most do, most of the time, but
-it's up to you to be sure.
+Последняя форма записи будет работать только если ваша реализация JavaScript
+сохраняет порядок ключей в объектах. Большинство реализаций в большинстве
+случаев его сохраняет, но вы должны в этом убедиться сами.
 
 {{/api_box_inline}}
 
 {{#api_box_inline fieldspecifiers}}
 
-Queries can specify a particular set of fields to include or exclude from the
-result object.
+В запросах можно указывать список полей, которые вы хотите включить в
+результат, или исключить из него.
 
-To exclude certain fields from the result objects, the field specifier
-is a dictionary whose keys are field names and whose values are `0`.
+Если вы хотите исключить некоторые поля из результата, то в качестве указателя
+полей должен быть объект, ключами которого будут их названия, а значениями -
+нули.
 
     // Users.find({}, {fields: {password: 0, hash: 0}})
 
-To return an object that only includes the specified field, use `1` as
-the value. The `_id` field is still included in the result.
+Если же вы хотите, чтобы объект результата содержал только определенные поля,
+то в указателе полей вместо `0` используйте `1`. Поле `_id` в данном случае
+также добавляется в результат.
 
     // Users.find({}, {fields: {firstname: 1, lastname: 1}})
 
-It is not possible to mix inclusion and exclusion styles (except for the cases
-when `_id` is included by default or explicitly excluded). Field operators such
-as `$` and `$elemMatch` are not available on the client side yet.
+Невозможно одновременно включать и исключать поля (кроме случая, когда поле
+`_id` включено по-умолчанию и его нужно исключить). Операторы в поля (такие,
+как `$` и `$elemMatch) на клиенте пока не поддерживаются.
 
-More advanced example:
+Более сложный пример:
 
     Users.insert({ alterEgos: [{ name: "Kira", alliance: "murderer" },
                                { name: "L", alliance: "police" }],
@@ -1294,8 +1301,9 @@ More advanced example:
 
     // returns { alterEgos: [{ name: "Kira" }, { name: "L" }] }
 
-See <a href="http://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/#projection">
-the MongoDB docs</a> for details of the nested field rules and array behavior.
+Подробнее про правила обработки вложенных полей и массивов можно прочитать в
+<a href="http://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/#projection">
+документации к MongoDB</a>.
 
 {{/api_box_inline}}
 

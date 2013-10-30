@@ -792,32 +792,32 @@ Template.api.collection_object_id = {
   id: "collection_object_id",
   name: "new Meteor.Collection.ObjectID(hexString)",
   locus: "Везде",
-  descr: ["Create a Mongo-style `ObjectID`.  If you don't specify a `hexString`, the `ObjectID` will generated randomly (not using MongoDB's ID construction rules)."],
+  descr: ["Создает `ObjectID`, используемый в MongoDB. Если вы не укажете `hexString`, то `ObjectID` будет сгенерирован случайным образом (не используя правила создания идентификаторов, используемые в MongoDB)."],
   args: [ {
     name: "hexString",
     type: "String",
-    descr: ["Необязательный аргумент.  The 24-character hexadecimal contents of the ObjectID to create"]
+    descr: ["Необязательный аргумент. Содержимое создаваемого ObjectID, состоящее из 24-ех шестнадцатеричных символов."]
   }]
 };
 
 Template.api.selectors = {
   id: "selectors",
-  name: "Mongo-style Selectors"
+  name: "Mongo-селекторы"
 };
 
 Template.api.modifiers = {
   id: "modifiers",
-  name: "Mongo-style Modifiers"
+  name: "Mongo-модификаторы"
 };
 
 Template.api.sortspecifiers = {
   id: "sortspecifiers",
-  name: "Sort Specifiers"
+  name: "Указатели сортировки"
 };
 
 Template.api.fieldspecifiers = {
   id: "fieldspecifiers",
-  name: "Field Specifiers"
+  name: "Указатели полей"
 };
 
 ////// DEPS
