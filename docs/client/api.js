@@ -1021,8 +1021,8 @@ Template.api.isolate = {
 Template.api.user = {
   id: "meteor_user",
   name: "Meteor.user()",
-  locus: "Anywhere but publish functions",
-  descr: ["Get the current user record, or `null` if no user is logged in. Реактивный источник данных."]
+  locus: "Везде, кроме функций публикации",
+  descr: ["Возвращает учетную запись текущего пользователя, или `null`, если пользователь не залогинен. Реактивный источник данных."]
 };
 
 Template.api.currentUser = {
@@ -1035,8 +1035,8 @@ Template.api.currentUser = {
 Template.api.userId = {
   id: "meteor_userid",
   name: "Meteor.userId()",
-  locus: "Anywhere but publish functions",
-  descr: ["Get the current user id, or `null` if no user is logged in. Реактивный источник данных."]
+  locus: "Везде, кроме функций публикации",
+  descr: ["Возвращает id текущего пользователя, или `null`, если пользователь не залогинен. Реактивный источник данных."]
 };
 
 
@@ -1044,14 +1044,14 @@ Template.api.users = {
   id: "meteor_users",
   name: "Meteor.users",
   locus: "Везде",
-  descr: ["A [Meteor.Collection](#collections) containing user documents."]
+  descr: ["[Коллекция](#collections), содержащая документы пользователей."]
 };
 
 Template.api.loggingIn = {
   id: "meteor_loggingin",
   name: "Meteor.loggingIn()",
   locus: "Клиент",
-  descr: ["True if a login method (such as `Meteor.loginWithPassword`, `Meteor.loginWithFacebook`, or `Accounts.createUser`) is currently in progress. Реактивный источник данных."]
+  descr: ["Возвращает `true`, если в данный момент происходит аутентификация пользователя при помощи таких методов, как `Meteor.loginWithPassword`, `Meteor.loginWithFacebook` или `Accounts.createUser`. Реактивный источник данных."]
 };
 
 Template.api.loggingInTemplate = {
@@ -1067,12 +1067,12 @@ Template.api.logout = {
   id: "meteor_logout",
   name: "Meteor.logout([callback])",
   locus: "Клиент",
-  descr: ["Log the user out."],
+  descr: ["Разлогинивает пользователя."],
   args: [
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
@@ -1081,12 +1081,12 @@ Template.api.logoutOtherClients = {
   id: "meteor_logoutotherclients",
   name: "Meteor.logoutOtherClients([callback])",
   locus: "Client",
-  descr: ["Log out other clients logged in as the current user, but does not log out the client that calls this function."],
+  descr: ["Разлогинивает всех клиентов, залогиненных под данным пользователем, кроме клиента, вызывающего эту функцию."],
   args: [
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
