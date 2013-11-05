@@ -1028,8 +1028,8 @@ Template.api.user = {
 Template.api.currentUser = {
   id: "template_currentuser",
   name: "{{currentUser}}",
-  locus: "Handlebars templates",
-  descr: ["Calls [Meteor.user()](#meteor_user). Use `{{#if currentUser}}` to check whether the user is logged in."]
+  locus: "Шаблоны Handlebars",
+  descr: ["Вызывает [Meteor.user()](#meteor_user). Используйте `{{#if currentUser}}`, чтобы проверить, залогинен ли пользователь."]
 };
 
 Template.api.userId = {
@@ -1057,8 +1057,8 @@ Template.api.loggingIn = {
 Template.api.loggingInTemplate = {
   id: "template_loggingin",
   name: "{{loggingIn}}",
-  locus: "Handlebars templates",
-  descr: ["Calls [Meteor.loggingIn()](#meteor_loggingin)."]
+  locus: "Шаблоны Handlebars",
+  descr: ["Вызывает [Meteor.loggingIn()](#meteor_loggingin)."]
 };
 
 
@@ -1096,22 +1096,22 @@ Template.api.loginWithPassword = {
   id: "meteor_loginwithpassword",
   name: "Meteor.loginWithPassword(user, password, [callback])",
   locus: "Клиент",
-  descr: ["Log the user in with a password."],
+  descr: ["Логинит пользователя с помощью пароля."],
   args: [
     {
       name: "user",
-      type: "Object or String",
-      descr: "Either a string interpreted as a username or an email; or an object with a single key: `email`, `username` or `id`."
+      type: "Object или String",
+      descr: "Если указана строка, то она интерпретируется либо как имя пользователя, либо как email. Если же указан объект, то в нем должно быть только одно поле: либо `email`, либо `username`, либо `id`."
     },
     {
       name: "password",
       type: "String",
-      descr: "The user's password. This is __not__ sent in plain text over the wire &mdash; it is secured with [SRP](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol)."
+      descr: "Пароль пользователя. Пароль __не__ отсылается в голом виде &mdash; он защищается по протоколу [SRP](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol)."
     },
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
@@ -1121,29 +1121,29 @@ Template.api.loginWithExternalService = {
   id: "meteor_loginwithexternalservice",
   name: "Meteor.loginWith<i>ExternalService</i>([options], [callback])",
   locus: "Клиент",
-  descr: ["Log the user in using an external service."],
+  descr: ["Логинит пользователя с помощью сторонних сервисов."],
   args: [
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
     }
   ],
   options: [
     {
       name: "requestPermissions",
-      type: "Array of Strings",
-      descr: "A list of permissions to request from the user."
+      type: "Массив строк",
+      descr: "Список разрешений, которые необходимо запросить у пользователя."
     },
     {
       name: "requestOfflineToken",
       type: "Boolean",
-      descr: "If true, asks the user for permission to act on their behalf when offline. This stores an additional offline token in the `services` field of the user document. Currently only supported with Google."
+      descr: "Если `true`, запрашивает у пользователя разрешение действовать от его имени, когда он не в сети. В этом случае в поле `services` учетной записи пользователя будет сохранен дополнительный offline-токен. В данный момент поддерживается только сервис Google."
     },
     {
       name: "forceApprovalPrompt",
       type: "Boolean",
-      descr: "If true, forces the user to approve the app's permissions, even if previously approved. Currently only supported with Google."
+      descr: "Если `true`, принудительно запрашивает у пользователя список разрешений, необходимых вашему приложению, даже если они уже были получены. В данный момент поддерживается только сервис Google."
     }
   ]
 };
@@ -1154,27 +1154,27 @@ Template.api.accounts_config = {
   id: "accounts_config",
   name: "Accounts.config(options)",
   locus: "Везде",
-  descr: ["Set global accounts options."],
+  descr: ["Настраивает систему учетных записей."],
   options: [
     {
       name: "sendVerificationEmail",
       type: "Boolean",
-      descr: "New users with an email address will receive an address verification email."
+      descr: "Новые пользователи, указавшие email-адрес, будут получать письмо с просьбой о его подтверждении."
     },
     {
       name: "forbidClientAccountCreation",
       type: "Boolean",
-      descr: "Calls to [`createUser`](#accounts_createuser) from the client will be rejected. In addition, if you are using [accounts-ui](#accountsui), the \"Create account\" link will not be available."
+      descr: "Все вызовы [`createUser`](#accounts_createuser) с клиента будут отклонены. Кроме того, если вы используете пакет [accounts-ui](#accountsui), ссылка \"Create account\", предназначенная для регистрации нового пользователя, будет недоступна."
     },
     {
       name: "restrictCreationByEmailDomain",
-      type: "String Or Function",
-      descr: "If set, only allow new users with an email in the specified domain or if the predicate function returns true. Works with password-based sign-in and external services that expose email addresses (Google, Facebook, GitHub). All existing users still can log in after enabling this option. Example: `Accounts.config({ restrictCreationByEmailDomain: 'school.edu' })`."
+      type: "String или Function",
+      descr: "Если указано, то будет разрешена регистрация только тех новых пользователей, чей email-адрес находится в указанном домене, или удовлетворяет указанной функции (она возвращает `true`). Работает при логине с использованием пароля, а также со всеми логин-сервисами, предоставляющими информацию о email-адресе пользователя (Google, Facebook, GitHub). Установка этой опции не влияет на возможность логина для существующих пользователей. Пример: `Accounts.config({ restrictCreationByEmailDomain: 'school.edu' })`."
     },
     {
       name: "loginExpirationInDays",
       type: "Number",
-      descr: "The number of days from when a user logs in until their token expires and they are logged out. Defaults to 90. Set to `null` to disable login expiration."
+      descr: "Количество дней после логина пользователя, спустя которое его токен будет инвалидирован и он будет разлогинен. По-умолчанию равняется 90. Укажите `null`, чтобы отключить срок действия логина."
     }
   ]
 };
@@ -1183,12 +1183,12 @@ Template.api.accounts_ui_config = {
   id: "accounts_ui_config",
   name: "Accounts.ui.config(options)",
   locus: "Клиент",
-  descr: ["Configure the behavior of [`{{loginButtons}}`](#accountsui)."],
+  descr: ["Настраивает поведение [пользовательского интерфейса системы учетных записей](#accountsui)."],
   options: [
     {
       name: "requestPermissions",
       type: "Object",
-      descr: "Which [permissions](#requestpermissions) to request from the user for each external service."
+      descr: "Список [разрешений](#requestpermissions), запрашиваемых у пользователя для каждого стороннего логин-сервиса."
     },
     {
       name: "requestOfflineToken",

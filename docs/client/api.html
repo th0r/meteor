@@ -93,17 +93,7 @@
       ];
     });
 
-Alternatively, a publish function can directly control its published
-record set by calling the functions [`added`](#publish_added) (to add a
-new document to the published record set), [`changed`](#publish_changed)
-(to change or clear some fields on a document already in the published
-record set), and [`removed`](#publish_removed) (to remove documents from
-the published record set). Publish functions that use these functions
-should also call [`ready`](#publish_ready) once the initial record set
-is complete. These methods are provided by `this` in your publish
-function.
-
-Кроме того, функции публикации могут явно контролировать публикуемые 
+Кроме того, функции публикации могут явно контролировать публикуемые
 ими документы, вызывая методы [`added`](#publish_added) (чтобы добавить новый
 документ в публикуемый набор), [`changed`](#publish_changed) (чтобы изменить 
 или удалить какие-либо поля в уже опубликованном документе) и 
@@ -1531,46 +1521,46 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 
 {{> api_box loginWithPassword}}
 
-This function is provided by the `accounts-password` package. See the
-[Passwords](#accounts_passwords) section below.
+Эта функция доступна при использовании пакета `accounts-password`. Смотрите
+главу [Пароли](#accounts_passwords).
 
 
 {{> api_box loginWithExternalService}}
 
-These functions initiate the login process with an external
-service (eg: Facebook, Google, etc), using OAuth. When called they open a new pop-up
-window that loads the provider's login page. Once the user has logged in
-with the provider, the pop-up window is closed and the Meteor client
-logs in to the Meteor server with the information provided by the external
-service.
+Эти функции инициируют процесс логина пользователя с помощью сторонних
+сервисов (например, Facebook, Google и т.д.), используя OAuth. При вызове они
+открывают страницу логина соответствующего сервиса в новом окне браузера.
+После того, как пользователь залогинится в сервисе, это окно закрывается и
+пользователь логинится в ваше приложение, используя информацию,
+предоставленную сторонним сервисом.
 
 <a id="requestpermissions" name="requestpermissions" />
 
-In addition to identifying the user to your application, some services
-have APIs that allow you to take action on behalf of the user. To
-request specific permissions from the user, pass the
-`requestPermissions` option the login function. This will cause the user
-to be presented with an additional page in the pop-up dialog to permit
-access to their data. The user's `accessToken` &mdash; with permissions
-to access the service's API &mdash; is stored in the `services` field of
-the user document. The supported values for `requestPermissions` differ
-for each login service and are documented on their respective developer
-sites:
+Некоторые сервисы, помимо идентификации пользователя, предоставляют доступ к
+своим API, которые позволяют выполнять действия от имени пользователя. Чтобы
+запросить у пользователя дополнительные разрешения, передайте их в качестве
+значения опции `requestPermissions` функции логина. В этом случае в попапе
+логина пользователю будет показана дополнительная страница, запрашивающая у
+него необходимые вам права. Полученный в результате токен доступа будет
+сохранен в поле `services` учетной записи пользователя. Список возможных
+разрешений (`requestPermissions`) различается от сервиса к сервису. Узнать о
+них можно на соответствующих страницах руководств для разработчиков:
 
 - Facebook: <http://developers.facebook.com/docs/authentication/permissions/>
 - GitHub: <http://developer.github.com/v3/oauth/#scopes>
 - Google: <https://developers.google.com/accounts/docs/OAuth2Login#scopeparameter>
 - Meetup: <http://www.meetup.com/meetup_api/auth/#oauth2-scopes>
-- Twitter, Weibo: `requestPermissions` currently not supported
+- Twitter, Weibo: опция `requestPermissions` в данный момент не поддерживается
 
-External login services typically require registering and configuring
-your application before use. The easiest way to do this is with the
-[`accounts-ui` package](#accountsui) which presents a step-by-step guide
-to configuring each service. However, the data can be also be entered
-manually in the `Accounts.loginServiceConfiguration` collection. For
-example:
+Обычно перед использованием сторонних логин-сервисов необходима регистрация в
+них вашего приложения и его настройка. Самый простой способ это сделать - это
+воспользоваться пакетом [`accounts-ui`](#accountsui), который содержит
+пошаговое руководство для настройки каждого сервиса. Однако, вы можете
+настроить их вручную, добавив всю необходимую информацию в коллекцию
+`Accounts.loginServiceConfiguration`:
 
-    // first, remove configuration entry in case service is already configured
+    // Сначала удаляем уже существующие настройки для сервиса
+    // (если таковые имеются)
     Accounts.loginServiceConfiguration.remove({
       service: "weibo"
     });
@@ -1581,9 +1571,10 @@ example:
     });
 
 
-Each external service has its own login provider package and login function. For
-example, to support GitHub login, run `$ meteor add accounts-github` and use the
-`Meteor.loginWithGithub` function:
+Каждый сторонний сервис хранится в отдельном пакете и имеет собственную
+функцию логина. Например, для того, чтобы добавить поддержку логина с помощью
+GitHub, выполните команду `$ meteor add accounts-github` и используйте
+функцию `Meteor.loginWithGithub`:
 
     Meteor.loginWithGithub({
       requestPermissions: ['user', 'public_repo']
