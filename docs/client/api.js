@@ -1193,12 +1193,12 @@ Template.api.accounts_ui_config = {
     {
       name: "requestOfflineToken",
       type: "Object",
-      descr: "To ask the user for permission to act on their behalf when offline, map the relevant external service to `true`. Currently only supported with Google. See [Meteor.loginWithExternalService](#meteor_loginwithexternalservice) for more details."
+      descr: "Чтобы запросить у пользователя разрешение действовать от его имени, когда он не в сети, присвойте свойству объекта, соответствующему названию сервиса, значение `true`. В данный момент поддерживается только сервис Google. Дополнительную информацию можно найти в документации к [Meteor.loginWithExternalService](#meteor_loginwithexternalservice)."
     },
     {
       name: "passwordSignupFields",
       type: "String",
-      descr: "Which fields to display in the user creation form. One of '`USERNAME_AND_EMAIL`', '`USERNAME_AND_OPTIONAL_EMAIL`', '`USERNAME_ONLY`', or '`EMAIL_ONLY`' (default)."
+      descr: "Указывает поля, которые будут показаны в форме создания пользователя. Значением должна быть одна из следующих строк: '`USERNAME_AND_EMAIL`', '`USERNAME_AND_OPTIONAL_EMAIL`', '`USERNAME_ONLY`' или '`EMAIL_ONLY`' (по-умолчанию)."
     }
   ]
 };
@@ -1207,12 +1207,12 @@ Template.api.accounts_validateNewUser = {
   id: "accounts_validatenewuser",
   name: "Accounts.validateNewUser(func)",
   locus: "Сервер",
-  descr: ["Set restrictions on new user creation."],
+  descr: ["Устанавливает ограничения на создание нового пользователя."],
   args: [
     {
       name: "func",
       type: "Function",
-      descr: "Called whenever a new user is created. Takes the new user object, and returns true to allow the creation or false to abort."
+      descr: "Вызывается при попытке создания нового пользователя. Принимает объект, описывающий нового пользователя. Верните `true`, если его создание разрешено, или `false` в противном случае."
     }
   ]
 };
@@ -1221,12 +1221,12 @@ Template.api.accounts_onCreateUser = {
   id: "accounts_oncreateuser",
   name: "Accounts.onCreateUser(func)",
   locus: "Сервер",
-  descr: ["Customize new user creation."],
+  descr: ["Расширяет процесс создания нового пользователя."],
   args: [
     {
       name: "func",
       type: "Function",
-      descr: "Called whenever a new user is created. Return the new user object, or throw an `Error` to abort the creation."
+      descr: "Вызывается при попытке создания нового пользователя. Верните новый объект, описывающий пользователя, или возбудите исключение, чтобы отменить его создание."
     }
   ]
 };

@@ -1590,7 +1590,7 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
 {{> api_box accounts_config}}
 {{> api_box accounts_ui_config}}
 
-Example:
+Пример:
 
     Accounts.ui.config({
       requestPermissions: {
@@ -1605,56 +1605,62 @@ Example:
 
 {{> api_box accounts_validateNewUser}}
 
-This can be called multiple times. If any of the functions return `false` or
-throw an error, the new user creation is aborted. To set a specific error
-message (which will be displayed by [`accounts-ui`](#accountsui)), throw a new
+Эта функция может быть вызвана несколько раз. Если хотя бы один из колбэков
+вернет `false` или возбудит исключение, создание нового пользователя будет
+запрещено. Чтобы указать сообщение об ошибке (которое будет показано в форме
+создания нового пользователя при использовании пакета
+[`accounts-ui`](#accountsui)), возбудите исключение
 [`Meteor.Error`](#meteor_error).
 
-Example:
+Пример:
 
-    // Validate username, sending a specific error message on failure.
+    // Проверяем имя пользователя и показываем соответствующее
+    // сообщение об ошибке.
     Accounts.validateNewUser(function (user) {
       if (user.username && user.username.length >= 3)
         return true;
       throw new Meteor.Error(403, "Username must have at least 3 characters");
     });
-    // Validate username, without a specific error message.
+    // Проверяем имя пользователя, не показывая сообщение об ошибке.
     Accounts.validateNewUser(function (user) {
       return user.username !== "root";
     });
 
 {{> api_box accounts_onCreateUser}}
 
-Use this when you need to do more than simply accept or reject new user
-creation. With this function you can programatically control the
-contents of new user documents.
+Используйте эту функцию в случае, если вам нужно не просто разрешить или
+запретить создание нового пользователя. С помощью нее вы можете
+контролировать содержимое учетных записей новых пользователей.
 
-The function you pass will be called with two arguments: `options` and
-`user`. The `options` argument comes
-from [`Accounts.createUser`](#accounts_createuser) for
-password-based users or from an external service login flow. `options` may come
-from an untrusted client so make sure to validate any values you read from
-it. The `user` argument is created on the server and contains a
-proposed user object with all the automatically generated fields
-required for the user to log in.
+В указанный вами колбэк будет передано два аргумента: `options` и `user`.
+Агрумент `options` передается из
+[`Accounts.createUser`](#accounts_createuser) в случае создания учетной
+записи, защищенной паролем, либо получается от стороннего логин-сервиса.
+Обязательно проверяйте всю информацию, хранящуюся в нем, т.к. она может прийти
+из недоверенных источников. Аргумент `user` содержит сгененированный на
+сервере объект учетной записи пользователя, содержащий все необходимые для
+его логина поля.
 
-The function should return the user document (either the one passed in or a
-newly-created object) with whatever modifications are desired. The returned
-document is inserted directly into the [`Meteor.users`](#meteor_users) collection.
+Функция должна вернуть новый объект учетной записи пользователя (либо
+переданный в нее объект `user`, либо какой-либо другой созданный вами объект),
+содержащий все необходимые изменения, который затем будет добавлен в коллекцию
+[`Meteor.users`](#meteor_users).
 
-The default create user function simply copies `options.profile` into
-the new user document. Calling `onCreateUser` overrides the default
-hook. This can only be called once.
+По-умолчанию, функция создания нового пользователя просто копирует
+`options.profile` в объект его учетной записи. Вызывая `onCreateUser`, вы
+переопределяете это поведение. Таким образом, функцию `onCreateUser` можно
+вызывать только один раз.
 
-Example:
+Пример:
 
 <!-- XXX replace d6 with _.random once we have underscore 1.4.2 -->
 
-    // Support for playing D&D: Roll 3d6 for dexterity
+    // Поддержка для игры в D&D: Бросаем кубик 3 раза, чтобы получить
+    // "ловкость" пользователя
     Accounts.onCreateUser(function(options, user) {
       var d6 = function () { return Math.floor(Random.fraction() * 6) + 1; };
       user.dexterity = d6() + d6() + d6();
-      // We still want the default hook's 'profile' behavior.
+      // Повторяем поведение функции создания нового пользователя по-умолчанию.
       if (options.profile)
         user.profile = options.profile;
       return user;
