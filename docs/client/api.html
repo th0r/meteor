@@ -1667,49 +1667,51 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
     });
 
 
-<h2 id="accounts_passwords"><span>Passwords</span></h2>
+<h2 id="accounts_passwords"><span>Пароли</span></h2>
 
-The `accounts-password` package contains a full system for password-based
-authentication. In addition to the basic username and password-based
-sign-in process, it also supports email-based sign-in including
-address verification and password recovery emails.
+Пакет `accounts-password` содержит систему аутентификации пользователей при
+помощи пароля. В дополнение к основному функционалу входа в систему на
+основе имени пользователя и пароля, пакет также поддерживает вход при помощи
+email-адреса, его верификацию и отсылку писем для восстановления пароля.
 
-Unlike most web applications, the Meteor client does not send the user's
-password directly to the server. It uses the [Secure Remote Password
-protocol](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol)
-to ensure the server never sees the user's plain-text password. This
-helps protect against embarrassing password leaks if the server's
-database is compromised.
+В отличии от большинства веб-приложений, Meteor-клиент не отсылает пароль на
+сервер в голом виде. Для его шифрования он использует протокол [Secure Remote
+Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
+помогает защитить пароли пользователей в случае, если безопасность базы
+данных скомпрометирована.
 
-To add password support to your application, run `$ meteor add
-accounts-password`. You can construct your own user interface using the
-functions below, or use the [`accounts-ui` package](#accountsui) to
-include a turn-key user interface for password-based sign-in.
+Чтобы добавить поддержку паролей в ваше приложение, выполните команду `$ meteor
+add accounts-password`. Вы можете создать свой собственный интерфейс
+пользователя, используя функции, описанные ниже, или же воспользоваться
+[пакетом `accounts-ui`](#accountsui), содержащим уже готовый интерфейс для
+аутентификации пользователей при помощи пароля.
 
 
 {{> api_box accounts_createUser}}
 
-On the client, this function logs in as the newly created user on
-successful completion. On the server, it returns the newly created user
-id.
+На клиенте эта функция логинит пользователя под новой учетной записью, в
+случае успешного ее создания. На сервере она возвращает id созданной
+учетной записи.
 
-On the client, you must pass `password` and one of `username` or `email`
-&mdash; enough information for the user to be able to log in again
-later. On the server, you can pass any subset of these options, but the
-user will not be able to log in until it has an identifier and a
-password.
+На клиенте для создания нового пользователя вам необходимо указать его пароль
+(`password`) и либо его имя (`username`), либо `email` &mdash; это
+минимальное количество информации, необходимое для последующего успешного
+логина. На сервере вы можете передать любой набор параметров, но пользователь
+не сможет залогиниться до тех пор, пока не будет указан его идентификатор и
+пароль.
 
-To create an account without a password on the server and still let the
-user pick their own password, call `createUser` with the `email` option
-and then
-call [`Accounts.sendEnrollmentEmail`](#accounts_sendenrollmentemail). This
-will send the user an email with a link to set their initial password.
+Чтобы на сервере создать учетную запись без пароля, но дать пользователю
+возможность установить его самому, вызовите `createUser`, указав `email`, а
+затем вызовите
+[`Accounts.sendEnrollmentEmail`](#accounts_sendenrollmentemail). После этого
+пользователю будет отправлено письмо со ссылкой для установки пароля.
 
-By default the `profile` option is added directly to the new user document. To
-override this behavior, use [`Accounts.onCreateUser`](#accounts_oncreateuser).
+По-умолчанию, объект `profile` напрямую записывается в учетную запись
+пользователя. Изменить это поведение можно при помощи функции
+[`Accounts.onCreateUser`](#accounts_oncreateuser).
 
-This function is only used for creating users with passwords. The external
-service login flows do not use this function.
+Эта функция используется только для создания пользователей с паролями.
+При логине пользователей при помощи сторонних сервисов она не используется.
 
 
 {{> api_box accounts_changePassword}}

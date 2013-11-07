@@ -1072,7 +1072,7 @@ Template.api.logout = {
     {
       name: "callback",
       type: "Function",
-      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
@@ -1086,7 +1086,7 @@ Template.api.logoutOtherClients = {
     {
       name: "callback",
       type: "Function",
-      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
@@ -1111,7 +1111,7 @@ Template.api.loginWithPassword = {
     {
       name: "callback",
       type: "Function",
-      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
@@ -1126,7 +1126,7 @@ Template.api.loginWithExternalService = {
     {
       name: "callback",
       type: "Function",
-      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, и с единственным аргументом `Error` в случае неудачи."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ],
   options: [
@@ -1237,34 +1237,34 @@ Template.api.accounts_createUser = {
   id: "accounts_createuser",
   name: "Accounts.createUser(options, [callback])",
   locus: "Везде",
-  descr: ["Create a new user."],
+  descr: ["Создает нового пользователя."],
   args: [
     {
       name: "callback",
       type: "Function",
-      descr: "Client only, optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Только на клиенте, необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ],
   options: [
     {
       name: "username",
       type: "String",
-      descr: "A unique name for this user."
+      descr: "Уникальное имя пользователя."
     },
     {
       name: "email",
       type: "String",
-      descr: "The user's email address."
+      descr: "Email-адрес пользователя."
     },
     {
       name: "password",
       type: "String",
-      descr: "The user's password. This is __not__ sent in plain text over the wire."
+      descr: "Пароль пользователя. __Не__ отсылается по сети в голом виде."
     },
     {
       name: "profile",
       type: "Object",
-      descr: "The user's profile, typically including the `name` field."
+      descr: "Профиль пользователя, обычно содержащий поле `name`."
     }
   ]
 };
@@ -1273,22 +1273,22 @@ Template.api.accounts_changePassword = {
   id: "accounts_changepassword",
   name: "Accounts.changePassword(oldPassword, newPassword, [callback])",
   locus: "Клиент",
-  descr: ["Change the current user's password. Must be logged in."],
+  descr: ["Меняет пароль текущего пользователя. Пользователь должен быть залогинен."],
   args: [
     {
       name: "oldPassword",
       type: "String",
-      descr: "The user's current password. This is __not__ sent in plain text over the wire."
+      descr: "Текущий пароль пользователя. __Не__ отсылается по сети в голом виде."
     },
     {
       name: "newPassword",
       type: "String",
-      descr: "A new password for the user. This is __not__ sent in plain text over the wire."
+      descr: "Новый пароль пользователя. __Не__ отсылается по сети в голом виде."
     },
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
