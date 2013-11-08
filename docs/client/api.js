@@ -1297,19 +1297,19 @@ Template.api.accounts_forgotPassword = {
   id: "accounts_forgotpassword",
   name: "Accounts.forgotPassword(options, [callback])",
   locus: "Клиент",
-  descr: ["Request a forgot password email."],
+  descr: ["Отсылает email со ссылкой для сброса пароля."],
   args: [
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ],
   options: [
     {
       name: "email",
       type: "String",
-      descr: "The email address to send a password reset link."
+      descr: "Email-адрес, на который будет отправлено письмо со ссылкой на сброс пароля."
     }
   ]
 };
@@ -1318,41 +1318,41 @@ Template.api.accounts_resetPassword = {
   id: "accounts_resetpassword",
   name: "Accounts.resetPassword(token, newPassword, [callback])",
   locus: "Клиент",
-  descr: ["Reset the password for a user using a token received in email. Logs the user in afterwards."],
+  descr: ["Сбрасывает пароль пользователя при помощи токена, полученного по email. После этого логинит пользователя."],
   args: [
     {
       name: "token",
       type: "String",
-      descr: "The token retrieved from the reset password URL."
+      descr: "Токен, полученный из ссылки для сброса пароля."
     },
     {
       name: "newPassword",
       type: "String",
-      descr: "A new password for the user. This is __not__ sent in plain text over the wire."
+      descr: "Новый пароль пользователя. __Не__ отсылается по сети в голом виде."
     },
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
-  ],
+  ]
 };
 
 Template.api.accounts_setPassword = {
   id: "accounts_setpassword",
   name: "Accounts.setPassword(userId, newPassword)",
   locus: "Сервер",
-  descr: ["Forcibly change the password for a user."],
+  descr: ["Принудительно меняет пароль пользователя."],
   args: [
     {
       name: "userId",
       type: "String",
-      descr: "The id of the user to update."
+      descr: "ID пользователя."
     },
     {
       name: "newPassword",
       type: "String",
-      descr: "A new password for the user."
+      descr: "Новый пароль пользователя."
     }
   ]
 };
@@ -1361,17 +1361,17 @@ Template.api.accounts_verifyEmail = {
   id: "accounts_verifyemail",
   name: "Accounts.verifyEmail(token, [callback])",
   locus: "Клиент",
-  descr: ["Marks the user's email address as verified. Logs the user in afterwards."],
+  descr: ["Помечает email-адрес пользователя, как подтвержденный. После этого логинит пользователя."],
   args: [
     {
       name: "token",
       type: "String",
-      descr: "The token retrieved from the verification URL."
+      descr: "Токен, полученный из ссылки для подтверждения email-адреса."
     },
     {
       name: "callback",
       type: "Function",
-      descr: "Optional callback. Called with no arguments on success, or with a single `Error` argument on failure."
+      descr: "Необязательный колбэк. Вызывется без аргументов в случае успеха, или с единственным аргументом `Error` в случае неудачи."
     }
   ]
 };
@@ -1381,17 +1381,17 @@ Template.api.accounts_sendResetPasswordEmail = {
   id: "accounts_sendresetpasswordemail",
   name: "Accounts.sendResetPasswordEmail(userId, [email])",
   locus: "Сервер",
-  descr: ["Send an email with a link the user can use to reset their password."],
+  descr: ["Отправляет письмо со ссылкой для сброса пароля пользователя."],
   args: [
     {
       name: "userId",
       type: "String",
-      descr: "The id of the user to send email to."
+      descr: "ID пользователя, которому необходимо отправить письмо."
     },
     {
       name: "email",
       type: "String",
-      descr: "Необязательный аргумент. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first email in the list."
+      descr: "Необязательный аргумент. Email-адрес пользователя, на который следует отправить письмо. Данный адрес должен находиться в списке email-адресов пользователя, хранящихся в поле `emails` его учетной записи. По-умолчанию письмо отсылается на первый адрес из этого списка."
     }
   ]
 };
@@ -1400,17 +1400,17 @@ Template.api.accounts_sendEnrollmentEmail = {
   id: "accounts_sendenrollmentemail",
   name: "Accounts.sendEnrollmentEmail(userId, [email])",
   locus: "Сервер",
-  descr: ["Send an email with a link the user can use to set their initial password."],
+  descr: ["Отправляет письмо со ссылкой, пройдя по которой пользователь может установить себе начальный пароль."],
   args: [
     {
       name: "userId",
       type: "String",
-      descr: "The id of the user to send email to."
+      descr: "ID пользователя, которому необходимо отправить письмо."
     },
     {
       name: "email",
       type: "String",
-      descr: "Необязательный аргумент. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first email in the list."
+      descr: "Необязательный аргумент. Email-адрес пользователя, на который следует отправить письмо. Данный адрес должен находиться в списке email-адресов пользователя, хранящихся в поле `emails` его учетной записи. По-умолчанию письмо отсылается на первый адрес из этого списка."
     }
   ]
 };
@@ -1419,17 +1419,17 @@ Template.api.accounts_sendVerificationEmail = {
   id: "accounts_sendverificationemail",
   name: "Accounts.sendVerificationEmail(userId, [email])",
   locus: "Сервер",
-  descr: ["Send an email with a link the user can use verify their email address."],
+  descr: ["Отправляет письмо со ссылкой, пройдя по которой пользователь может подтвердить данный email-адрес."],
   args: [
     {
       name: "userId",
       type: "String",
-      descr: "The id of the user to send email to."
+      descr: "ID пользователя, которому необходимо отправить письмо."
     },
     {
       name: "email",
       type: "String",
-      descr: "Необязательный аргумент. Which address of the user's to send the email to. This address must be in the user's `emails` list. Defaults to the first unverified email in the list."
+      descr: "Необязательный аргумент. Email-адрес пользователя, на который следует отправить письмо. Данный адрес должен находиться в списке email-адресов пользователя, хранящихся в поле `emails` его учетной записи. По-умолчанию письмо отсылается на первый адрес из этого списка."
     }
   ]
 };
@@ -1440,7 +1440,7 @@ Template.api.accounts_emailTemplates = {
   id: "accounts_emailtemplates",
   name: "Accounts.emailTemplates",
   locus: "Везде",
-  descr: ["Options to customize emails sent from the Accounts system."]
+  descr: ["Объект, служащий для настройки писем, отсылаемых системой учетных записей."]
 };
 
 

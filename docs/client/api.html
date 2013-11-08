@@ -1672,7 +1672,7 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
 Пакет `accounts-password` содержит систему аутентификации пользователей при
 помощи пароля. В дополнение к основному функционалу входа в систему на
 основе имени пользователя и пароля, пакет также поддерживает вход при помощи
-email-адреса, его верификацию и отсылку писем для восстановления пароля.
+email-адреса, его подтверждение и отсылку писем для восстановления пароля.
 
 В отличии от большинства веб-приложений, Meteor-клиент не отсылает пароль на
 сервер в голом виде. Для его шифрования он использует протокол [Secure Remote
@@ -1680,8 +1680,8 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
 помогает защитить пароли пользователей в случае, если безопасность базы
 данных скомпрометирована.
 
-Чтобы добавить поддержку паролей в ваше приложение, выполните команду `$ meteor
-add accounts-password`. Вы можете создать свой собственный интерфейс
+Чтобы добавить поддержку паролей в ваше приложение, выполните команду
+`$ meteor add accounts-password`. Вы можете создать свой собственный интерфейс
 пользователя, используя функции, описанные ниже, или же воспользоваться
 [пакетом `accounts-ui`](#accountsui), содержащим уже готовый интерфейс для
 аутентификации пользователей при помощи пароля.
@@ -1718,90 +1718,93 @@ add accounts-password`. Вы можете создать свой собстве
 
 {{> api_box accounts_forgotPassword}}
 
-This triggers a call
-to [`Accounts.sendResetPasswordEmail`](#accounts_sendresetpasswordemail)
-on the server. Pass the token the user receives in this email
-to [`Accounts.resetPassword`](#accounts_resetpassword) to
-complete the password reset process.
+Эта функция вызывает серверный метод
+[`Accounts.sendResetPasswordEmail`](#accounts_sendresetpasswordemail). Чтобы
+завершить процесс сброса пароля, необходимо передать токен из отосланного
+пользователю письма в функцию
+[`Accounts.resetPassword`](#accounts_resetpassword).
 
-If you are using the [`accounts-ui` package](#accountsui), this is handled
-automatically. Otherwise, it is your responsiblity to prompt the user for the
-new password and call `resetPassword`.
+Если вы используете [пакет `accounts-ui`](#accountsui), то все это делается
+автоматически. В противном случае, вы должны сами показать пользователю
+диалог ввода нового пароля и заменить им старый, вызвав функцию
+`resetPassword`.
 
 {{> api_box accounts_resetPassword}}
 
-This function accepts tokens generated
-by [`Accounts.sendResetPasswordEmail`](#accounts_sendresetpasswordemail)
-and
+Эта функция принимает токены, созданные методами
+[`Accounts.sendResetPasswordEmail`](#accounts_sendresetpasswordemail) и
 [`Accounts.sendEnrollmentEmail`](#accounts_sendenrollmentemail).
 
 {{> api_box accounts_setPassword}}
 
 {{> api_box accounts_verifyEmail}}
 
-This function accepts tokens generated
-by [`Accounts.sendVerificationEmail`](#accounts_sendverificationemail). It
-sets the `emails.verified` field in the user record.
+Эта функция принимает токены, созданные методом
+[`Accounts.sendVerificationEmail`](#accounts_sendverificationemail). Она
+меняет значение поля `emails.verified` в учетной записи пользователя.
 
 {{> api_box accounts_sendResetPasswordEmail}}
 
-The token in this email should be passed
-to [`Accounts.resetPassword`](#accounts_resetpassword).
+Токен из данного письма должен быть передан в функцию
+[`Accounts.resetPassword`](#accounts_resetpassword).
 
-To customize the contents of the email, see
-[`Accounts.emailTemplates`](#accounts_emailtemplates).
+Информацию о том, как настроить содержимое отсылаемых писем, можно найти в
+документации к [`Accounts.emailTemplates`](#accounts_emailtemplates).
 
 {{> api_box accounts_sendEnrollmentEmail}}
 
-The token in this email should be passed
-to [`Accounts.resetPassword`](#accounts_resetpassword).
+Токен из данного письма должен быть передан в функцию
+[`Accounts.resetPassword`](#accounts_resetpassword).
 
-To customize the contents of the email, see
-[`Accounts.emailTemplates`](#accounts_emailtemplates).
+Информацию о том, как настроить содержимое отсылаемых писем, можно найти в
+документации к [`Accounts.emailTemplates`](#accounts_emailtemplates).
 
 {{> api_box accounts_sendVerificationEmail}}
 
-The token in this email should be passed
-to [`Accounts.verifyEmail`](#accounts_verifyemail).
+Токен из данного письма должен быть передан в функцию
+[`Accounts.verifyEmail`](#accounts_verifyemail).
 
-To customize the contents of the email, see
-[`Accounts.emailTemplates`](#accounts_emailtemplates).
+Информацию о том, как настроить содержимое отсылаемых писем, можно найти в
+документации к [`Accounts.emailTemplates`](#accounts_emailtemplates).
 
 {{> api_box accounts_emailTemplates}}
 
-This is an `Object` with several fields that are used to generate text
-for the emails sent by `sendResetPasswordEmail`, `sendEnrollmentEmail`,
-and `sendVerificationEmail`.
+Этот объект служит для настройки содержимого писем, отправляемых функциями
+`sendResetPasswordEmail`, `sendEnrollmentEmail` и `sendVerificationEmail`.
 
-Override fields of the object by assigning to them:
+Объект содержит следующие свойства:
 
-- `from`: A `String` with an [RFC5322](http://tools.ietf.org/html/rfc5322) From
-   address. By default, the email is sent from `no-reply@meteor.com`. If you
-   wish to receive email from users asking for help with their account, be sure
-   to set this to an email address that you can receive email at.
-- `siteName`: The public name of your application. Defaults to the DNS name of
-   the application (eg: `awesome.meteor.com`).
-- `resetPassword`: An `Object` with two fields:
- - `resetPassword.subject`: A `Function` that takes a user object and returns
-   a `String` for the subject line of a reset password email.
- - `resetPassword.text`: A `Function` that takes a user object and a url, and
-   returns the body text for a reset password email.
-- `enrollAccount`: Same as `resetPassword`, but for initial password setup for
-   new accounts.
-- `verifyEmail`: Same as `resetPassword`, but for verifying the users email
-   address.
+- `from`: Строка, содержащая адрес отправителя в формате
+   [RFC5322](http://tools.ietf.org/html/rfc5322). По-умолчанию, письмо
+   отправляется с `no-reply@meteor.com`. Если вы хотите получать письма от
+   пользователей, испытывающих проблемы со свой учетной записью, то здесь
+   необходимо указать адрес, на который они смогут отсылать вам письма.
+- `siteName`: Публичное название вашего приложения. По-умолчанию, содержит
+   DNS-имя вашего приложения (напрмер, `awesome.meteor.com`).
+- `resetPassword`: Объект с двумя свойствами:
+ - `resetPassword.subject`: Функция, принимающая объект учетной записи
+   пользователя и возвращающая заголовок письма для сброса пароля в виде
+   строки.
+ - `resetPassword.text`: Функция, принимающая объект учетной записи
+   пользователя и URL и возвращающая текст письма для сброса пароля в виде
+   строки.
+- `enrollAccount`: То же, что и `resetPassword`, но для установки начального
+   пароля для новых учетных записей.
+- `verifyEmail`: То же, что и `resetPassword`, но для подтверждения
+   email-адресов пользователя.
 
 
-Example:
+Пример:
 
-    Accounts.emailTemplates.siteName = "AwesomeSite";
-    Accounts.emailTemplates.from = "AwesomeSite Admin <accounts@example.com>";
+    Accounts.emailTemplates.siteName = "ЧудоСайт";
+    Accounts.emailTemplates.from = "Админ ЧудоСайта <accounts@example.com>";
     Accounts.emailTemplates.enrollAccount.subject = function (user) {
-        return "Welcome to Awesome Town, " + user.profile.name;
+        return "Добро пожаловать в Чудо-Город, " + user.profile.name;
     };
     Accounts.emailTemplates.enrollAccount.text = function (user, url) {
-       return "You have been selected to participate in building a better future!"
-         + " To activate your account, simply click the link below:\n\n"
+       return "Вас выбрали для участия в строительстве лучшего будущего! "
+         + "Чтобы активировать вашу учетную запись, просто пройдите по "
+         + "данной ссылке:\n\n"
          + url;
     };
 
