@@ -1809,31 +1809,30 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
     };
 
 
-<h2 id="templates_api"><span>Templates</span></h2>
+<h2 id="templates_api"><span>Шаблоны</span></h2>
 
-A template that you declare as `<{{! }}template name="foo"> ... </{{!
-}}template>` can be accessed as the function `Template.foo`, which
-returns a string of HTML when called.
+Каждый шаблон, объявленный вами в виде `<{{! }}template name="foo"> ... </{{!
+}}template>`, преобразуется в функцию `Template.foo`, которая при вызове
+возвращает строку в виде HTML.
 
-The same template may occur many times on the page, and these
-occurrences are called template instances.  Template instances have a
-life cycle of being created, put into the document, and later taken
-out of the document and destroyed.  Meteor manages these stages for
-you, including determining when a template instance has been removed
-or replaced and should be cleaned up.  You can associate data with a
-template instance, and you can access its DOM nodes when it is in the
-document.
+Один и тот же шаблон может быть отрисован на странице множество раз. Каждая
+такая отрисовка называется экземпляром шаблона. Жизненный цикл экземпляра
+шаблона можно разделить на несколько этапов: его создание, вставка на
+страницу и последующее изъятие со страницы и уничтожение. Meteor управляет
+всеми этими этапами без вашего вмешательства. Он даже самостоятельно
+определяет, что экземпляр шаблона был изъят со страницы, и уничтожает его. К
+экземпляру шаблона можно привязать какие-либо данные, а также обращаться к
+его DOM-узлам.
 
-Additionally, Meteor will maintain a template instance and its state
-even if its surrounding HTML is re-rendered into new DOM nodes.  As
-long as the structure of template invocations is the same, Meteor will
-not consider any instances to have been created or destroyed.  You can
-request that the same DOM nodes be retained as well using `preserve`
-and `constant`.
+Кроме того, Meteor сохранит экземпляр шаблона и его состояние даже в случае,
+если окружающий его HTML перерендерился в новые DOM-узлы. Если структура
+вызовов шаблонов не меняется, то Meteor считает, что все созданные экземпляры
+шаблонов можно использовать заново. При помощи `preserve` и `constant`
+можно также указать, что вместе с экземплярами шаблонов вы хотите сохранить и
+некоторые DOM-узлы.
 
-There are a number of callbacks and directives that you can specify on
-a named template and that apply to all instances of the template.
-They are described below.
+Есть целый ряд колбэков и директив, которые вы можете указать для шаблона, и
+которые будут применены ко всем его экземплярам. Все они описаны ниже.
 
 {{> api_box template_call}}
 

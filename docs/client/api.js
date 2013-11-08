@@ -1739,11 +1739,11 @@ Template.api.template_call = {
   id: "template_call",
   name: "Template.<em>myTemplate</em>([data])",
   locus: "Клиент",
-  descr: ["Call a template function by name to produce HTML."],
+  descr: ["Возвращает сгенерированный шаблоном HTML."],
   args: [
     {name: "data",
      type: "Object",
-     descr: 'Необязательный аргумент. The data context object with which to call the template.'}
+     descr: 'Необязательный аргумент. Данные для шаблона.'}
   ]
 };
 
