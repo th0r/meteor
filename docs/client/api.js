@@ -1751,21 +1751,21 @@ Template.api.template_rendered = {
   id: "template_rendered",
   name: "Template.<em>myTemplate</em>.rendered = function ( ) { ... }",
   locus: "Клиент",
-  descr: ["Provide a callback when an instance of a template is rendered."]
+  descr: ["Колбэк, вызываемый при отрисовке экземпляра шаблона."]
 };
 
 Template.api.template_created = {
   id: "template_created",
   name: "Template.<em>myTemplate</em>.created = function ( ) { ... }",
   locus: "Клиент",
-  descr: ["Provide a callback when an instance of a template is created."]
+  descr: ["Колбэк, вызываемый при создании экземпляра шаблона."]
 };
 
 Template.api.template_destroyed = {
   id: "template_destroyed",
   name: "Template.<em>myTemplate</em>.destroyed = function ( ) { ... }",
   locus: "Клиент",
-  descr: ["Provide a callback when an instance of a template is destroyed."]
+  descr: ["Колбэк, вызываемый при уничтожении экземпляра шаблона."]
 };
 
 Template.api.template_events = {

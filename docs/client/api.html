@@ -1811,7 +1811,7 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
 
 <h2 id="templates_api"><span>Шаблоны</span></h2>
 
-Каждый шаблон, объявленный вами в виде `<{{! }}template name="foo"> ... </{{!
+Шаблон, объявленный вами в виде `<{{! }}template name="foo">...</{{!
 }}template>`, преобразуется в функцию `Template.foo`, которая при вызове
 возвращает строку в виде HTML.
 
@@ -1824,7 +1824,7 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
 экземпляру шаблона можно привязать какие-либо данные, а также обращаться к
 его DOM-узлам.
 
-Кроме того, Meteor сохранит экземпляр шаблона и его состояние даже в случае,
+Кроме того, Meteor сохраняет экземпляр шаблона и его состояние даже в случае,
 если окружающий его HTML перерендерился в новые DOM-узлы. Если структура
 вызовов шаблонов не меняется, то Meteor считает, что все созданные экземпляры
 шаблонов можно использовать заново. При помощи `preserve` и `constant`
@@ -1836,47 +1836,45 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
 
 {{> api_box template_call}}
 
-When called inside a template helper, the body of `Meteor.render`, or
-other settings where reactive HTML is being generated, the resulting
-HTML is annotated so that it renders as reactive DOM elements.
-Otherwise, the HTML is unadorned and static.
+Если функция вызывается из хэлпера шаблона, тела `Meteor.render` или из любого
+другого места, генерирующего реактивный HTML, полученный HTML аннотируется
+для преобразования в реактивные DOM-элементы. В противном случае полученный
+HTML никак не обрабатывается.
 
 
 {{> api_box template_rendered}}
 
-This callback is called once when an instance of Template.*myTemplate* is
-rendered into DOM nodes and put into the document for the first time, and again
-each time any part of the template is re-rendered.
+Этот колбэк первый раз вызывается после преобразования экземпляра шаблона
+Template.*myTemplate* в DOM-узлы и вставки их на страницу, а затем каждый раз
+при перерисовке лобой части этого шаблона.
 
-In the body of the callback, `this` is a [template
-instance](#template_inst) object that is unique to this occurrence of
-the template and persists across re-renderings.  Use the `created` and
-`destroyed` callbacks to perform initialization or clean-up on the
-object.
+Внутри колбэка `this` указывает на объект [экземпляра
+шаблона](#template_inst), который уникальный для данного экземпляра и
+сохраняется при его перерисовках. Для инициализации и очистки этого объекта
+используйте колбэки `created` и `destroyed`.
 
 {{> api_box template_created}}
 
-This callback is called when an invocation of *myTemplate* represents
-a new occurrence of the template and not a re-rendering of an existing
-template instance.  Inside the callback, `this` is the new [template
-instance](#template_inst) object.  Properties you set on this object
-will be visible from the `rendered` and `destroyed` callbacks and from
-event handlers.
+Этот колбэк вызывется в случае, когда шаблонная функция Template.*myTemplate*
+вызывается при создания нового экземпляра шаблона, а не при перерисовке
+существующего. Внутри колбэка `this` указывает на новый объект [экземпляра
+шаблона](#template_inst). Свойства, которые вы добавите в этот объект, будут
+доступны из колбэков `rendered` и `destroyed`, а также из обработчиков событий.
 
-This callback fires once and is the first callback to fire.  Every
-`created` has a corresponding `destroyed`; that is, if you get a
-`created` callback with a certain template instance object in `this`,
-you will eventually get a `destroyed` callback for the same object.
+Этот колбэк вызывается самым первым и только один раз. Для каждого из
+колбэков `create` существует соответсвующий колбэк `destroyed`. Это означает,
+что если для определенного объекта экзепляра шаблона был вызван колбэк
+`created`, то в конечном итоге для него обязательно будет вызван и колбэк
+`destroyed`.
 
 {{> api_box template_destroyed}}
 
-This callback is called when an occurrence of a template is taken off
-the page for any reason and not replaced with a re-rendering.  Inside
-the callback, `this` is the [template instance](#template_inst) object
-being destroyed.
+Этот колбэк вызывается, когда экземпляр шаблона окончательно удаляется со
+страницы. Внутри колбэка `this` указывает на объект удаляемого [экземпляра
+шаблона](#template_inst).
 
-This callback is most useful for cleaning up or undoing any external
-effects of `created`.  It fires once and is the last callback to fire.
+Этот колбэк удобно использовать для отмены всех действий, сделанных вами в
+колбэке `created`. Он вызывается самым последним и только один раз.
 
 
 {{> api_box template_events}}
