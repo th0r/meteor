@@ -1449,17 +1449,17 @@ Template.api.check = {
   id: "check",
   name: "check(value, pattern)",
   locus: "Везде",
-  descr: ["Checks that a value matches a [pattern](#matchpatterns). If the value does not match the pattern, throws a `Match.Error`."],
+  descr: ["Проверяет, что значение соответствует [шаблону](#matchpatterns). Если оно не соответствует, то возбуждает исключение `Match.Error`."],
   args: [
     {
       name: "value",
-      type: "Any",
-      descr: "The value to check"
+      type: "Любой",
+      descr: "Проверяемое значение."
     },
     {
       name: "pattern",
-      type: "Match pattern",
-      descr: "The [pattern](#matchpatterns) to match `value` against"
+      type: "Шаблон значения",
+      descr: "[Шаблон](#matchpatterns), на соответствие которому будет проверяться значение."
     }
   ]
 };
@@ -1468,24 +1468,24 @@ Template.api.match_test = {
   id: "match_test",
   name: "Match.test(value, pattern)",
   locus: "Везде",
-  descr: ["Returns true if the value matches the [pattern](#matchpatterns)."],
+  descr: ["Возвращает `true`, если значение соответствует [шаблону](#matchpatterns)."],
   args: [
     {
       name: "value",
-      type: "Any",
-      descr: "The value to check"
+      type: "Любое",
+      descr: "Проверяемое значение."
     },
     {
       name: "pattern",
-      type: "Match pattern",
-      descr: "The [pattern](#matchpatterns) to match `value` against"
+      type: "Шаблон значения",
+      descr: "[Шаблон](#matchpatterns), на соответствие которому будет проверяться значение."
     }
   ]
 };
 
 Template.api.matchpatterns = {
   id: "matchpatterns",
-  name: "Match patterns"
+  name: "Шаблоны значений"
 };
 
 Template.api.setTimeout = {
