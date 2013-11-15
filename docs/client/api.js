@@ -826,11 +826,11 @@ Template.api.deps_autorun = {
   id: "deps_autorun",
   name: "Deps.autorun(runFunc)",
   locus: "Клиент",
-  descr: ["Run a function now and rerun it later whenever its dependencies change. Returns a Computation object that can be used to stop or observe the rerunning."],
+  descr: ["Вызывает функцию и перевыполняет ее каждый раз при изменении ее зависимостей. Возвращает объект созданного реактивного контекста (`Сomputation`), который можно использовать для остановки перевыполнения или его отслеживания."],
   args: [
     {name: "runFunc",
      type: "Function",
-     descr: "The function to run. It receives one argument: the Computation object that will be returned."}
+     descr: "Вызываемая функция. Принимает единственный аргумент: возвращаемый из `Deps.autorun` объект созданного реактивного контекста (`Сomputation`)."}
   ]
 };
 

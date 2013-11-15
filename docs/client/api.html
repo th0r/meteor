@@ -2491,26 +2491,26 @@ sub-template.
 {{> api_box clearTimeout}}
 {{> api_box clearInterval}}
 
-<h2 id="deps"><span>Deps</span></h2>
+<h2 id="deps"><span>Объект Deps</span></h2>
+Meteor содержит простую систему отслеживания зависимостей, которая позволяет
+автоматически перезапускать реактивные контексты (например, перерисовывать
+шаблоны) всякий раз при изменении информации в реактивных источниках данных
+(например, значений в объекте [`Session`](#session) или результатов запросов
+к БД).
 
-Meteor has a simple dependency tracking system which allows it to
-automatically rerun templates and other computations whenever
-[`Session`](#session) variables, database queries, and other data
-sources change.
+В отличие от большинства других систем, вы не должны указывать эти
+зависимости вручную &mdash; все работает само по себе. Алгоритм простой и
+эффективный. Когда вы вызываете функцию, поддерживающую реактивные изменения
+(например, запрос к базе данных), она автоматически сохраняет текущий
+реактивный контекст (в виде экземпляра объекта `Computation`), если, конечно,
+он присутствует (например, контекст отрисовки шаблона). Позже, когда данные
+изменятся, функция может "инвалидировать" сохраненный контекст, что вызовет
+его перезапуск (перерисовку шаблона).
 
-Unlike most other systems, you don't have to manually declare these
-dependencies &mdash; it "just works". The mechanism is simple and
-efficient. When you call a function that supports reactive updates
-(such as a database query), it automatically saves the current
-Computation object, if any (representing, for example, the current
-template being rendered).  Later, when the data changes, the function
-can "invalidate" the Computation, causing it to rerun (rerendering the
-template).
-
-Applications will find [`Deps.autorun`](#deps_autorun) useful, while more
-advanced facilities such as `Deps.Dependency` and `onInvalidate`
-callbacks are intended primarily for package authors implementing new
-reactive data sources.
+Для приложений будет полезна функция [`Deps.autorun`](#deps_autorun), в то
+время как более продвинутые средства, такие как `Deps.Dependency` и колбэки
+`onInvalidate`, предназначены больше для создателей пакетов, реализующих
+новые реактивные источники данных.
 
 {{> api_box deps_autorun }}
 
