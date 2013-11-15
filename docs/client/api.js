@@ -1492,17 +1492,17 @@ Template.api.setTimeout = {
   id: "meteor_settimeout",
   name: "Meteor.setTimeout(func, delay)",
   locus: "Везде",
-  descr: ["Call a function in the future after waiting for a specified delay."],
+  descr: ["Вызывает функцию через определенный промежуток времени."],
   args: [
     {
       name: "func",
       type: "Function",
-      descr: "The function to run"
+      descr: "Вызываемая функция."
     },
     {
       name: "delay",
       type: "Number",
-      descr: "Number of milliseconds to wait before calling function"
+      descr: "Промежуток времени в миллисекундах."
     }
   ]
 };
@@ -1511,17 +1511,17 @@ Template.api.setInterval = {
   id: "meteor_setinterval",
   name: "Meteor.setInterval(func, delay)",
   locus: "Везде",
-  descr: ["Call a function repeatedly, with a time delay between calls."],
+  descr: ["Многократно вызывает функцию через определенный промежуток времени."],
   args: [
     {
       name: "func",
       type: "Function",
-      descr: "The function to run"
+      descr: "Вызываемая функция."
     },
     {
       name: "delay",
       type: "Number",
-      descr: "Number of milliseconds to wait between each function call."
+      descr: "Промежуток времени в миллисекундах между вызовами функции."
     }
   ]
 };
@@ -1530,12 +1530,12 @@ Template.api.clearTimeout = {
   id: "meteor_cleartimeout",
   name: "Meteor.clearTimeout(id)",
   locus: "Везде",
-  descr: ["Cancel a function call scheduled by `Meteor.setTimeout`."],
+  descr: ["Отменяет вызов функции, запланированный с помощью `Meteor.setTimeout`."],
   args: [
     {
       name: "id",
       type: "Number",
-      descr: "The handle returned by `Meteor.setTimeout`"
+      descr: "Дескриптор, возвращенный функцией `Meteor.setTimeout`."
     }
   ]
 };
@@ -1544,12 +1544,12 @@ Template.api.clearInterval = {
   id: "meteor_clearinterval",
   name: "Meteor.clearInterval(id)",
   locus: "Везде",
-  descr: ["Cancel a repeating function call scheduled by `Meteor.setInterval`."],
+  descr: ["Отменяет все последующие вызовы функции, запланированные с помощью `Meteor.setInterval`."],
   args: [
     {
       name: "id",
       type: "Number",
-      descr: "The handle returned by `Meteor.setInterval`"
+      descr: "Дескриптор, возвращенный функцией `Meteor.setInterval`."
     }
   ]
 };

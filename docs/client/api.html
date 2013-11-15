@@ -2469,24 +2469,24 @@ sub-template.
 
 {{/api_box_inline}}
 
-<h2 id="timers"><span>Timers</span></h2>
+<h2 id="timers"><span>Таймеры</span></h2>
 
-Meteor uses global environment variables
-to keep track of things like the current request's user.  To make sure
-these variables have the right values, you need to use
-`Meteor.setTimeout` instead of `setTimeout` and `Meteor.setInterval`
-instead of `setInterval`.
+Для того, чтобы отслеживать некоторые вещи, например, текущего пользователя
+для обрабатываемого запроса, Meteor использует глобальные переменные среды.
+Для того, чтобы эти переменные имели правильные значения, вместо `setTimeout`
+и `setInterval` вам необходимо использовать соответсвенно `Meteor.setTimeout`
+и `Meteor.setInterval`.
 
-These functions work just like their native JavaScript equivalents.
-You'll get an error if you call the native function.
+Эти функции работаю точно так же, как и их нативные JavaScript-реализации.
+Вы получите сообщение об ошибке, если вызовите нативную функцию.
 
 {{> api_box setTimeout}}
 
-Returns a handle that can be used by `Meteor.clearTimeout`.
+Возвращает дескриптор, которые используется при вызове `Meteor.clearTimeout`.
 
 {{> api_box setInterval}}
 
-Returns a handle that can be used by `Meteor.clearInterval`.
+Возвращает дескриптор, которые используется при вызове `Meteor.clearInterval`.
 
 {{> api_box clearTimeout}}
 {{> api_box clearInterval}}
