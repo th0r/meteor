@@ -59,13 +59,14 @@ Template.api.settings = {
   id: "meteor_settings",
   name: "Meteor.settings",
   locus: "Везде",
-  descr: ["`Meteor.settings` содержит все настройки приложения, переданные при " +
-          "помощи опции `--settings` команде `meteor run` или `meteor deploy`. " +
-          "Если вы укажите опцию `--settings` и передадите JSON-файл в качестве агрумента, " +
-          "то содержимое этого файла будет доступно в серверном коде в качестве " +
-          "JSON-объекта `Meteor.settings`. В противном случае этот объект будет " +
-          "пустым. Если объект содержит ключ `public`, то `Meteor.settings.public` " +
-          "будет также доступно на клиенте."]
+  descr: ["`Meteor.settings` содержит настройки приложения. Их можно указать " +
+          "либо передав опцию `--settings` (содержащую путь к JSON-файлу) " +
+          "команде `meteor run` или `meteor deploy`, либо указав их в переменной " +
+          "среды `METEOR_SETTINGS` в виде JSON-строки. Если вы не укажите " +
+          "никаких настроек, то `Meteor.settings` будет пустым объектом. Если " +
+          "объект содержит ключ `public`, то `Meteor.settings.public` будет " +
+          "доступен как на сервере, так и на клиенте. Все остальные ключи " +
+          "будут доступны только на сервере."]
 };
 
 Template.api.release = {
@@ -320,6 +321,14 @@ Template.api.subscription_userId = {
 };
 
 
+Template.api.subscription_connection = {
+  id: "publish_connection",
+  name: "<i>this</i>.connection",
+  locus: "Server",
+  descr: ["Access inside the publish function. The incoming [connection](#meteor_onconnection) for this subscription."]
+};
+
+
 Template.api.subscribe = {
   id: "meteor_subscribe",
   name: "Meteor.subscribe(name [, arg1, arg2, ... ] [, callbacks])",
@@ -381,6 +390,13 @@ Template.api.method_invocation_isSimulation = {
   name: "<i>this</i>.isSimulation",
   locus: "Везде",
   descr: ["Используется внутри метода. Значение типа Boolean. Равно `true`, если вызывается не настоящий метод, а заглушка."]
+};
+
+Template.api.method_invocation_connection = {
+  id: "method_connection",
+  name: "<i>this</i>.connection",
+  locus: "Server",
+  descr: ["Access inside a method invocation. The [connection](#meteor_onconnection) this method was received on. `null` if the method is not associated with a connection, eg. a server initiated method call."]
 };
 
 Template.api.error = {
@@ -478,6 +494,18 @@ Template.api.connect = {
     {name: "url",
      type: "String",
      descr: "URL другого приложения на Meteor."}
+  ]
+};
+
+Template.api.onConnection = {
+  id: "meteor_onconnection",
+  name: "Meteor.onConnection(callback)",
+  locus: "Server",
+  descr: ["Register a callback to be called when a new DDP connection is made to the server."],
+  args: [
+    {name: "callback",
+     type: "function",
+     descr: "The function to call when a new DDP connection is established."}
   ]
 };
 
@@ -1169,7 +1197,7 @@ Template.api.accounts_config = {
     {
       name: "restrictCreationByEmailDomain",
       type: "String или Function",
-      descr: "Если указано, то будет разрешена регистрация только тех новых пользователей, чей email-адрес находится в указанном домене, или удовлетворяет указанной функции (она возвращает `true`). Работает при логине с использованием пароля, а также со всеми логин-сервисами, предоставляющими информацию о email-адресе пользователя (Google, Facebook, GitHub). Установка этой опции не влияет на возможность логина для существующих пользователей. Пример: `Accounts.config({ restrictCreationByEmailDomain: 'school.edu' })`."
+      descr: "Если указано, то будет разрешена регистрация только тех новых пользователей, чей email-адрес находится в указанном домене, или удовлетворяет указанной функции (она возвращает `true`). В функцию передается полный email-адрес нового пользователя. Работает при логине с использованием пароля, а также со всеми логин-сервисами, предоставляющими информацию о email-адресе пользователя (Google, Facebook, GitHub). Установка этой опции не влияет на возможность логина для существующих пользователей. Пример: `Accounts.config({ restrictCreationByEmailDomain: 'school.edu' })`."
     },
     {
       name: "loginExpirationInDays",

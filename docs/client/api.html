@@ -178,6 +178,8 @@ Meteor покажет предупреждение, если вы вызовит
 {{> api_box subscription_error}}
 {{> api_box subscription_stop}}
 
+{{> api_box subscription_connection}}
+
 {{> api_box subscribe}}
 
 Подписка на набор данных означает, что сервер должен отослать эти данные на
@@ -275,6 +277,7 @@ Meteor отложит обработку данных из публикации 
 того же клиента.
 * `userId`: id текущего пользователя.
 * `setUserId`: функция, ассоциирующая текущего клиента с каким-либо юзером.
+* `connection`: доступно на сервере - [подключение](#meteor_onconnection), по которому был совершен вызов данного метода.
 
 Вызов `methods` на клиенте объявляет *заглушки* для одноименных серверных
 методов. Их объявление необязательно, и вы можете этого не делать. В этом
@@ -321,6 +324,8 @@ Meteor](#accounts_api), то устанавливаемое значение д�
 т.е. N+1-ый метод не запустится до тех пор, пока не завершится N-ый. Однако,
 вы можете это изменить, вызвав `this.unblock` - это запустит N+1-ый метод в
 новом волокне.
+
+{{> api_box method_invocation_connection}}
 
 {{> api_box error}}
 
@@ -457,6 +462,47 @@ Meteor отслеживает все сделанные из методов за
 
 Это может быть полезно для экономии энергии на мобильных устройствах, когда
 обновление информации в реальном времени не обязательно.
+
+
+{{> api_box onConnection}}
+
+`onConnection` returns an object with a single method `stop`.  Calling
+`stop` unregisters the callback, so that this callback will no longer
+be called on new connections.
+
+The callback is called with a single argument, the server-side
+`connection` representing the connection from the client.  This object
+contains the following fields:
+
+<dl class="objdesc">
+{{#dtdd name="id" type="String"}}
+A globally unique id for this connection.
+{{/dtdd}}
+
+{{#dtdd name="close" type="Function"}}
+Close this DDP connection. The client is free to reconnect, but will
+receive a different connection with a new `id` if it does.
+{{/dtdd}}
+
+{{#dtdd name="onClose" type="Function"}}
+Register a callback to be called when the connection is closed. If the
+connection is already closed, the callback will be called immediately.
+{{/dtdd}}
+</dl>
+
+{{#note}}
+Currently when a client reconnects to the server (such as after
+temporarily losing its Internet connection), it will get a new
+connection each time.  The `onConnection` callbacks will be called
+again, and the new connection will have a new connection `id`.
+
+In the future, when client reconnection is fully implemented,
+reconnecting from the client will reconnect to the same connection on
+the server: the `onConnection` callback won't be called for that
+connection again, and the connection will still have the same
+connection `id`.
+{{/note}}
+
 
 {{> api_box connect}}
 
@@ -878,7 +924,9 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 разрешить это изменение.
 
 `fieldNames` - это массив изменяемых полей верхнего уровня документа `doc`,
-например `['name',`&nbsp;`'score']`. `modifier` - это необработанный
+например `['name',`&nbsp;`'score']`.
+
+`modifier` - это необработанный
 Mongo-модификатор, который хочет применить клиент, например `{$set:
 {'name.first': "Alice"}, $inc: {score: 1}}`.
 
@@ -2478,7 +2526,7 @@ sub-template.
 и `Meteor.setInterval`.
 
 Эти функции работаю точно так же, как и их нативные JavaScript-реализации.
-Вы получите сообщение об ошибке, если вызовите нативную функцию.
+Если вы вызовите нативную функцию, то получите сообщение об ошибке, информирующее о том, что код Meteor-а должен выполняться в волокне (Fiber) и советующее использовать `Meteor.bindEnvironment`.
 
 {{> api_box setTimeout}}
 
