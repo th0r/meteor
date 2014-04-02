@@ -8,8 +8,12 @@ Package.on_use(function (api) {
   api.use('deps', 'client');
   api.use('check', 'server');
   api.use('random', ['client', 'server']);
-  api.use('service-configuration', ['client', 'server']);
   api.use('ejson', 'server');
+  api.use('callback-hook', 'server');
+
+  // use unordered to work around a circular dependency
+  // (service-configuration needs Accounts.connection)
+  api.use('service-configuration', ['client', 'server'], { unordered: true });
 
   // needed for getting the currently logged-in user
   api.use('livedata', ['client', 'server']);
@@ -18,9 +22,9 @@ Package.on_use(function (api) {
   // we'd probably want to abstract this away
   api.use('mongo-livedata', ['client', 'server']);
 
-  // If handlebars happens to be loaded, we'll define some helpers like
+  // If the 'ui' package is loaded, we'll define some helpers like
   // {{currentUser}}.  If not, no biggie.
-  api.use('handlebars', 'client', {weak: true});
+  api.use('ui', 'client', {weak: true});
 
   // Allow us to detect 'autopublish', and publish some Meteor.users fields if
   // it's loaded.

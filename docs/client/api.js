@@ -535,7 +535,7 @@ Template.api.meteor_collection = {
     },
     {name: "transform",
      type: "Function",
-     descr: "Необязательная функция трансформации. Она служит для преобразования документов перед тем, как они будут возвращены функциями `fetch` и `findOne`, а также перед передачей их в колбэки функций `observe`, `allow` и `deny`."
+     descr: "Необязательная функция трансформации. Она служит для преобразования документов перед тем, как они будут возвращены функциями `fetch` и `findOne`, а также перед передачей их в колбэки функций `observe`, `map`, `forEach`, `allow` и `deny`. Преобразований *не происходит* для колбэков функции `observeChanges`, а также для курсоров, возвращенных из функций публикации."
     }
   ]
 };
@@ -547,7 +547,7 @@ Template.api.find = {
   descr: ["Ищет в коллекции документы, соответствующие селектору."],
   args: [
     {name: "selector",
-     type: "Mongo-селектор или String",
+     type: "Mongo-селектор (Object или String)",
      type_link: "selectors",
      descr: "Запрос."}
   ],
@@ -582,7 +582,7 @@ Template.api.findone = {
   descr: ["Ищет первый документ, удовлетворяющий серектору, с учетом параметров сортировки и пропуска результатов."],
   args: [
     {name: "selector",
-     type: "Mongo-селектор или String",
+     type: "Mongo-селектор (Object или String)",
      type_link: "selectors",
      descr: "Запрос."}
   ],
@@ -808,7 +808,7 @@ Template.api.cursor_observe_changes = {
   ]
 };
 
-Template.api.id = {
+Template.api.random_id = {
   id: "meteor_id",
   name: "Random.id()",
   locus: "Везде",
@@ -997,53 +997,11 @@ Template.api.dependency_hasdependents = {
 // writeFence
 // invalidationCrossbar
 
-Template.api.render = {
-  id: "meteor_render",
-  name: "Meteor.render(htmlFunc)",
-  locus: "Клиент",
-  descr: ["Create DOM nodes that automatically update themselves as data changes."],
-  args: [
-    {name: "htmlFunc",
-     type: "Function returning a string of HTML",
-     descr: "Function that generates HTML to be rendered.  Called immediately and re-run whenever data changes.  May also be a string of HTML instead of a function."}
-  ]
-};
-
-Template.api.renderList = {
-  id: "meteor_renderlist",
-  name: "Meteor.renderList(observable, docFunc, [elseFunc])",
-  locus: "Клиент",
-  descr: ["Create DOM nodes that automatically update themselves based on the results of a database query."],
-  args: [
-    {name: "observable",
-     type: "Cursor",
-     type_link: "meteor_collection_cursor",
-     descr: "Query cursor to observe as a reactive source of ordered documents."},
-    {name: "docFunc",
-     type: "Function taking a document and returning HTML",
-     descr: "Render function to be called for each document."},
-    {name: "elseFunc",
-     type: "Function returning HTML",
-     descr: "Необязательный аргумент.  Render function to be called when query is empty."}
-  ]
-};
-
 
 Template.api.eventmaps = {
   id: "eventmaps",
   name: "Event Maps"
 };
-
-Template.api.constant = {
-  id: "constant",
-  name: "Constant regions"
-};
-
-Template.api.isolate = {
-  id: "isolate",
-  name: "Reactivity isolation"
-};
-
 
 
 Template.api.user = {
@@ -1056,7 +1014,7 @@ Template.api.user = {
 Template.api.currentUser = {
   id: "template_currentuser",
   name: "{{currentUser}}",
-  locus: "Шаблоны Handlebars",
+  locus: "Шаблоны",
   descr: ["Вызывает [Meteor.user()](#meteor_user). Используйте `{{#if currentUser}}`, чтобы проверить, залогинен ли пользователь."]
 };
 
@@ -1085,7 +1043,7 @@ Template.api.loggingIn = {
 Template.api.loggingInTemplate = {
   id: "template_loggingin",
   name: "{{loggingIn}}",
-  locus: "Шаблоны Handlebars",
+  locus: "Шаблоны",
   descr: ["Вызывает [Meteor.loggingIn()](#meteor_loggingin)."]
 };
 
@@ -1260,6 +1218,33 @@ Template.api.accounts_onCreateUser = {
 };
 
 
+Template.api.accounts_validateLoginAttempt = {
+  id: "accounts_validateloginattempt",
+  name: "Accounts.validateLoginAttempt(func)",
+  locus: "Server",
+  descr: ["Validate login attempts."],
+  args: [
+    {
+      name: "func",
+      type: "Function",
+      descr: "Called whenever a login is attempted (either successful or unsuccessful).  A login can be aborted by returning a falsy value or throwing an exception."
+    }
+  ]
+};
+
+Template.api.accounts_onLogin = {
+  id: "accounts_onlogin",
+  name: "Accounts.onLogin(func) and Accounts.onLoginFailure(func)",
+  locus: "Server",
+  descr: ["Register a callback to be called after a login attempt."],
+  args: [
+    {
+      name: "func",
+      type: "Function",
+      descr: "The callback to be called after the login attempt"
+    }
+  ]
+};
 
 Template.api.accounts_createUser = {
   id: "accounts_createuser",
@@ -1629,7 +1614,8 @@ Template.api.bindEnvironment = {
   ]
 };
 
-Template.api.set = {
+// Can't name this '.set', since that's a method on components.
+Template.api.session_set = {
   id: "session_set",
   name: "Session.set(key, value)",
   locus: "Клиент",
@@ -1659,7 +1645,8 @@ Template.api.setDefault = {
   ]
 };
 
-Template.api.get = {
+// Can't name this '.get', since that's a method on components.
+Template.api.session_get = {
   id: "session_get",
   name: "Session.get(key)",
   locus: "Клиент",
@@ -1762,19 +1749,6 @@ Template.api.http_del = {
 };
 
 
-// XXX move these up to right place
-Template.api.template_call = {
-  id: "template_call",
-  name: "Template.<em>myTemplate</em>([data])",
-  locus: "Клиент",
-  descr: ["Возвращает сгенерированный шаблоном HTML."],
-  args: [
-    {name: "data",
-     type: "Object",
-     descr: 'Необязательный аргумент. Данные для шаблона.'}
-  ]
-};
-
 Template.api.template_rendered = {
   id: "template_rendered",
   name: "Template.<em>myTemplate</em>.rendered = function ( ) { ... }",
@@ -1818,18 +1792,6 @@ Template.api.template_helpers = {
     {name: "helpers",
      type: "Object",
      descr: "Dictionary of helper functions by name."}
-  ]
-};
-
-Template.api.template_preserve = {
-  id: "template_preserve",
-  name: "Template.<em>myTemplate</em>.preserve(selectors)",
-  locus: "Клиент",
-  descr: ["Specify rules for preserving individual DOM elements on re-render."],
-  args: [
-    {name: "selectors",
-     type: "Array or Object",
-     descr: "Array of CSS selectors that each match at most one element, such as `['.thing1', '.thing2']`, or, alternatively, a dictionary of selectors and node-labeling functions (see below)."}
   ]
 };
 
@@ -1877,6 +1839,80 @@ Template.api.template_data = {
   locus: "Клиент",
   descr: ["The data context of this instance's latest invocation."]
 };
+
+
+Template.api.ui_registerhelper = {
+  id: "ui_registerhelper",
+  name: "UI.registerHelper(name, function)",
+  locus: "Client",
+  descr: ["Defines a [helper function](#template_helpers) which can be used from all templates."],
+  args: [
+    {name: "name",
+     type: "String",
+     descr: "The name of the helper function you are defining."
+    },
+    {name: "function",
+     type: "Function",
+     descr: "The helper function itself."
+    }]
+};
+
+Template.api.ui_body = {
+  id: "ui_body",
+  name: "UI.body",
+  locus: "Client",
+  descr: ["The [component object](#templates_api) representing your `<body>` tag."]
+};
+
+Template.api.ui_render = {
+  id: "ui_render",
+  name: "UI.render(Template.<em>myTemplate</em>)",
+  locus: "Client",
+  descr: ["Executes a template's logic."],
+  args: [
+    {name: "template",
+     type: "Template",
+     descr: "The particular template to evaluate."
+    }]
+};
+
+Template.api.ui_renderwithdata = {
+  id: "ui_renderwithdata",
+  name: "UI.renderWithData(Template.<em>myTemplate</em>, data)",
+  locus: "Client",
+  descr: ["Executes a template's logic with a data context. Otherwise identical to `UI.render`."],
+  args: [
+    {name: "template",
+     type: "Template",
+     descr: "The particular template to evaluate."
+    },
+    {name: "data",
+     type: "Object",
+     descr: "The data context that will be used when evaluating the template."
+    }]
+};
+
+Template.api.ui_insert = {
+  id: "ui_insert",
+  name: "UI.insert(instantiatedComponent, parentNode[, nextNode])",
+  locus: "Client",
+  descr: ["Inserts an instantiated component into the DOM and calls its [`rendered`](#template_rendered) callback."],
+  args: [
+    {name: "instantiatedComponent",
+     type: "Instantiated component object",
+     descr: "The return value from `UI.render` or `UI.renderWithData`."
+    },
+    {name: "parentNode",
+     type: "DOM Node",
+     descr: "The node that will be the parent of the rendered template."
+    },
+    {name: "nextNode",
+     type: "DOM Node",
+     descr: "If provided, must be a child of <em>parentNode</em>; the template will be inserted before this node. If not provided, the template will be inserted as the last child."
+    }]
+};
+
+
 
 var rfc = function (descr) {
   return '[RFC5322](http://tools.ietf.org/html/rfc5322) ' + descr;

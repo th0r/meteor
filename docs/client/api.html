@@ -1,5 +1,5 @@
 <template name="api">
-{{#better_markdown}}
+{{#markdown}}
 
 <h1 id="api">Meteor API</h1>
 
@@ -110,6 +110,11 @@
       check(roomId, String);
       var count = 0;
       var initializing = true;
+
+      // Функция `observeChanges` завершается только после вызова колбэков
+      // `added` для всех текущих документов в коллекции, что в нашем случае
+      // приведет к посылке клиентам кучи сообщений `self.changed()`.
+      // Чтобы этого избежать мы используем флаг `initializing`.
       var handle = Messages.find({roomId: roomId}).observeChanges({
         added: function (id) {
           count++;
@@ -123,9 +128,9 @@
         // изменения сообщений нам не важны
       });
 
-      // Функция `observeChanges` завершается только после вызова колбэков
-      // `added` для всех текущих документов в коллекции. Теперь возвращаем
-      // начальное значение и информируем о готовности подписки.
+      // Вместо этого мы пошлем всего одно сообщение `self.added()` сразу после 
+      // того, как завершится вызов `observeChanges`, и информируем о 
+      // готовности подписки.
       initializing = false;
       self.added("counts", roomId, {count: count});
       self.ready();
@@ -185,9 +190,10 @@ Meteor покажет предупреждение, если вы вызовит
 Подписка на набор данных означает, что сервер должен отослать эти данные на
 клиент. Клиент сохраняет эти данные в локальных [коллекциях
 Minimongo](#meteor_collection), названия которых берутся из аргумента
-`collection` методов `added`, `changed`, и `removed` хэндлера публикации.
-Meteor отложит обработку данных из публикации до тех пор, пока на клиенте не
-будут объявлены [коллекции](#meteor_collection), необходимые для их сохранения.
+`collection` методов [`added`](#publish_added), [`changed`](#publish_changed), и
+[`removed`](#publish_removed) хэндлера публикации. Meteor отложит обработку
+данных из публикации до тех пор, пока на клиенте не будут объявлены
+[коллекции](#meteor_collection), необходимые для их сохранения.
 
     // Допустим, "allplayers" публикует данные из серверной коллекции "players".
     // На клиенте можно подписаться на эту публикацию (и даже получить данные
@@ -445,7 +451,7 @@ Meteor отслеживает все сделанные из методов за
 
 [Реактивная](#reactivity) природа этого объекта позволяет не использовать
 колбэки для информирования вас об изменении статуса подключения. Вы можете
-использовать его в [шаблонах](#templates), или же в любом другом [реактивном
+использовать его в [шаблонах](#livehtmltemplates), или же в любом другом [реактивном
 контексте](#deps_autorun) чтобы отслеживать его изменения в реальном времени.
 
 {{> api_box reconnect}}
@@ -487,6 +493,30 @@ receive a different connection with a new `id` if it does.
 {{#dtdd name="onClose" type="Function"}}
 Register a callback to be called when the connection is closed. If the
 connection is already closed, the callback will be called immediately.
+{{/dtdd}}
+
+{{#dtdd name="clientAddress" type="String"}}
+  The IP address of the client in dotted form (such as `"127.0.0.1"`).
+
+  If you're running your Meteor server behind a proxy (so that clients
+  are connecting to the proxy instead of to your server directly),
+  you'll need to set the `HTTP_FORWARDED_COUNT` environment variable
+  for the correct IP address to be reported by `clientAddress`.
+
+  Set `HTTP_FORWARDED_COUNT` to an integer representing the number of
+  proxies in front of your server.  For example, you'd set it to `"1"`
+  when your server was behind one proxy.
+{{/dtdd}}
+
+{{#dtdd name="httpHeaders" type="Object"}}
+  When the connection came in over an HTTP transport (such as with
+  Meteor's default SockJS implementation), this field contains
+  whitelisted HTTP headers.
+
+  Cookies are deliberately excluded from the headers as they are a
+  security risk for this transport.  For details and alternatives, see
+  the [SockJS
+  documentation](https://github.com/sockjs/sockjs-node#authorisation).
 {{/dtdd}}
 </dl>
 
@@ -581,22 +611,32 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 
 Вот что происходит, если вы указываете название коллекции:
 
-* Одноименная коллекция создается на сервере в базе данных Mongo. Когда вы
-вызываете методы этой коллекции на сервере, они преобразовываются в
-соответствующие операции с базой данных Mongo (правда, только после проверки
-указанных вами [правил контроля доступа](#allow)).
+* Eсли вы не указываете `connection`, на сервере в базе данных Mongo 
+создается одноименная коллекция. Когда вы вызываете методы этой коллекции на
+сервере, они преобразовываются в соответствующие операции с базой данных 
+Mongo (правда, только после проверки указанных вами [правил контроля
+доступа](#allow)).
 
-* На клиенте создается экземпляр Minimongo - это частичная реализация Mongo
-на чистом JavaScript, хранящая данные в оперативной памяти. Он используется
+* На клиенте (а также на сервере, если вы укажете `collection`) 
+создается экземпляр Minimongo - это частичная реализация Mongo на чистом
+JavaScript, хранящая данные в оперативной памяти. Он используется
 в качестве локального кэша, хранящего только ту часть базы, которая
-необходима данному клиенту. Поиск документов ([`find`](#find)) на клиенте
-происходит только в этом локальном кэше, без обращения к серверу.
+необходима данному клиенту. Поиск документов ([`find`](#find)) происходит
+только в этом локальном кэше, без обращения к серверу.
 
 * Когда на клиенте вы хотите внести какие-либо изменения в базу данных
 (используя методы [`insert`](#insert), [`update`](#update) и
 [`remove`](#remove)), то они сразу же вносятся в локальный кэш и
-параллельно посылается запрос на их внесение в БД на сервере. За это отвечает
-пакет `livedata`.
+параллельно посылается запрос на их внесение в БД на сервере. Делается это с 
+помощью [заглушек](#meteor_methods), т.к. запись в БД реализована в виде 
+методов.
+
+{{#note}}
+When, on the server, you write to a collection which has a specified
+`connection` to another server, it sends the corresponding method to the other
+server and receives the changed values back from it over DDP. Unlike on the
+client, it does not execute the write locally first.
+{{/note}}
 
 Если в качестве названия коллекции вы укажете `null`, тогда будет создана
 локальная коллекция. Она ни с чем не синхронизируется - это просто локальное
@@ -635,6 +675,9 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
       Scratchpad.insert({number: i * 2});
     assert(Scratchpad.find({number: {$lt: 9}}).count() === 5);
 
+Generally, you'll assign `Meteor.Collection` objects in your app to global
+variables.  You can only create one `Meteor.Collection` object for each
+underlying Mongo collection.
 
 Если вы укажете функцию трансформации (опция `transform`) документов при
 создании коллекции, или же при вызове ее некоторых методов, то она будет
@@ -642,7 +685,8 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 соответствующих функций, или перед их передачей в колбэки. Это позволяет
 расширить возможности при работе с документами (например, обернуть их в
 класс и т.п.). Опцию `transform` поддерживают функции `find`, `findOne`,
-`allow` и `deny`.
+`allow` и `deny`. Функции трансформации должны возвращать объект и они не 
+могут менять значение поля `_id` документа.
 
     // Создаем класс Animal, конструктор которого принимает документ
     Animal = function (doc) {
@@ -674,8 +718,6 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 В данном релизе у Minimongo присутствуют некоторые ограничения:
 
 * `$pull` в модификаторах принимает только определенные виды селекторов.
-* не поддерживает позиционный оператор `$` в модификаторах (указывающий
-на позицию первого найденного элемента в массиве).
 * не поддерживаются `findAndModify`, функции группировки, и map/reduce.
 
 Их поддержка будет рассмотрена в будущих версиях. Полная информация касательно
@@ -702,12 +744,19 @@ ORM (Object-Relation Mapper). Он объявляет *коллекцию* (пр
 уверенностью сказать, попадут ли эти изменения в результат, или нет.
 {{/warning}}
 
-Курсоры - это реактивный источник данных. Когда вы, находясь в реактивном
-контексте, первый раз получаете документы курсора с помощью методов `fetch`,
-`map` и `forEach`, Meteor устанавливает зависимость между этим контекстом и
-полученными данными. Любое изменение коллекции, которое вызывает изменение
-документов курсора, ведет к перевыполнению этого контекста. Чтобы отключить
-такое поведение, передайте в метод `find` опцию `{reactive: false}`.
+Курсоры - это реактивный источник данных. На клиенте, когда вы, находясь в
+реактивном контексте, первый раз получаете документы курсора с помощью 
+методов `fetch`, `map` и `forEach`, Meteor устанавливает зависимость между
+этим контекстом и полученными данными. Любое изменение коллекции, которое
+вызывает изменение документов курсора, ведет к перевыполнению этого 
+контекста. Чтобы отключить такое поведение, передайте в метод `find` опцию
+`{reactive: false}`.
+
+Note that when `fields` are specified, only changes to the included
+fields will trigger callbacks in `observe`, `observeChanges` and
+invalidations in reactive computations using this cursor. Careful use
+of `fields` allows for more fine-grained reactivity for computations
+that don't depend on an entire document.
 
 {{> api_box findone}}
 
@@ -1060,15 +1109,6 @@ the first call is waiting. If strict sequential execution is necessary, use
 
 {{> api_box cursor_count}}
 
-    // Показываем количество постов, удовлетворяющих определенным условиям.
-    // Автоматически обновляем их количество при изменении БД.
-    var frag = Meteor.render(function () {
-      var highScoring = Posts.find({score: {$gt: 10}});
-      return "<p>There are " + highScoring.count() + " posts with " +
-        "scores greater than 10</p>";
-    });
-    document.body.appendChild(frag);
-
 В отличии от других методов, `count` регистрирует зависимость реактивного
 контекста только от количества документов в курсоре. Это означает, что контекст
 не будет инвалидировать при изменении содержимого документов или их порядка.
@@ -1092,30 +1132,30 @@ the first call is waiting. If strict sequential execution is necessary, use
 <dt><span class="name">added(document)</span> <span class="or">или</span></dt>
 <dt><span class="name">addedAt(document, atIndex, before)</span></dt>
 <dd>
-{{#better_markdown}}
+{{#markdown}}
 В результатах запроса появился новый документ `document`. `atIndex` указывает
 позицию нового документа, а `before` содержит `_id` документа, перед которым
 он находится, или `null`, если новый документ является последним в списке.
-{{/better_markdown}}
+{{/markdown}}
 </dd>
 
 <dt><span class="name">changed(newDocument, oldDocument)
     <span class="or">или</span></span></dt>
 <dt><span class="name">changedAt(newDocument, oldDocument, atIndex)</span></dt>
 <dd>
-{{#better_markdown}}
+{{#markdown}}
 Содержимое документа изменилось с `oldDocument` на `newDocument`. Позиция
 измененного документа содержится в `atIndex`.
-{{/better_markdown}}
+{{/markdown}}
 </dd>
 
 <dt><span class="name">removed(oldDocument)</span>
   <span class="or">или</span></dt>
 <dt><span class="name">removedAt(oldDocument, atIndex)</span></dt>
 <dd>
-{{#better_markdown}}
+{{#markdown}}
 Документ `oldDocument` изчез из результатов. Его позиция была `atIndex`.
-{{/better_markdown}}
+{{/markdown}}
 </dd>
 
 {{#dtdd "movedTo(document, fromIndex, toIndex, before)"}}
@@ -1155,12 +1195,12 @@ the first call is waiting. If strict sequential execution is necessary, use
   <span class="or">или</span></dt>
 <dt><span class="name">addedBefore(id, fields, before)</span></dt>
 <dd>
-{{#better_markdown}}
+{{#markdown}}
 В результатах запроса появился новый документ с указанным id. В `fields`
 содержатся все поля нового документа, за исключением поля `_id`. `before`
 содержит id документа, перед которым он находится, или `null`, если новый
 документ является последним в списке.
-{{/better_markdown}}
+{{/markdown}}
 </dd>
 
 {{#dtdd "changed(id, fields)"}}
@@ -1232,13 +1272,16 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
   вызова их методов `getTimestamp` на данный момент являются бессмысленными.
 {{/note}}
 
-{{#api_box_inline selectors}}
+{{#api_box selectors}}
 
-В своей простейшей форме, селектор - это просто набор полей, которые должны
-находиться в документе:
+Самые простые селекторы - это обычная строка или
+[`Meteor.Collection.ObjectID`](#collection_object_id). Они указывают 
+на документ с соответствующим `_id`.
 
-    // Соответствует всем документам, у которых поле "deleted"
-    // имеет значение false
+Немного более сложная форма селектора - это объект с набором полей, которые
+должны находиться в документе:
+
+    // Matches all documents where deleted is false
     {deleted: false}
 
     // Соответствует всем документам, у которых поля "name" и "cognomen" имеют
@@ -1262,11 +1305,11 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
     {fruit: {$in: ["peach", "plum", "pear"]}}
 
 Полную документацию по селекторам можно прочитать
-[здесь](http://www.mongodb.org/display/DOCS/Advanced+Queries).
+[здесь](http://docs.mongodb.org/manual/reference/operator/).
 
-{{/api_box_inline}}
+{{/api_box}}
 
-{{#api_box_inline modifiers}}
+{{#api_box modifiers}}
 
 Модификатор - это объект, описывающий то, как должен быть изменен документ.
 Вот несколько примеров:
@@ -1289,9 +1332,9 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 Полный список возможных модификаторов можно посмотреть
 [здесь](http://www.mongodb.org/display/DOCS/Updating#Updating-ModifierOperations).
 
-{{/api_box_inline}}
+{{/api_box}}
 
-{{#api_box_inline sortspecifiers}}
+{{#api_box sortspecifiers}}
 
 Сортировка может быть указана несколькими различными способами:
 
@@ -1306,28 +1349,36 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 сохраняет порядок ключей в объектах. Большинство реализаций в большинстве
 случаев его сохраняет, но вы должны в этом убедиться сами.
 
-{{/api_box_inline}}
+{{/api_box}}
 
-{{#api_box_inline fieldspecifiers}}
+{{#api_box fieldspecifiers}}
 
 В запросах можно указывать список полей, которые вы хотите включить в
 результат, или исключить из него.
 
 Если вы хотите исключить некоторые поля из результата, то в качестве указателя
 полей должен быть объект, ключами которого будут их названия, а значениями -
-нули.
+нули. Все неуказанные поля включаются в результат.
 
     // Users.find({}, {fields: {password: 0, hash: 0}})
 
-Если же вы хотите, чтобы объект результата содержал только определенные поля,
-то в указателе полей вместо `0` используйте `1`. Поле `_id` в данном случае
-также добавляется в результат.
+Чтобы включить в результат только определенные поля, укажите в качестве их 
+значения `1`. Поле `_id` в данном случае также добавляется в результат.
 
     // Users.find({}, {fields: {firstname: 1, lastname: 1}})
 
-Невозможно одновременно включать и исключать поля (кроме случая, когда поле
-`_id` включено по-умолчанию и его нужно исключить). Операторы в поля (такие,
-как `$` и `$elemMatch) на клиенте пока не поддерживаются.
+Невозможно одновременно включать и исключать поля кроме случая, когда поле
+`_id` включено по-умолчанию и его нужно исключить. Однако, такие указатели 
+полей не могут быть использованы с [`observeChanges`](#observe_changes),
+[`observe`](#observe), курсорами, возвращаемыми из [функций
+публикации](#meteor_publish) и курсорами, используемыми в хэлперах
+`{{dstache}}#each}}` в шаблонах. Они могут быть использованы с
+[`fetch`](#fetch), [`findOne`](#findone), [`forEach`](#foreach) и [`map`](#map).
+
+
+<a href="http://docs.mongodb.org/manual/reference/operator/projection/">
+Операторы в полях</a>, такие как `$` и `$elemMatch`), на клиенте пока не
+поддерживаются.
 
 Более сложный пример:
 
@@ -1343,9 +1394,10 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 <a href="http://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/#projection">
 документации к MongoDB</a>.
 
-{{/api_box_inline}}
+{{/api_box}}
 
 <h2 id="session"><span>Объект Session</span></h2>
+
 `Session` - это глобальный объект на клиенте, предназначенный для хранения
 разнообразных данных в виде "ключ-значение". Используйте его для хранения,
 например, выделенного элемента списка.
@@ -1355,7 +1407,7 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 вызове [`Session.set`](#session_set)`("currentList", x)` он перерисуется
 автоматически.
 
-{{> api_box set}}
+{{> api_box session_set}}
 
 Пример:
 
@@ -1373,21 +1425,28 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 текущее значение переменной сессии не перетиралось ее начальным значением
 каждый раз при загрузке новой версии приложения.
 
-{{> api_box get}}
+{{> api_box session_get}}
 
 Пример:
 
-    Session.set("enemy", "Eastasia");
-    var frag = Meteor.render(function () {
-      return "<p>We've always been at war with " +
-        Session.get("enemy") + "</p>";
+    // в main.html
+    {{lt}}template name="main">
+      <p>We've always been at war with {{dstache}}theEnemy}}.</p>
+    {{lt}}/template>
+
+    // в main.js
+    Template.main.helpers({
+      theEnemy: function () {
+        return Session.get("enemy");
+      }
     });
 
+    Session.set("enemy", "Eastasia");
     // На странице будет написано "We've always been at war with Eastasia"
-    document.body.append(frag);
 
-    // Надпись изменится на "We've always been at war with Eurasia"
     Session.set("enemy", "Eurasia");
+    // Надпись изменится на "We've always been at war with Eurasia"
+
 
 {{> api_box equals}}
 
@@ -1396,13 +1455,13 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
     (1) Session.get("key") === value
     (2) Session.equals("key", value)
 
-... но использовать лучше второе, т.к. в этом случае происходит меньше
+... но использовать лучше второй вариант, т.к. в этом случае происходит меньше
 инвалидаций (перерисовок шаблонов), что делает ваше приложение более
 эффективным.
 
 Пример:
 
-    <template name="postsView">
+    {{lt}}template name="postsView">
     {{dstache}}! Выводим динамически изменяющийся список постов.
         Пользователь может выбрать пост, кликнув не него.
         Выделенному посту добавляется CSS-класс, чтобы он отличался
@@ -1411,11 +1470,11 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
     {{dstache}}#each posts}}
       {{dstache}}> postItem }}
     {{dstache}}/each}}
-    </{{! }}template>
+    {{lt}}/template>
 
-    <template name="postItem">
+    {{lt}}template name="postItem">
       <div class="{{dstache}}postClass}}">{{dstache}}title}}</div>
-    </{{! }}template>
+    {{lt}}/template>
 
     ///// в JS-файле
     Template.postsView.posts = function() {
@@ -1532,10 +1591,18 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 текущего залогиненного пользователя. Опубликовать дополнительные поля вы
 можете следующим образом:
 
+    // На сервере
     Meteor.publish("userData", function () {
-      return Meteor.users.find({_id: this.userId},
-                               {fields: {'other': 1, 'things': 1}});
+      if (this.userId) {
+        return Meteor.users.find({_id: this.userId},
+                                 {fields: {'other': 1, 'things': 1}});
+      } else {
+        this.ready();
+      }
     });
+
+    // На клиенте
+    Meteor.subscribe("userData");
 
 Если ваше приложение использует пакет `autopublish`, то информация обо всех
 пользователях будет опубликована для всех клиентов. Эта информация включает
@@ -1575,6 +1642,16 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 
 {{> api_box loginWithExternalService}}
 
+Список доступных функций:
+
+* `Meteor.loginWithMeteorDeveloperAccount`
+* `Meteor.loginWithFacebook`
+* `Meteor.loginWithGithub`
+* `Meteor.loginWithGoogle`
+* `Meteor.loginWithMeetup`
+* `Meteor.loginWithTwitter`
+* `Meteor.loginWithWeibo`
+
 Эти функции инициируют процесс логина пользователя с помощью сторонних
 сервисов (например, Facebook, Google и т.д.), используя OAuth. При вызове они
 открывают страницу логина соответствующего сервиса в новом окне браузера.
@@ -1598,21 +1675,22 @@ MongoDB для Node](http://mongodb.github.com/node-mongodb-native/api-bson-gene
 - GitHub: <http://developer.github.com/v3/oauth/#scopes>
 - Google: <https://developers.google.com/accounts/docs/OAuth2Login#scopeparameter>
 - Meetup: <http://www.meetup.com/meetup_api/auth/#oauth2-scopes>
-- Twitter, Weibo: опция `requestPermissions` в данный момент не поддерживается
+- Twitter, Weibo, Meteor developer accounts: опция `requestPermissions` в данный момент не поддерживается
 
 Обычно перед использованием сторонних логин-сервисов необходима регистрация в
 них вашего приложения и его настройка. Самый простой способ это сделать - это
 воспользоваться пакетом [`accounts-ui`](#accountsui), который содержит
 пошаговое руководство для настройки каждого сервиса. Однако, вы можете
 настроить их вручную, добавив всю необходимую информацию в коллекцию
-`Accounts.loginServiceConfiguration`:
+`ServiceConfiguration.configurations`, которая становится доступна при 
+подключении пакета `service-configuration`:
 
     // Сначала удаляем уже существующие настройки для сервиса
     // (если таковые имеются)
-    Accounts.loginServiceConfiguration.remove({
+    ServiceConfiguration.configurations.remove({
       service: "weibo"
     });
-    Accounts.loginServiceConfiguration.insert({
+    ServiceConfiguration.configurations.insert({
       service: "weibo",
       clientId: "1292962797",
       secret: "75a730b58f5691de5522789070c319bc"
@@ -1674,6 +1752,14 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
       return user.username !== "root";
     });
 
+If the user is being created as part of a login attempt from a client (eg,
+calling [`Accounts.createUser`](#accounts_createuser) from the client, or
+[logging in for the first time with an external
+service](#meteor_loginwithexternalservice)), these callbacks are called *before*
+the [`Accounts.validateLoginAttempt`](#accounts_validateloginattempt)
+callbacks. If these callbacks succeed but those fail, the user will still be
+created but the connection will not be logged in as that user.
+
 {{> api_box accounts_onCreateUser}}
 
 Используйте эту функцию в случае, если вам нужно не просто разрешить или
@@ -1715,6 +1801,78 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
     });
 
 
+{{> api_box accounts_validateLoginAttempt}}
+
+Call `validateLoginAttempt` with a callback to be called on login
+attempts.  It returns an object with a single method, `stop`.  Calling
+`stop()` unregisters the callback.
+
+When a login attempt is made, the registered validate login callbacks
+are called with a single argument, the attempt info object:
+
+<dl class="objdesc">
+{{#dtdd name="type" type="String"}}
+  The service name, such as "password" or "twitter".
+{{/dtdd}}
+
+{{#dtdd name="allowed" type="Boolean"}}
+  Whether this login is allowed and will be successful (if not aborted
+  by any of the validateLoginAttempt callbacks).  False if the login
+  will not succeed (for example, an invalid password or the login was
+  aborted by a previous validateLoginAttempt callback).
+{{/dtdd}}
+
+{{#dtdd name="error" type="Exception"}}
+  When `allowed` is false, the exception describing why the login
+  failed.  It will be a `Meteor.Error` for failures reported to the
+  user (such as invalid password), and can be a another kind of
+  exception for internal errors.
+{{/dtdd}}
+
+{{#dtdd name="user" type="Object"}}
+  When it is known which user was attempting to login, the Meteor user
+  object.  This will always be present for successful logins.
+{{/dtdd}}
+
+{{#dtdd name="connection" type="Object"}}
+  The `connection` object the request came in on. See
+  [`Meteor.onConnection`](#meteor_onconnection) for details.
+{{/dtdd}}
+
+{{#dtdd name="methodName" type="String"}}
+  The name of the Meteor method being used to login.
+{{/dtdd}}
+
+{{#dtdd name="methodArguments" type="Array"}}
+  An array of the arguments passed to the login method.
+{{/dtdd}}
+</dl>
+
+A validate login callback must return a truthy value for the login to
+proceed.  If the callback returns a falsy value or throws an
+exception, the login is aborted.  Throwing a `Meteor.Error` will
+report the error reason to the user.
+
+All registered validate login callbacks are called, even if one of the
+callbacks aborts the login.  The later callbacks will see the
+`allowed` field set to `false` since the login will now not be
+successful.
+
+
+{{> api_box accounts_onLogin}}
+
+Either the `onLogin` or the `onLoginFailure` callbacks will be called
+for each login attempt. The `onLogin` callbacks are called after the
+user has been successfully logged in. The `onLoginFailure` callbacks are
+called after a login attempt is denied.
+
+These functions return an object with a single method, `stop`.  Calling
+`stop()` unregisters the callback.
+
+The callbacks are called with a single argument, the same attempt info
+object as [`validateLoginAttempt`](#accounts_validateloginattempt).
+
+
 <h2 id="accounts_passwords"><span>Пароли</span></h2>
 
 Пакет `accounts-password` содержит систему аутентификации пользователей при
@@ -1744,9 +1902,9 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
 На клиенте для создания нового пользователя вам необходимо указать его пароль
 (`password`) и либо его имя (`username`), либо `email` &mdash; это
 минимальное количество информации, необходимое для последующего успешного
-логина. На сервере вы можете передать любой набор параметров, но пользователь
-не сможет залогиниться до тех пор, пока не будет указан его идентификатор и
-пароль.
+логина. На сервере вы можете не указывать пароль, но пользователь не сможет 
+залогиниться до тех пор, пока вы его не установите (например, при помощи
+[`Accounts.setPassword`](#accounts_setpassword)).
 
 Чтобы на сервере создать учетную запись без пароля, но дать пользователю
 возможность установить его самому, вызовите `createUser`, указав `email`, а
@@ -1836,6 +1994,9 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
  - `resetPassword.text`: Функция, принимающая объект учетной записи
    пользователя и URL и возвращающая текст письма для сброса пароля в виде
    строки.
+ - `resetPassword.html`: Необязательная функция, принимающая объект учетной
+   записи пользователя и URL и возвращающая HTML письма для сброса пароля в виде
+   строки.
 - `enrollAccount`: То же, что и `resetPassword`, но для установки начального
    пароля для новых учетных записей.
 - `verifyEmail`: То же, что и `resetPassword`, но для подтверждения
@@ -1859,9 +2020,17 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
 
 <h2 id="templates_api"><span>Шаблоны</span></h2>
 
-Шаблон, объявленный вами в виде `<{{! }}template name="foo">...</{{!
-}}template>`, преобразуется в функцию `Template.foo`, которая при вызове
-возвращает строку в виде HTML.
+
+Когда в HTML-файле вы объявляете шаблон вида
+`<{{! }}template name="foo"> ... <{{!}}/template>`, Meteor создает "объект 
+компонента" и сохраняет его под именем `Template.foo`.
+    
+{{#note}}
+   Meteor's component API is currently in flux. This section documents a few
+   features of the component object that are useful for writing apps; a future
+   release will elaborate more about how components work and about how to build
+   components that aren't just template.
+{{/note}}
 
 Один и тот же шаблон может быть отрисован на странице множество раз. Каждая
 такая отрисовка называется экземпляром шаблона. Жизненный цикл экземпляра
@@ -1872,62 +2041,10 @@ Password](http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol). Это
 экземпляру шаблона можно привязать какие-либо данные, а также обращаться к
 его DOM-узлам.
 
-Кроме того, Meteor сохраняет экземпляр шаблона и его состояние даже в случае,
-если окружающий его HTML перерендерился в новые DOM-узлы. Если структура
-вызовов шаблонов не меняется, то Meteor считает, что все созданные экземпляры
-шаблонов можно использовать заново. При помощи `preserve` и `constant`
-можно также указать, что вместе с экземплярами шаблонов вы хотите сохранить и
-некоторые DOM-узлы.
-
-Есть целый ряд колбэков и директив, которые вы можете указать для шаблона, и
-которые будут применены ко всем его экземплярам. Все они описаны ниже.
-
-{{> api_box template_call}}
-
-Если функция вызывается из хэлпера шаблона, тела `Meteor.render` или из любого
-другого места, генерирующего реактивный HTML, полученный HTML аннотируется
-для преобразования в реактивные DOM-элементы. В противном случае полученный
-HTML никак не обрабатывается.
-
-
-{{> api_box template_rendered}}
-
-Этот колбэк первый раз вызывается после преобразования экземпляра шаблона
-Template.*myTemplate* в DOM-узлы и вставки их на страницу, а затем каждый раз
-при перерисовке лобой части этого шаблона.
-
-Внутри колбэка `this` указывает на объект [экземпляра
-шаблона](#template_inst), который уникальный для данного экземпляра и
-сохраняется при его перерисовках. Для инициализации и очистки этого объекта
-используйте колбэки `created` и `destroyed`.
-
-{{> api_box template_created}}
-
-Этот колбэк вызывется в случае, когда шаблонная функция Template.*myTemplate*
-вызывается при создания нового экземпляра шаблона, а не при перерисовке
-существующего. Внутри колбэка `this` указывает на новый объект [экземпляра
-шаблона](#template_inst). Свойства, которые вы добавите в этот объект, будут
-доступны из колбэков `rendered` и `destroyed`, а также из обработчиков событий.
-
-Этот колбэк вызывается самым первым и только один раз. Для каждого из
-колбэков `create` существует соответсвующий колбэк `destroyed`. Это означает,
-что если для определенного объекта экзепляра шаблона был вызван колбэк
-`created`, то в конечном итоге для него обязательно будет вызван и колбэк
-`destroyed`.
-
-{{> api_box template_destroyed}}
-
-Этот колбэк вызывается, когда экземпляр шаблона окончательно удаляется со
-страницы. Внутри колбэка `this` указывает на объект удаляемого [экземпляра
-шаблона](#template_inst).
-
-Этот колбэк удобно использовать для отмены всех действий, сделанных вами в
-колбэке `created`. Он вызывается самым последним и только один раз.
-
 
 {{> api_box template_events}}
 
-Declare event handers for instances of this template. Multiple calls add
+Declare event handlers for instances of this template. Multiple calls add
 new event handlers in addition to the existing ones.
 
 See [Event Maps](#eventmaps) for a detailed description of the event
@@ -1946,104 +2063,83 @@ Example:
       }
     });
 
-In Handlebars, this helper would then be invoked as `{{dstache}}foo}}`.
+Now you can invoke this helper with `{{dstache}}foo}}` in the template defined
+with `<{{! }}template name="myTemplate">`.
 
-The following syntax is equivalent, but won't work for reserved property
-names:
+The following syntax is a shorthand for when you only have one helper to define:
 
     Template.myTemplate.foo = function () {
       return Session.get("foo");
     };
 
-{{> api_box template_preserve}}
+To create a helper that can be used in any template, use
+[`UI.registerHelper`](#ui_registerhelper).
 
-You can "preserve" a DOM element during re-rendering, leaving the
-existing element in place in the document while replacing the
-surrounding HTML.  This means that re-rendering a template need not
-disturb text fields, iframes, and other sensitive elements it
-contains.  The elements to preserve must be present both as nodes in
-the old DOM and as tags in the new HTML.  Meteor will patch the DOM
-around the preserved elements.
 
-{{#note}}
-By default, new Meteor apps automatically include the
-`preserve-inputs` package.  This preserves all elements of type
-`input`, `textarea`, `button`, `select`, and `option` that have unique
-`id` attributes or that have `name` attributes that are unique within
-an enclosing element with an `id` attribute.  To turn off this default
-behavior, simply remove the `preserve-inputs` package.
-{{/note}}
+{{> api_box template_rendered}}
 
-Preservation is useful in a variety of cases where replacing a DOM
-element with an identical or modified element would not have the same
-effect as retaining the original element.  These include:
+This callback is called once when an instance of Template.*myTemplate* is
+rendered into DOM nodes and put into the document for the first time.
 
-* Input text fields and other form controls
-* Elements with CSS animations
-* Iframes
-* Nodes with references kept in JavaScript code
+In the body of the callback, `this` is a [template
+instance](#template_inst) object that is unique to this occurrence of
+the template and persists across re-renderings.  Use the `created` and
+`destroyed` callbacks to perform initialization or clean-up on the
+object.
 
-If you want to preserve a whole region of the DOM, an element and its
-children, or nodes not rendered by Meteor, use a [constant
-region](#constant) instead.
+Because your template has been rendered, you can use functions like
+`this.findAll` which look at its DOM nodes.
 
-To preserve nodes, pass a list of selectors, each of which should match
-at most one element in the template.  When the template is re-rendered,
-the selector is run on the old DOM and the new DOM, and Meteor will
-reuse the old element in place while working in any HTML changes around
-it.
+{{> api_box template_created}}
 
-A second form of `preserve` takes a labeling function for each selector
-and allows the selectors to match multiple nodes. The node-labeling
-function takes a node and returns a label string that is unique for each
-node, or `false` to exclude the node from preservation.
+This callback is called before your template's logic is evaluated for the first
+time.  Inside the callback, `this` is the new [template
+instance](#template_inst) object.  Properties you set on this object will be
+visible from the `rendered` and `destroyed` callbacks and from event handlers.
 
-For example, to preserve all `<input>` elements with ids in template 'foo', use:
-
-    Template.foo.preserve({
-      'input[id]': function (node) { return node.id; }
-    });
-
-Selectors are interpreted as rooted at the top level of the template.
-Each occurrence of the template operates independently, so the selectors
-do not have to be unique on the entire page, only within one occurrence
-of the template.  Selectors will match nodes even if they are in
-sub-templates.
-
-Preserving a node does *not* preserve its attributes or contents. They
-will be updated to reflect the new HTML. Text in input fields is not
-preserved unless the input field has focus, in which case the cursor and
-selection are left intact. Iframes retain their navigation state and
-animations continue to run as long as their parameters haven't changed.
-
-There are some cases where nodes can not be preserved because of
-constraints inherent in the DOM API. For example, an element's tag name
-can't be changed, and it can't be moved relative to its parent or other
-preserved nodes.  For this reason, nodes that are re-ordered or
-re-parented by an update will not be preserved.
+This callback fires once and is the first callback to fire.  Every
+`created` has a corresponding `destroyed`; that is, if you get a
+`created` callback with a certain template instance object in `this`,
+you will eventually get a `destroyed` callback for the same object.
 
 {{#note}}
-Previous versions of Meteor had an implicit page-wide `preserve`
-directive that labeled nodes by their "id" and "name" attributes.
-This has been removed in favor of the explicit, opt-in mechanism.
+  The `created` callback is not currently very useful. In a later release, the
+  template instance object (or something like it) will be visible from helper
+  functions, and `created` will be a useful way to set up values that are read
+  from helpers. For now, you probably just want to use `rendered`.
 {{/note}}
+
+{{> api_box template_destroyed}}
+
+This callback is called when an occurrence of a template is taken off
+the page for any reason and not replaced with a re-rendering.  Inside
+the callback, `this` is the [template instance](#template_inst) object
+being destroyed.
+
+This callback is most useful for cleaning up or undoing any external effects of
+`created` or `rendered`.  It fires once and is the last callback to fire.
 
 
 <h2 id="template_inst"><span>Template instances</span></h2>
 
 A template instance object represents an occurrence of a template in
 the document.  It can be used to access the DOM and it can be
-assigned properties that persist across page re-renderings.
+assigned properties that persist as the template is reactively updated.
 
 Template instance objects are found as the value of `this` in the
-`created`, `rendered`, and `destroyed` template callbacks and as an
+`created`, `rendered`, and `destroyed` template callbacks, and as an
 argument to event handlers.
 
-In addition to the properties and functions described below, you can
-assign additional properties of your choice to the object.  Property names
-starting with `_` are guaranteed to be available for your use.  Use
-the `created` and `destroyed` callbacks to perform initialization or
-clean-up on the object.
+{{#note}}
+  You cannot currently access the template instance object from helpers.
+  We plan to refactor how template instances work and make them more
+  universally accessible.
+{{/note}}
+
+In addition to the properties and functions described below, you can assign
+additional properties of your choice to the object. Use the
+[`created`](#template_created) and [`destroyed`](#template_destroyed) callbacks
+to perform initialization or clean-up on the object.
 
 You can only access `findAll`, `find`, `firstNode`, and `lastNode`
 from the `rendered` callback and event handlers, not from `created`
@@ -2052,7 +2148,11 @@ in the DOM.
 
 {{> api_box template_findAll}}
 
-Returns an array of DOM elements matching `selector`.
+Returns a [jQuery object](http://api.jquery.com/Types/#jQuery) of DOM elements
+matching `selector`. This object is similar to an array but has other methods
+defined by the jQuery library.
+
+You can also call this function as `this.$(selector)`.
 
 The template instance serves as the document root for the selector. Only
 elements inside the template and its sub-templates can match parts of
@@ -2084,88 +2184,50 @@ the template.  It is updated each time the template is re-rendered.
 Access is read-only and non-reactive.
 
 
-{{> api_box render}}
+<h2 id="ui"><span>Template utilities</span></h2>
 
-`Meteor.render` creates a `DocumentFragment` (a sequence of DOM nodes)
-that automatically updates in realtime. Most Meteor apps don't need to
-call this directly; they use templates and Meteor handles the rendering.
+The `UI` namespace contains several utilities that are helpful when writing your
+user interface.  `UI.registerHelper` allows you to define helper functions which
+you can use in every template.  `UI.render`, `UI.renderWithData`, and
+`UI.insert` allow you to manually render templates and insert them directly into
+any part of the DOM for finer control than just using template inclusions.
 
-Pass in `htmlFunc`, a function that returns an HTML
-string. `Meteor.render` calls the function and turns the output into
-DOM nodes. Meanwhile, it tracks the data that was used when `htmlFunc`
-ran, and automatically wires up callbacks so that whenever any of the
-data changes, `htmlFunc` is re-run and the DOM nodes are updated in
-place.
+{{> api_box ui_registerhelper}}
 
-You may insert the returned `DocumentFragment` directly into the DOM
-wherever you would like it to appear. The inserted nodes will continue
-to update until they are taken off the screen. Then they will be
-automatically cleaned up. For more details about clean-up, see
-[`Deps.flush`](#deps_flush).
+{{> api_box ui_body}}
 
-`Meteor.render` tracks the data dependencies of `htmlFunc` by running
-it in a reactive computation, so it can respond to changes in any reactive
-data sources used by that function. For more information, or to learn
-how to make your own reactive data sources, see
-[Reactivity](#reactivity).
+You can define helpers and event maps on `UI.body` just like on any
+`Template.myTemplate` object.
 
-Example:
+{{> api_box ui_render}}
 
-    // Client side: show the number of players online.
-    var frag = Meteor.render(function () {
-      return "<p>There are " + Players.find({online: true}).count() +
-        " players online.</p>";
-    });
-    document.body.appendChild(frag);
+This returns an "instantiated component" object, which can be passed to
+[`UI.insert`](#ui_insert). The template's [`created`](#template_created) callback
+will be invoked.  The component will continue to be updated reactively as the
+data used changes.
 
-    // Server side: find all players that have been idle for a while,
-    // and mark them as offline. The count on the screen will
-    // automatically update on all clients.
-    Players.update({idleTime: {$gt: 30}}, {$set: {online: false}});
+{{#warning}}
+  Future releases will provide a richer API for "instantiated components"
+  (probably unifying them with "template instances"). For now, all you can
+  do with them is pass them to `UI.insert`.
 
-{{> api_box renderList}}
+  Most users will not need to manually render components or manually insert them
+  into the DOM at all.  As of 0.8.0, if you call `UI.render` and never insert
+  the result into the DOM, the logic to keep the instantiated component updated
+  will continue running in your browser forever. Additionally, if you remove any
+  part of your DOM using any mechanism other than jQuery, the logic to keep that
+  part of the the DOM updated will continue running.  To avoid these issues,
+  either avoid directly updating the DOM or ensure that any removals go through
+  jQuery.
+{{/warning}}
 
-Creates a `DocumentFragment` that automatically updates as the results
-of a database query change. Most Meteor apps use `{{dstache}}#each}}` in
-a template instead of calling this directly.
+{{> api_box ui_renderwithdata}}
 
-`renderList` is more efficient than using `Meteor.render` to render HTML
-for a list of documents.  For example, if a new document is created in
-the database that matches the query, a new item will be rendered and
-inserted at the appropriate place in the DOM without re-rendering the
-other elements.  Similarly, if a document changes position in a sorted
-query, the DOM nodes will simply be moved and not re-rendered.
-
-`docFunc` is called as needed to generate HTML for each document.  If
-you provide `elseFunc`, then whenever the query returns no results, it
-will be called to render alternate content. You might use this to show
-a message like "No records match your query."
-
-Each call to `docFunc` or `elseFunc` is run in its own reactive
-computation so that if it has other external data dependencies, it will be
-individually re-run when the data changes.
-
-Example:
-
-    // List the titles of all of the posts that have the tag
-    // "frontpage". Keep the list updated as new posts are made, as tags
-    // change, etc.  Display the selected post differently.
-    var frag = Meteor.renderList(
-      Posts.find({tags: "frontpage"}),
-      function(post) {
-        var style = Session.equals("selectedId", post._id) ? "selected" : "";
-        // A real app would need to quote/sanitize post.name
-        return '<div class="' + style + '">' + post.name + '</div>';
-      });
-    document.body.appendChild(frag);
-
-    // Select a post.  This will cause only the selected item and the
-    // previously selected item to update.
-    var somePost = Posts.findOne({tags: "frontpage"});
-    Session.set("selectedId", somePost._id);
+{{> api_box ui_insert}}
 
 
-{{#api_box_inline eventmaps}}
+
+{{#api_box eventmaps}}
 
 Several functions take event maps. An event map is an object where
 the properties specify a set of events to handle, and the values are
@@ -2193,8 +2255,8 @@ information about the event, and `template`, a [template
 instance](#template_inst) for the template where the handler is
 defined.  The handler also receives some additional context data in
 `this`, depending on the context of the current element handling the
-event.  In a Handlebars template, an element's context is the
-Handlebars data context where that element occurs, which is set by
+event.  In a template, an element's context is the
+data context where that element occurs, which is set by
 block helpers such as `#with` and `#each`.
 
 Example:
@@ -2326,73 +2388,17 @@ catching typing in text fields, while `keydown` and `keyup` can be
 used for arrow keys or modifier keys.
 {{/dtdd}}
 
-{{#dtdd "<code>tap</code>"}} Tap on an element.  On touch-enabled
-devices, this is a replacement to `click` that fires immediately.
-These events are synthesized from `touchmove` and `touchend`.
-{{/dtdd}}
-
 </dl>
 
 Other DOM events are available as well, but for the events above,
 Meteor has taken some care to ensure that they work uniformly in all
 browsers.
 
-{{/api_box_inline}}
+{{/api_box}}
 
-
-
-{{#api_box_inline constant}}
-
-You can mark a region of a template as "constant" and not subject to
-re-rendering using the
-`{{dstache}}#constant}}...{{dstache}}/constant}}` block helper.
-Content inside the `#constant` block helper is preserved exactly as-is
-even if the enclosing template is re-rendered.  Changes to other parts
-of the template are patched in around it in the same manner as
-`preserve`.  Unlike individual node preservation, a constant region
-retains not only the identities of its nodes but also their attributes
-and contents.  The contents of the block will only be evaluated once
-per occurrence of the enclosing template.
-
-Constant regions allow non-Meteor content to be embedded in a Meteor
-template.  Many third-party widgets create and manage their own DOM
-nodes programmatically. Typically, you put an empty element in your
-template, which the widget or library will then populate with
-children. Normally, when Meteor re-renders the enclosing template it
-would remove the new children, since the template says it should be
-empty. If the container is wrapped in a `#constant` block, however, it
-is left alone; whatever content is currently in the DOM remains.
-
-{{#note}}
-Constant regions are intended for embedding non-Meteor content.
-Event handlers and reactive dependencies don't currently work
-correctly inside constant regions.
-{{/note}}
-
-
-{{/api_box_inline}}
-
-{{#api_box_inline isolate}}
-
-Each template runs as its own reactive computation.  When the template
-accesses a reactive data source, such as by calling `Session.get` or
-making a database query, this establishes a data dependency that will
-cause the whole template to be re-rendered when the data changes.
-This means that the amount of re-rendering for a particular change
-is affected by how you've divided your HTML into templates.
-
-Typically, the exact extent of re-rendering is not crucial, but if you
-want more control, such as for performance reasons, you can use the
-`{{dstache}}#isolate}}...{{dstache}}/isolate}}` helper.  Data
-dependencies established inside an `#isolate` block are localized to
-the block and will not in themselves cause the parent template to be
-re-rendered.  This block helper essentially conveys the reactivity
-benefits you would get by pulling the content out into a new
-sub-template.
-
-{{/api_box_inline}}
 
 <h2 id="match"><span>Объект Match</span></h2>
+
 Методы и публикации в Meteor принимают любые [EJSON](#ejson)-совместимые
 аргументы, но в большинстве случаев мы хотим, чтобы они были определенного
 типа. Пакет `check` содержит маленькую библиотеку, предназначенную для
@@ -2428,7 +2434,7 @@ sub-template.
 
 {{> api_box match_test}}
 
-{{#api_box_inline matchpatterns}}
+{{#api_box matchpatterns}}
 
 Шаблоны значений, передаваемые в функции `check` и `Match.test`, могут быть
 следующих видов:
@@ -2515,7 +2521,7 @@ sub-template.
 {{/dtdd}}
 </dl>
 
-{{/api_box_inline}}
+{{/api_box}}
 
 <h2 id="timers"><span>Таймеры</span></h2>
 
@@ -2629,25 +2635,18 @@ exactly the same work as `Deps.flush`.  The flushing process consists
 of rerunning any invalidated computations.  If additional
 invalidations happen while flushing, they are processed as part of the
 same flush until there is no more work to be done.  Callbacks
-registered with [`Meteor.afterFlush`](#deps_afterflush) are called
+registered with [`Deps.afterFlush`](#deps_afterflush) are called
 after processing outstanding invalidations.
-
-Any auto-updating DOM elements that are found to not be in the
-document during a flush may be cleaned up by Meteor (meaning that
-Meteor will stop tracking and updating the elements, so that the
-browser's garbage collector can delete them).  So, if you manually
-call `flush`, you need to make sure that any auto-updating elements
-that you have created by calling [`Meteor.render`](#meteor_render)
-have already been inserted in the main DOM tree.
 
 It is illegal to call `flush` from inside a `flush` or from a running
 computation.
 
 {{> api_box deps_nonreactive }}
 
-Calls `func()` with `Deps.currentComputation` temporarily set to
-`null`.  If `func` accesses reactive data sources, these data sources
-will never cause a rerun of the enclosing computation.
+Calls `func` with `Deps.currentComputation` temporarily set to `null`
+and returns `func`'s own return value.  If `func` accesses reactive data
+sources, these data sources will never cause a rerun of the enclosing
+computation.
 
 {{> api_box deps_active }}
 
@@ -2906,9 +2905,25 @@ When you add a type to EJSON, Meteor will be able to use that type in:
 
 {{/note}}
 
-Instances of your type should implement the following interface:
+Instances of your type must implement [`typeName`](#ejson_type_typeName) and
+[`toJSONValue`](#ejson_type_toJSONValue) methods, and may implement
+[`clone`](#ejson_type_clone) and [`equals`](#ejson_type_equals) methods if the
+default implementations are not sufficient.
+
+{{> api_box ejsonTypeName}}
+{{> api_box ejsonTypeToJSONValue}}
+
+For example, the `toJSONValue` method for
+[`Meteor.Collection.ObjectID`](#collection_object_id) could be:
+
+    function () {
+      return this.toHexString();
+    };
 
 {{> api_box ejsonTypeClone}}
+
+If your type does not have a `clone` method, `EJSON.clone` will use
+[`toJSONValue`](#ejson_type_toJSONValue) and the factory instead.
 
 {{> api_box ejsonTypeEquals}}
 
@@ -2920,15 +2935,9 @@ the following properties:
  - *Symmetry* - for any two instances `a` and `b`: `a.equals(b)` if and only if `b.equals(a)`.
  - *Transitivity* - for any three instances `a`, `b`, and `c`: `a.equals(b)` and `b.equals(c)` implies `a.equals(c)`.
 
-{{> api_box ejsonTypeName}}
-{{> api_box ejsonTypeToJSONValue}}
+If your type does not have an `equals` method, `EJSON.equals` will compare the
+result of calling [`toJSONValue`](#ejson_type_toJSONValue) instead.
 
-For example, the `toJSONValue` method for
-[`Meteor.Collection.ObjectID`](#collection_object_id) could be:
-
-    function () {
-      return this.toHexString();
-    };
 
 <h2 id="http"><span>HTTP</span></h2>
 
@@ -3084,11 +3093,11 @@ by spammers.)
                 'Hello from Meteor!',
                 'This is a test of Email.send.');
 
-{{/better_markdown}}
+{{/markdown}}
 
 <h2 id="assets"><span>Assets</span></h2>
 
-{{#better_markdown}}
+{{#markdown}}
 `Assets` allows server code in a Meteor application to access static server
 assets, which are located in the `private` subdirectory of an application's
 tree.
@@ -3102,7 +3111,7 @@ directory called `nested` with a file called `data.txt` inside it, then server
 code can read `data.txt` by running:
 
     var data = Assets.getText('nested/data.txt');
-{{/better_markdown}}
+{{/markdown}}
 
 </template>
 
@@ -3113,6 +3122,7 @@ code can read `data.txt` by running:
 
 <template name="api_box">
 <div class="api {{bare}}">
+
 <h3 id="{{id}}">
   <a class="name selflink" href="#{{id}}">{{{name}}}</a>
 {{#if locus}}
@@ -3121,7 +3131,7 @@ code can read `data.txt` by running:
 </h3>
 
 <div class="desc">
-{{#each descr}}{{#better_markdown}}{{{this}}}{{/better_markdown}}{{/each}}
+{{#each descr}}{{#markdown}}{{{this}}}{{/markdown}}{{/each}}
 </div>
 
 {{#if args}}
@@ -3134,8 +3144,8 @@ code can read `data.txt` by running:
 {{> api_box_args options}}
 {{/if}}
 
-{{#if body}}
-{{#better_markdown}}{{{body}}}{{/better_markdown}}
+{{#if UI.contentBlock}}
+{{#markdown}}{{> UI.contentBlock}}{{/markdown}}
 {{/if}}
 
 </div>
@@ -3155,12 +3165,12 @@ code can read `data.txt` by running:
       {{{type}}}
     {{/if}}
   </span></dt>
-<dd>{{#better_markdown}}{{{descr}}}{{/better_markdown}}</dd>
+<dd>{{#markdown}}{{{descr}}}{{/markdown}}</dd>
 {{/each}}
 </dl>
 </template>
 
 
-<template name="api_section_helper">
+<template name="api_section">
 <h2 id="{{id}}"><a href="#{{id}}" class="selflink"><span>{{name}}</span></a></h2>
 </template>
