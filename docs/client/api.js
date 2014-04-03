@@ -324,8 +324,8 @@ Template.api.subscription_userId = {
 Template.api.subscription_connection = {
   id: "publish_connection",
   name: "<i>this</i>.connection",
-  locus: "Server",
-  descr: ["Access inside the publish function. The incoming [connection](#meteor_onconnection) for this subscription."]
+  locus: "Сервер",
+  descr: ["Используется внутри функции публикации. Входящее [соединение](#meteor_onconnection) для данной подписки."]
 };
 
 
@@ -395,15 +395,15 @@ Template.api.method_invocation_isSimulation = {
 Template.api.method_invocation_connection = {
   id: "method_connection",
   name: "<i>this</i>.connection",
-  locus: "Server",
-  descr: ["Access inside a method invocation. The [connection](#meteor_onconnection) this method was received on. `null` if the method is not associated with a connection, eg. a server initiated method call."]
+  locus: "Сервер",
+  descr: ["Используется внутри метода. [Соединение](#meteor_onconnection), по которому был произведен вызов этого метода. Равно `null`, если у вызова метода нет ассоциированного с ним соединения (например, метод вызывался самим сервером)."]
 };
 
 Template.api.error = {
   id: "meteor_error",
   name: "new Meteor.Error(error, reason, details)",
   locus: "Везде",
-  descr: ["Класс ошибок, кидаемых методами."],
+  descr: ["Класс ошибок, возбуждаемых методами."],
   args: [
     {name: "error",
      type: "Number",
@@ -500,12 +500,12 @@ Template.api.connect = {
 Template.api.onConnection = {
   id: "meteor_onconnection",
   name: "Meteor.onConnection(callback)",
-  locus: "Server",
-  descr: ["Register a callback to be called when a new DDP connection is made to the server."],
+  locus: "Сервер",
+  descr: ["Регистрирует колбэк, который будет вызван при установке нового DDP-соединения с сервером."],
   args: [
     {name: "callback",
-     type: "function",
-     descr: "The function to call when a new DDP connection is established."}
+     type: "Function",
+     descr: "Функция, вызываемая при установке нового DDP-соединения с сервером."}
   ]
 };
 
@@ -1066,7 +1066,7 @@ Template.api.logout = {
 Template.api.logoutOtherClients = {
   id: "meteor_logoutotherclients",
   name: "Meteor.logoutOtherClients([callback])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Разлогинивает всех клиентов, залогиненных под данным пользователем, кроме клиента, вызывающего эту функцию."],
   args: [
     {
@@ -1221,7 +1221,7 @@ Template.api.accounts_onCreateUser = {
 Template.api.accounts_validateLoginAttempt = {
   id: "accounts_validateloginattempt",
   name: "Accounts.validateLoginAttempt(func)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Validate login attempts."],
   args: [
     {
@@ -1235,7 +1235,7 @@ Template.api.accounts_validateLoginAttempt = {
 Template.api.accounts_onLogin = {
   id: "accounts_onlogin",
   name: "Accounts.onLogin(func) and Accounts.onLoginFailure(func)",
-  locus: "Server",
+  locus: "Сервер",
   descr: ["Register a callback to be called after a login attempt."],
   args: [
     {
@@ -1844,7 +1844,7 @@ Template.api.template_data = {
 Template.api.ui_registerhelper = {
   id: "ui_registerhelper",
   name: "UI.registerHelper(name, function)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Defines a [helper function](#template_helpers) which can be used from all templates."],
   args: [
     {name: "name",
@@ -1860,14 +1860,14 @@ Template.api.ui_registerhelper = {
 Template.api.ui_body = {
   id: "ui_body",
   name: "UI.body",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["The [component object](#templates_api) representing your `<body>` tag."]
 };
 
 Template.api.ui_render = {
   id: "ui_render",
   name: "UI.render(Template.<em>myTemplate</em>)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Executes a template's logic."],
   args: [
     {name: "template",
@@ -1879,7 +1879,7 @@ Template.api.ui_render = {
 Template.api.ui_renderwithdata = {
   id: "ui_renderwithdata",
   name: "UI.renderWithData(Template.<em>myTemplate</em>, data)",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Executes a template's logic with a data context. Otherwise identical to `UI.render`."],
   args: [
     {name: "template",
@@ -1895,7 +1895,7 @@ Template.api.ui_renderwithdata = {
 Template.api.ui_insert = {
   id: "ui_insert",
   name: "UI.insert(instantiatedComponent, parentNode[, nextNode])",
-  locus: "Client",
+  locus: "Клиент",
   descr: ["Inserts an instantiated component into the DOM and calls its [`rendered`](#template_rendered) callback."],
   args: [
     {name: "instantiatedComponent",

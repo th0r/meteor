@@ -424,44 +424,41 @@ programming](http://en.wikipedia.org/wiki/Reactive_programming)). Это
 <h2 id="livehtmltemplates">Живые HTML-шаблоны</h2>
 
 HTML-шаблоны занимают важнейшее место в любом веб-приложении. В Meteor 
-используется фирменная технология обновления страниц в реальном времени под 
-названием Blaze, которая позволяет вам _реактивно_ рендерить ваши шаблоны. 
-означает, что они будут обновляться автоматически, как только изменятся
-данные, необходимые для их отрисовки.
+используется фирменная технология живого обновления страниц под названием Blaze,
+которая позволяет вам _реактивно_ рендерить ваши шаблоны. Это означает, что
+они будут обновляться автоматически, как только изменятся данные, необходимые
+для их отрисовки.
 
-Meteor makes it easy to use your favorite HTML templating language along with
-Meteor's live page update technology. Just write your template as you normally
-would, and Meteor will take care of making it update in realtime.
+Meteor позволяет с легкостью использовать ваш любимый шаблонизатор вместе с
+фирменной технологией живого обновления страниц. Просто пишите шаблоны как
+обычно, а Meteor позаботится о том, чтобы они обновлялись в реальном времени.
 
-Meteor ships with a templating language called
+Meteor поставляется с шаблонизатором
 [Spacebars](https://github.com/meteor/meteor/blob/devel/packages/spacebars/README.md),
-inspired by [Handlebars](http://handlebarsjs.com/).  It shares some of the
-spirit and syntax of Handlebars, but it has been tailored to produce reactive
-Meteor templates when compiled.
+много почерпнувшим из [Handlebars](http://handlebarsjs.com/). У них похожий
+синтаксис, но Spacebars был адаптирован для компиляции реактивных шаблонов.
 
 {{#note}}
-  Today, the only templating system that ships with Meteor is Spacebars, though
-  our community has created packages for other languages such as
-  [Jade](https://atmospherejs.com/package/jade).
+  На сегодняшний день Spacebars - это единственный шаблонизатор, поставляемый
+  вместе с Meteor, однако наше комьюнити создало пакеты для поддержки и других
+  языков, например [Jade](https://atmospherejs.com/package/jade).
 {{/note}}
 
-To define templates, create a file in your project with the `.html`
-extension. In the file, make a `<template>` tag and give it a
-`name` attribute. Put the template contents inside the tag. Meteor
-will precompile the template, ship it down to the client, and make it
-available as on the global `Template` object.
+Для объявления шаблона, создайте в вашем проекте файл с расширением `.html`.
+В файле создайте тэг `<template>`, положите в него ваш шаблон и задайте ему
+имя в атрибуте `name` тэга. Meteor скомпилирует ваш шаблон и отправит его на
+клиент, где он будет доступен в качестве функции глобального объекта `Template`.
 
-When you app is loaded, it automatically renders the special template called
-`<body>`, which is written using the `<body>` element instead of a
-`<template>`. You insert a template inside another template by using the
-`{{dstache}}> inclusion}}` operator.
+После загрузки приложения, Meteor автоматически рендерит специальный шаблон
+под названием `body`, который объявляется при помощи элемента `<body>` вместо
+`<template>`. Для вставки одного шаблона в другой используется оператор
+`{{dstache}}> ...}}`, где вместо троеточия должно стоять имя вставляемого
+шаблона.
 
-The easiest way to get data into templates is by defining helper
-functions in JavaScript. Just add the helper functions directly on the
-`Template.`*templateName* object. Putting it all together:
+Самый простой способ передать данные в шаблон - это объявить хэлпер-функцию
+прямо в объекте шаблона `Template.`*templateName*. Вот простой пример:
 
-
-    <!-- in myapp.html -->
+    <!-- в myapp.html -->
     <body>
       <h1>Today's weather!</h1>
       {{dstache}}> forecast}}
@@ -471,12 +468,12 @@ functions in JavaScript. Just add the helper functions directly on the
       <div>It'll be {{dstache}}prediction}} tonight</div>
     {{lt}}/template>
 
-    // in client/myapp.js: reactive helper function
+    // в client/myapp.js: реактивная хэлпер-функция
     Template.forecast.prediction = function () {
       return Session.get("weather");
     };
 
-    // in the JavaScript console
+    // в консоли браузера
     > Session.set("weather", "cloudy");
     > document.body.innerHTML
      => "<h1>Today's weather!</h1> <div>It'll be cloudy tonight</div>"
@@ -486,16 +483,16 @@ functions in JavaScript. Just add the helper functions directly on the
      => "<h1>Today's weather!</h1> <div>It'll be cool and dry tonight</div>"
 
 
-To iterate over an array or database cursor, use `{{dstache}}#each}}`:
+Для обхода массива или курсора используйте хэлпер `{{dstache}}#each}}`:
 
-    <!-- in myapp.html -->
+    <!-- в myapp.html -->
     <template name="players">
       {{dstache}}#each topScorers}}
         <div>{{dstache}}name}}</div>
       {{dstache}}/each}}
     {{lt}}/template>
 
-    // in myapp.js
+    // в myapp.js
     Template.players.topScorers = function () {
       return Users.find({score: {$gt: 100}}, {sort: {score: -1}});
     };
@@ -526,13 +523,13 @@ To iterate over an array or database cursor, use `{{dstache}}#each}}`:
       {{dstache}}/each}}
     {{lt}}/template>
 
-Хэлперы также можно использовать для передачи неизменной информации.
+Хэлперы также можно использовать для передачи неизменных данных:
 
     // Прекрасно работает с {{dstache}}#each sections}}
     Template.report.sections = ["Situation", "Complication", "Resolution"];
 
 И наконец, вы можете указать таблицу обработчиков событий, используя свойство
-`events` функции шаблона. Формат этой таблицы указан в разделе [Карты
+`events` объекта шаблона. Формат этой таблицы указан в разделе [Карты
 событий](#eventmaps). В обработчике события, `this` будет указывать на 
 контекст данных того элемента, который это событие вызвал.
 
@@ -575,10 +572,10 @@ README](https://github.com/meteor/meteor/blob/devel/packages/spacebars/README.md
 (компиляция [CoffeeScript](http://coffeescript.org)) или `templating` 
 (компиляция HTML-шаблонов).
 
-Вы можете посмотреть список доступных пакетов с помошью команды [`meteor 
-list`](#meteorlist), добавлять пакеты в ваш проект с помошью [`meteor 
-add`](#meteoradd), и удалять их из проекта с помошью [`meteor 
-remove`](#meteorremove).
+Вы можете посмотреть список доступных пакетов с помошью команды
+[`meteor list`](#meteorlist), добавлять пакеты в ваш проект с помошью
+[`meteor add`](#meteoradd), и удалять их из проекта с помошью
+[`meteor remove`](#meteorremove).
 
 По умолчанию, все новые приложения используют пакет `standard-app-packages`. 
 Он включает в себя основные пакеты, составляющие ядро Meteor, и необходимые в
@@ -699,13 +696,13 @@ remove`](#meteorremove).
 <template name="deploying">
 {{#markdown}}
 
-<h2 id="deploying">Разворачивание приложения</h2>
+<h2 id="deploying">Выкладка</h2>
 
 Meteor - это полноценный сервер для приложений. В нем есть все, что нужно, 
-для выкладки вашего приложения в интернет: от вас требуется только
+для выкладки вашего приложения в сеть: от вас требуется только
 JavaScript, HTML и CSS.
 
-<h3 class="nosection">Разворачивание на серверах Meteor</h3>
+<h3 class="nosection">Выкладка на сервера Meteor</h3>
 
 Самый простой способ выложить ваше приложение - это использовать команду 
 `meteor deploy`. Мы предоставляем его, потому что это именно то, что мы 
@@ -728,7 +725,7 @@ JavaScript, HTML и CSS.
 Вы предоставляем этот сервис бесплатно. Он также полезен для быстрой выкладки
 демок, бета-версий и т.д.
 
-<h3 class="nosection">Разворачивание на собственных серверах</h3>
+<h3 class="nosection">Выкладка на собственные сервера</h3>
 
 Вы также можете выложить ваше приложение на собственные сервера, либо сервера
 любого другого провайдера, например, Heroku.
