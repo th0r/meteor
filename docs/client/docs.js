@@ -87,24 +87,24 @@ Meteor.startup(function () {
 
 var toc = [
   {name: "Meteor " + Template.headline.release(), id: "top"}, [
-    "Quick start",
-    "Seven principles",
-    "Resources"
+    {name: "Быстрый старт", id: "quickstart"},
+    {name: "Семь принципов", id: "sevenprinciples"},
+    {name: "Ресурсы", id: "resources"}
   ],
-  "Concepts", [
-    "What is Meteor?",
-    "Structuring your app",
-    "Data and security",
-    "Reactivity",
-    "Live HTML templates",
-    "Using packages",
-    "Namespacing",
-    "Deploying",
-    "Writing packages"
+  {name: "Основы", id: "concepts"}, [
+    {name: "Что такое Meteor?", id: "whatismeteor"},
+    {name: "Структура приложения", id: "structuringyourapp"},
+    {name: "Данные и безопасность", id: "dataandsecurity"},
+    {name: "Реактивность", id: "reactivity"},
+    {name: "Живые шаблоны", id: "livehtmltemplates"},
+    {name: "Работа с пакетами", id: "usingpackages"},
+    {name: "Пространства имен", id: "namespacing"},
+    {name: "Выкладка", id: "deploying"},
+    {name: "Создание пакетов", id: "writingpackages"}
   ],
 
   "API", [
-    "Core", [
+    {name: "Ядро", id: "core"}, [
       "Meteor.isClient",
       "Meteor.isServer",
       "Meteor.startup",
@@ -113,7 +113,7 @@ var toc = [
       "Meteor.release"
     ],
 
-    "Publish and subscribe", [
+    {name: "Публикации и подписки", id: "publishandsubscribe"}, [
       "Meteor.publish", [
         {instance: "this", name: "userId", id: "publish_userId"},
         {instance: "this", name: "added", id: "publish_added"},
@@ -128,7 +128,7 @@ var toc = [
       "Meteor.subscribe"
     ],
 
-    {name: "Methods", id: "methods_header"}, [
+    {name: "Методы", id: "methods_header"}, [
       "Meteor.methods", [
         {instance: "this", name: "userId", id: "method_userId"},
         {instance: "this", name: "setUserId", id: "method_setUserId"},
@@ -141,7 +141,7 @@ var toc = [
       "Meteor.apply"
     ],
 
-    {name: "Server connections", id: "connections"}, [
+    {name: "Соединение с сервером", id: "connections"}, [
       "Meteor.status",
       "Meteor.reconnect",
       "Meteor.disconnect",
@@ -149,7 +149,7 @@ var toc = [
       "DDP.connect"
     ],
 
-    {name: "Collections", id: "collections"}, [
+    {name: "Коллекции", id: "collections"}, [
       "Meteor.Collection", [
         {instance: "collection", name: "find"},
         {instance: "collection", name: "findOne"},
@@ -173,20 +173,20 @@ var toc = [
       {type: "spacer"},
       {name: "Meteor.Collection.ObjectID", id: "collection_object_id"},
       {type: "spacer"},
-      {name: "Selectors", style: "noncode"},
-      {name: "Modifiers", style: "noncode"},
-      {name: "Sort specifiers", style: "noncode"},
-      {name: "Field specifiers", style: "noncode"}
+      {name: "Селекторы", style: "noncode", id: "selectors"},
+      {name: "Модификаторы", style: "noncode", id: "modifiers"},
+      {name: "Указатели сортировки", style: "noncode", id: "sortspecifiers"},
+      {name: "Указатели полей", style: "noncode", id: "fieldspecifiers"}
     ],
 
-    "Session", [
+    {name: "Session", id: "session"}, [
       "Session.set",
       {name: "Session.setDefault", id: "session_set_default"},
       "Session.get",
       "Session.equals"
     ],
 
-    {name: "Accounts", id: "accounts_api"}, [
+    {name: "Учетные записи", id: "accounts_api"}, [
       "Meteor.user",
       "Meteor.userId",
       "Meteor.users",
@@ -210,7 +210,7 @@ var toc = [
       {name: "Accounts.onLoginFailure", id: "accounts_onlogin"}
     ],
 
-    {name: "Passwords", id: "accounts_passwords"}, [
+    {name: "Пароли", id: "accounts_passwords"}, [
       "Accounts.createUser",
       "Accounts.changePassword",
       "Accounts.forgotPassword",
@@ -225,7 +225,7 @@ var toc = [
       "Accounts.emailTemplates"
     ],
 
-    {name: "Templates", id: "templates_api"}, [
+    {name: "Шаблоны", id: "templates_api"}, [
       {prefix: "Template", instance: "myTemplate", id: "templates_api"}, [
         {name: "events", id: "template_events"},
         {name: "helpers", id: "template_helpers"},
@@ -233,7 +233,7 @@ var toc = [
         {name: "created", id: "template_created"},
         {name: "destroyed", id: "template_destroyed"}
       ],
-      {name: "Template instances", id: "template_inst"}, [
+      {name: "Экземпляры шаблонов", id: "template_inst"}, [
         {instance: "this", name: "findAll", id: "template_findAll"},
         {instance: "this", name: "find", id: "template_find"},
         {instance: "this", name: "firstNode", id: "template_firstNode"},
@@ -248,23 +248,23 @@ var toc = [
         "UI.insert"
       ],
       {type: "spacer"},
-      {name: "Event maps", style: "noncode"}
+      {name: "Карты событий", style: "noncode", id: "eventmaps"}
      ],
 
-    "Match", [
+    {name: "Match", id: "match"}, [
       "check",
       "Match.test",
-      {name: "Match patterns", style: "noncode"}
+      {name: "Шаблоны значений", style: "noncode", id: "matchpatterns"}
     ],
 
-    "Timers", [
+    {name: "Таймеры", id: "timers"}, [
       "Meteor.setTimeout",
       "Meteor.setInterval",
       "Meteor.clearTimeout",
       "Meteor.clearInterval"
     ],
 
-    "Deps", [
+    {name: "Deps", id: "deps"}, [
       "Deps.autorun",
       "Deps.flush",
       "Deps.nonreactive",
@@ -330,7 +330,7 @@ var toc = [
     ]
   ],
 
-  "Packages", [ [
+  {name: "Пакеты", id: "packages"}, [ [
     "accounts-ui",
     "amplify",
     "appcache",
@@ -350,7 +350,7 @@ var toc = [
     "underscore"
   ] ],
 
-  "Command line", [ [
+  {name: "Командная строка", id: "сommandline"}, [ [
     "meteor help",
     "meteor run",
     "meteor create",
