@@ -1,3 +1,6 @@
+### Русская документация (Russian documentation)
+http://docs.meteor.com.ru
+
 # Meteor
 
 Meteor is an ultra-simple environment for building modern web
