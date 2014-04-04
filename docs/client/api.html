@@ -1754,13 +1754,14 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
       return user.username !== "root";
     });
 
-If the user is being created as part of a login attempt from a client (eg,
-calling [`Accounts.createUser`](#accounts_createuser) from the client, or
-[logging in for the first time with an external
-service](#meteor_loginwithexternalservice)), these callbacks are called *before*
-the [`Accounts.validateLoginAttempt`](#accounts_validateloginattempt)
-callbacks. If these callbacks succeed but those fail, the user will still be
-created but the connection will not be logged in as that user.
+Если новый пользователь создается в процессе логина (например, при вызове на
+клиенте функции [`Accounts.createUser`](#accounts_createuser) или после
+первого [логина с помощью какого-либо стороннего
+сервиса](#meteor_loginwithexternalservice)), то эти
+колбэки будут вызваны *перед* колбэками
+[`Accounts.validateLoginAttempt`](#accounts_validateloginattempt). Если эти
+колбэки отработают успешно, а те нет, то новый пользователь все-равно будет
+создан, но не залогинен.
 
 {{> api_box accounts_onCreateUser}}
 
@@ -1805,74 +1806,76 @@ created but the connection will not be logged in as that user.
 
 {{> api_box accounts_validateLoginAttempt}}
 
-Call `validateLoginAttempt` with a callback to be called on login
-attempts.  It returns an object with a single method, `stop`.  Calling
-`stop()` unregisters the callback.
+Вызов `validateLoginAttempt` регистрирует колбэк, который будет вызываться
+при каждой попытке логина. Он возвращает объект с единственным методом
+`stop`. Вызов этого метода удалит указанный колбэк из списка зарегистрированных.
 
-When a login attempt is made, the registered validate login callbacks
-are called with a single argument, the attempt info object:
+Когда происходит попытка логина, все зарегистрированные колбэки вызываются с
+единственным аргументом - объектом, содержащим информацию об этой попытке:
 
 <dl class="objdesc">
 {{#dtdd name="type" type="String"}}
-  The service name, such as "password" or "twitter".
+  Название сервиса, например, "password" или "twitter"
 {{/dtdd}}
 
 {{#dtdd name="allowed" type="Boolean"}}
-  Whether this login is allowed and will be successful (if not aborted
-  by any of the validateLoginAttempt callbacks).  False if the login
-  will not succeed (for example, an invalid password or the login was
-  aborted by a previous validateLoginAttempt callback).
+  Разрешена ли эта попытка и будет ли в итоге успешной (если не будет
+  впоследствии запрещена одним из колбэков `validateLoginAttempt`).
+  Принимает значение `false`, если попытка будет неудачной (например, если
+  был указан неверный пароль, либо эта попытка была запрещена предыдущими
+  вызовами колбэков `validateLoginAttempt`).
 {{/dtdd}}
 
 {{#dtdd name="error" type="Exception"}}
-  When `allowed` is false, the exception describing why the login
-  failed.  It will be a `Meteor.Error` for failures reported to the
-  user (such as invalid password), and can be a another kind of
-  exception for internal errors.
+  Если `allowed` принимает значение `false`, это поле содержит объект
+  исключения, описывающий причину запрета логина. В случаях, когда пользователь
+  информируется об ошибке (например, неправильный пароль), он будет экземпляром
+  `Meteor.Error`, иначе может быть любым другим типом исключения.
 {{/dtdd}}
 
 {{#dtdd name="user" type="Object"}}
-  When it is known which user was attempting to login, the Meteor user
-  object.  This will always be present for successful logins.
+  В случаях, когда известен пользователь, совершивший попытку логина,
+  содержит объект учетной записи этого пользователя. Всегда присутствует при
+  успешных попытках.
 {{/dtdd}}
 
 {{#dtdd name="connection" type="Object"}}
-  The `connection` object the request came in on. See
-  [`Meteor.onConnection`](#meteor_onconnection) for details.
+  Объект соединения, по которому пришел запрос. См.
+  [`Meteor.onConnection`](#meteor_onconnection).
 {{/dtdd}}
 
 {{#dtdd name="methodName" type="String"}}
-  The name of the Meteor method being used to login.
+  Названия удаленного метода, использованного для логина.
 {{/dtdd}}
 
 {{#dtdd name="methodArguments" type="Array"}}
-  An array of the arguments passed to the login method.
+  Массив аргументов, переданных в метод логина.
 {{/dtdd}}
 </dl>
 
-A validate login callback must return a truthy value for the login to
-proceed.  If the callback returns a falsy value or throws an
-exception, the login is aborted.  Throwing a `Meteor.Error` will
-report the error reason to the user.
+Чтобы разрешить процесс логина, колбэк должен вернуть истинное значение. Если
+же он возвращает ложное значение, либо возбуждает исключение, логин запрещается.
+При возбуждении исключения `Meteor.Error`, пользователь будет информирован о
+причине ошибки.
 
-All registered validate login callbacks are called, even if one of the
-callbacks aborts the login.  The later callbacks will see the
-`allowed` field set to `false` since the login will now not be
-successful.
+При каждой попытке логина вызываются все зарегистрированные колбэки, даже
+если один из них ее запретил. Но в этом случае для всех последующих колбэков
+поле `allowed` будет принимать значение `false`, т.к. данная попытка уже
+будет неудачной.
 
 
 {{> api_box accounts_onLogin}}
 
-Either the `onLogin` or the `onLoginFailure` callbacks will be called
-for each login attempt. The `onLogin` callbacks are called after the
-user has been successfully logged in. The `onLoginFailure` callbacks are
-called after a login attempt is denied.
+После каждой попытки логина будут вызваны либо колбэки `onLogin`, либо колбэки
+`onLoginFailure`. Колбэки `onLogin` вызываются после каждого успешного
+логина, а `onLoginFailure` - после каждого неудачного.
 
-These functions return an object with a single method, `stop`.  Calling
-`stop()` unregisters the callback.
+Эти функции возвращают объект с единственным методом `stop`, вызов которого
+удалит соответствующий колбэк из списка зарегистрированных.
 
-The callbacks are called with a single argument, the same attempt info
-object as [`validateLoginAttempt`](#accounts_validateloginattempt).
+Все они вызываются с единственным аргументом - объектом, содержащим информацию
+о попытке логина (см.
+[`validateLoginAttempt`](#accounts_validateloginattempt)).
 
 
 <h2 id="accounts_passwords"><span>Пароли</span></h2>

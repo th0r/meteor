@@ -1222,26 +1222,26 @@ Template.api.accounts_validateLoginAttempt = {
   id: "accounts_validateloginattempt",
   name: "Accounts.validateLoginAttempt(func)",
   locus: "Сервер",
-  descr: ["Validate login attempts."],
+  descr: ["Проверяет попытки логина."],
   args: [
     {
       name: "func",
       type: "Function",
-      descr: "Called whenever a login is attempted (either successful or unsuccessful).  A login can be aborted by returning a falsy value or throwing an exception."
+      descr: "Вызывается при попытке логина (успешной или нет). Чтобы запретить ее, нужно либо вернуть ложное значение, либо возбудить исключение."
     }
   ]
 };
 
 Template.api.accounts_onLogin = {
   id: "accounts_onlogin",
-  name: "Accounts.onLogin(func) and Accounts.onLoginFailure(func)",
+  name: "Accounts.onLogin(func) и Accounts.onLoginFailure(func)",
   locus: "Сервер",
-  descr: ["Register a callback to be called after a login attempt."],
+  descr: ["Регистрирует колбэк, который будет вызван после попытки логина."],
   args: [
     {
       name: "func",
       type: "Function",
-      descr: "The callback to be called after the login attempt"
+      descr: "Колбэк, вызываемый после попытки логина."
     }
   ]
 };
