@@ -3047,52 +3047,24 @@ Example asynchronous HTTP call:
 
 <h2 id="email"><span>Email</span></h2>
 
-<!-- The `email` package allows sending email from a Meteor app. To use it, add the
-package to your project with `$ meteor add email`. -->
-
 Пакет `email` позволяет отправлять электронную почту из Meteor-приложения. Для его использования, добавьте пакет в ваш проект с помощью `$ meteor add email`.
-
-<!-- The server reads from the `MAIL_URL` environment variable to determine how to
-send mail. Currently, Meteor supports sending mail over SMTP; the `MAIL_URL`
-environment variable should be of the form
-`smtp://USERNAME:PASSWORD@HOST:PORT/`. For apps deployed with `meteor deploy`,
-`MAIL_URL` defaults to an account (provided by
-[Mailgun](http://www.mailgun.com/)) which allows apps to send up to 200 emails
-per day; you may override this default by assigning to `process.env.MAIL_URL`
-before your first call to `Email.send`. -->
 
 Сервер использует значение переменной среды `MAIL_URL`, чтобы определить, как отправлять почту. В настоящее время, Meteor поддерживает отправку почты через SMTP; переменная `MAIL_URL` должна иметь вид `smtp://USERNAME:PASSWORD@HOST:PORT/`.
 
-Для приложений, развернутых с помощью `meteor deploy`, `MAIL_URL` по-умолчанию ?с аккаунтом? (предоставляется [Mailgun](http://www.mailgun.com/)), позволяющим отправлять до 200 писем в день; Вы можете изменить это поведение, назначив на `process.env.MAIL_URL` до первого вызова Email.send.
+Для приложений, развернутых с помощью `meteor deploy`, `MAIL_URL` по-умолчанию связан с аккаунтом (предоставляется [Mailgun](http://www.mailgun.com/)), позволяющим отправлять до 200 писем в день; вы можете переопределить значение по умолчанию, назначив `process.env.MAIL_URL` до первого вызова Email.send.
 
-<!-- If `MAIL_URL` is not set (eg, when running your application locally),
-`Email.send` outputs the message to standard output instead. -->
-
-Если `MAIL_URL` не установлен (например, при запуске приложения локально), ?`Email.send` выводит сообщение в стандартный вывод вместо этого.?
+Если переменная `MAIL_URL` не определена (например, при запуске приложения локально), `Email.send` выводит сообщение в стандартный выход.
 
 {{> api_box email_send }}
 
-<!-- You must provide the `from` option and at least one of `to`, `cc`, and `bcc`;
-all other options are optional. -->
-
 Необходимо указать параметр `from` и по крайней мере один вариант из `to`, `cc`, или `bcc`; все остальные параметры являются необязательными.
-
-<!-- `Email.send` only works on the server. Here is an example of how a
-client could use a server method call to send an email. (In an actual
-application, you'd need to be careful to limit the emails that a
-client could send, to prevent your server from being used as a relay
-by spammers.) -->
 
 `Email.send` работает только на сервере. Вот пример того, как клиент может использовать вызов серверного метода, чтобы отправить письмо. (В реальном приложении, вам нужно быть осторожным, чтобы ограничить сообщения, которые клиент может отправить, чтобы ваш сервер не был использован в качестве ретранслятора спамерами.)
 
-<!--     // In your server code: define a method that the client can call -->
     // В вашем серверном коде: определяем метод, который сможет вызвать клиент
     Meteor.methods({
       sendEmail: function (to, from, subject, text) {
         check([to, from, subject, text], [String]);
-
-<!--         // Let other method calls from the same client start running,
-        // without waiting for the email sending to complete. -->
 
         // Пусть вызовы других методов от этого же клиента запускаются,
         // не дожидаясь завершения отправки письма
@@ -3107,7 +3079,6 @@ by spammers.) -->
       }
     });
 
-    <!-- // In your client code: asynchronously send an email -->
     // В вашем клиентском коде: асинхронная отправка письма
     Meteor.call('sendEmail',
                 'alice@example.com',
