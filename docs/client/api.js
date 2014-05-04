@@ -1968,12 +1968,11 @@ Template.api.assets_getText = {
   id: "assets_getText",
   name: "Assets.getText(assetPath, [asyncCallback])",
   locus: "Сервер",
-  descr: ["Возвращает статичные серверные данные как строку в UTF8 кодировке."],
+  descr: ["Возвращает содержимое статичного файла в виде строки в кодировке UTF8."],
   args: [
     {name: "assetPath",
      type: "String",
-     descr: "Путь к данным, относительно" +
-     "подкаталога `private`."
+     descr: "Путь к статичному файлу относительно поддиректории `private`."
     },
     {name: "asyncCallback",
      type: "Function",
@@ -1988,12 +1987,11 @@ Template.api.assets_getBinary = {
   id: "assets_getBinary",
   name: "Assets.getBinary(assetPath, [asyncCallback])",
   locus: "Сервер",
-  descr: ["Возвращает статичные серверные данные как [EJSON Binary](#ejson_new_binary)."],
+  descr: ["Возвращает содержимое статичного файла в виде [EJSON Binary](#ejson_new_binary)."],
   args: [
     {name: "assetPath",
      type: "String",
-     descr: "Путь к данным, относительно" +
-     "подкаталога `private`."
+     descr: "Путь к статичному файлу относительно поддиректории `private`."
     },
     {name: "asyncCallback",
      type: "Function",
