@@ -1922,44 +1922,44 @@ Template.api.email_send = {
   id: "email_send",
   name: "Email.send(options)",
   locus: "Сервер",
-  descr: ["Send an email. Throws an `Error` on failure to contact mail " +
-          "server or if mail server returns an error."],
+  descr: ["Отправляет email. Выбрасывает `Error` при неудачной попытке " +
+          "связаться с почтовым сервером или если почтовый сервер вернул ошибку."],
   options: [
     {name: "from",
      type: "String",
-     descr: rfc('"From:" address (required)')
+     descr: rfc('"From:" адрес (обязателен)')
     },
     {name: "to",
      type: "String or Array of strings",
-     descr: rfc('"To:" address[es]')
+     descr: rfc('"To:" адрес[а]')
     },
     {name: "cc",
      type: "String or Array of strings",
-     descr: rfc('"Cc:" address[es]')
+     descr: rfc('"Cc:" адрес[а]')
     },
     {name: "bcc",
      type: "String or Array of strings",
-     descr: rfc('"Bcc:" address[es]')
+     descr: rfc('"Bcc:" адрес[а]')
     },
     {name: "replyTo",
      type: "String or Array of strings",
-     descr: rfc('"Reply-To:" address[es]')
+     descr: rfc('"Reply-To:" адрес[а]')
     },
     {name: "subject",
      type: "String",
-     descr: rfc('"Subject:" line')
+     descr: rfc('"Subject"')
     },
     {name: "text",
      type: "String",
-     descr: rfc('mail body (plain text)')
+     descr: rfc('тело письма (обычный текст)')
     },
     {name: "html",
      type: "String",
-     descr: rfc('mail body (HTML)')
+     descr: rfc('тело письма (HTML)')
     },
     {name: "headers",
      type: "Object",
-     descr: rfc('custom headers (dictionary)')
+     descr: rfc('пользовательские заголовки (словарь)')
     }
   ]
 };
