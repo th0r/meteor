@@ -1968,18 +1968,17 @@ Template.api.assets_getText = {
   id: "assets_getText",
   name: "Assets.getText(assetPath, [asyncCallback])",
   locus: "Сервер",
-  descr: ["Retrieve the contents of the static server asset as a UTF8-encoded string."],
+  descr: ["Возвращает содержимое статичного файла в виде строки в кодировке UTF8."],
   args: [
     {name: "assetPath",
      type: "String",
-     descr: "The path of the asset, relative to the application's " +
-     "`private` subdirectory."
+     descr: "Путь к статичному файлу относительно поддиректории `private`."
     },
     {name: "asyncCallback",
      type: "Function",
-     descr: "Optional callback, which is called asynchronously with the error " +
-     "or result after the function is complete. If not provided, the function " +
-     "runs synchronously."
+     descr: "Опциональный коллбэк, который вызывается асинхронно с ошибкой " +
+     "или результатом после выполнения функции. Если этот параметр не указан, " +
+     "то функция выполняется синхронно."
     }
   ]
 };
@@ -1988,18 +1987,17 @@ Template.api.assets_getBinary = {
   id: "assets_getBinary",
   name: "Assets.getBinary(assetPath, [asyncCallback])",
   locus: "Сервер",
-  descr: ["Retrieve the contents of the static server asset as an [EJSON Binary](#ejson_new_binary)."],
+  descr: ["Возвращает содержимое статичного файла в виде [EJSON Binary](#ejson_new_binary)."],
   args: [
     {name: "assetPath",
      type: "String",
-     descr: "The path of the asset, relative to the application's " +
-     "`private` subdirectory."
+     descr: "Путь к статичному файлу относительно поддиректории `private`."
     },
     {name: "asyncCallback",
      type: "Function",
-     descr: "Optional callback, which is called asynchronously with the error " +
-     "or result after the function is complete. If not provided, the function " +
-     "runs synchronously."
+     descr: "Опциональный коллбэк, который вызывается асинхронно с ошибкой " +
+     "или результатом после выполнения функции. Если этот параметр не указан, " +
+     "то функция выполняется синхронно."
     }
   ]
 };
