@@ -59,14 +59,15 @@ Template.api.settings = {
   id: "meteor_settings",
   name: "Meteor.settings",
   locus: "Везде",
-  descr: ["`Meteor.settings` содержит настройки приложения. Их можно указать " +
-          "либо передав опцию `--settings` (содержащую путь к JSON-файлу) " +
-          "команде `meteor run` или `meteor deploy`, либо указав их в переменной " +
-          "среды `METEOR_SETTINGS` в виде JSON-строки. Если вы не укажите " +
-          "никаких настроек, то `Meteor.settings` будет пустым объектом. Если " +
-          "объект содержит ключ `public`, то `Meteor.settings.public` будет " +
-          "доступен как на сервере, так и на клиенте. Все остальные ключи " +
-          "будут доступны только на сервере."]
+  descr: ["`Meteor.settings` содержит настройки приложения. Их можно указать, " +
+          "передав опцию `--settings` (содержащую путь к JSON-файлу) " +
+          "команде `meteor run` или `meteor deploy`. При запуске приложения " +
+          "напрямую (например, из пакета), эти настройки необходимо указать " +
+          "в переменной среды `METEOR_SETTINGS` в виде JSON-строки." +
+          "Если вы не укажите никаких настроек, то `Meteor.settings` будет " +
+          "пустым объектом. Если объект содержит ключ `public`, то " +
+          "`Meteor.settings.public` будет доступен как на сервере, так и на" +
+          "клиенте. Все остальные ключи будут доступны только на сервере."]
 };
 
 Template.api.release = {
@@ -1161,6 +1162,11 @@ Template.api.accounts_config = {
       name: "loginExpirationInDays",
       type: "Number",
       descr: "Количество дней после логина пользователя, спустя которое его токен будет инвалидирован и он будет разлогинен. По-умолчанию равняется 90. Укажите `null`, чтобы отключить срок действия логина."
+    },
+    {
+      name: "oauthSecretKey",
+      type: "String",
+      descr: "При использовании пакета `oauth-encryption` здесь указывается 16-ти байтовый ключ, необходимый для зашифровки конфиденциальных учетных данных, хранящихся в БД. Эту опция может быть указана только на сервере. Подробнее об этом можно узнать в файле packages/oauth-encryption/README.md."
     }
   ]
 };
@@ -1681,7 +1687,7 @@ Template.api.httpcall = {
   args: [
     {name: "method",
      type: "String",
-     descr: 'The HTTP method to use: "`GET`", "`POST`", "`PUT`", or "`DELETE`".'},
+     descr: 'The [HTTP method](http://en.wikipedia.org/wiki/HTTP_method) to use, such as "`GET`", "`POST`", or "`HEAD`".'},
     {name: "url",
      type: "String",
      descr: 'The URL to retrieve.'},
@@ -1716,7 +1722,7 @@ Template.api.httpcall = {
      descr: "Maximum time in milliseconds to wait for the request before failing.  There is no timeout by default."},
     {name: "followRedirects",
      type: "Boolean",
-     descr: "If true, transparently follow HTTP redirects.  Cannot be set to false on the client."}
+     descr: "If `true`, transparently follow HTTP redirects. Cannot be set to `false` on the client. Default `true`."}
   ]
 };
 

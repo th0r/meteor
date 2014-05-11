@@ -1711,6 +1711,11 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
         Session.set('errorMessage', err.reason || 'Unknown error');
     });
 
+Login service configuration is sent from the server to the client over DDP when
+your app starts up; you may not call the login function until the configuration
+is loaded. The function `Accounts.loginServicesConfigured()` is a reactive data
+source that will return true once the login service is configured; you should
+not make login buttons visible or active until it is true.
 
 
 {{> api_box currentUser}}
@@ -1861,7 +1866,15 @@ GitHub, выполните команду `$ meteor add accounts-github` и ис
 При каждой попытке логина вызываются все зарегистрированные колбэки, даже
 если один из них ее запретил. Но в этом случае для всех последующих колбэков
 поле `allowed` будет принимать значение `false`, т.к. данная попытка уже
-будет неудачной.
+будет неудачной. Это позволяет последуюшим колбэкам переопределять ошибки
+предыдущих. Например, заменить сообщение "Incorrect password" на любое другое.
+
+Тем колбэкам, которые не собираются заменять сообщения об ошибках, как правило,
+нет смысла отрабатывать в случае, когда попытка логина была уже запрещена.
+Поэтому такие колбэки должны начинаться с
+
+    if (!attempt.allowed)
+      return false;
 
 
 {{> api_box accounts_onLogin}}
