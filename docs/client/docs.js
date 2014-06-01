@@ -255,7 +255,8 @@ var toc = [
         "UI.body",
         "UI.render",
         "UI.renderWithData",
-        "UI.insert"
+        "UI.insert",
+        "UI.getElementData"
       ],
       {type: "spacer"},
       {name: "Карты событий", style: "noncode", id: "eventmaps"}

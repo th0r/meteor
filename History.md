@@ -1,6 +1,40 @@
 ## v.NEXT
 
 
+## v.0.8.1.3
+
+* Fix a security issue in the `spiderable` package. `spiderable` now
+  uses the ROOT_URL environment variable instead of the Host header to
+  determine which page to snapshot.
+
+* Fix hardcoded Twitter URL in `oauth1` package. This fixes a regression
+  in 0.8.0.1 that broke Atmosphere packages that do OAuth1
+  logins. #2154.
+
+* Add `credentialSecret` argument to `Google.retrieveCredential`, which
+  was forgotten in a previous release.
+
+* Remove nonexistent `-a` and `-r` aliases for `--add` and `--remove` in
+  `meteor help authorized`. #2155
+
+* Add missing `underscore` dependency in the `oauth-encryption` package. #2165
+
+* Fix minification bug that caused some apps to fail to render in IE8. #2037.
+
+
+## v.0.8.1.2
+
+* Fix memory leak (introduced in 0.8.1) by making sure to unregister
+  sessions at the server when they are closed due to heartbeat timeout.
+
+* Add `credentialSecret` argument to `Google.retrieveCredential`,
+  `Facebook.retrieveCredential`, etc., which is needed to use them as of
+  0.8.1. #2118
+
+* Fix 0.8.1 regression that broke apps using a `ROOT_URL` with a path
+  prefix. #2109
+
+
 ## v0.8.1.1
 
 * Fix 0.8.1 regression preventing clients from specifying `_id` on insert. #2097
